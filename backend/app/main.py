@@ -16,7 +16,7 @@ from app.models.application import Application
 from app.routes.users import router as users_router
 from app.routes.projects import router as projects_router
 from app.routes import opportunity
-
+from app.routes import application
 
 
 Base.metadata.create_all(bind=engine)
@@ -25,7 +25,9 @@ app = FastAPI()
 app.include_router(
     opportunity.router
 )
-
+app.include_router(
+    application.router
+)
 
 app.include_router(users_router)
 
