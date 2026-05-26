@@ -11,7 +11,7 @@ class ProjectCreate(BaseModel):
 
     project_type: str
 
-    owner_id: int
+    
 
 
 class ProjectResponse(BaseModel):

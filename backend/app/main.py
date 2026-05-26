@@ -17,11 +17,16 @@ from app.routes.users import router as users_router
 from app.routes.projects import router as projects_router
 from app.routes import opportunity
 from app.routes import application
+from app.routes import auth
+
 
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+app.include_router(
+    auth.router
+)
 app.include_router(
     opportunity.router
 )
