@@ -23,6 +23,7 @@ from app.utils.security import (
     create_access_token
 )
 
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
@@ -34,17 +35,28 @@ router = APIRouter(
     response_model=TokenResponse
 )
 def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
+
+    form_data:
+    OAuth2PasswordRequestForm
+    = Depends(),
+
+    db: Session =
+    Depends(get_db)
+
 ):
 
     user = (
+
         db.query(User)
+
         .filter(
-            User.email ==
+            User.email
+            ==
             form_data.username
         )
+
         .first()
+
     )
 
     if not user:
@@ -55,8 +67,11 @@ def login(
         )
 
     if not verify_password(
+
         form_data.password,
+
         user.password
+
     ):
 
         raise HTTPException(
@@ -65,12 +80,20 @@ def login(
         )
 
     token = create_access_token(
+
         {
-            "sub": user.email
+            "sub":
+            user.email
         }
+
     )
 
     return {
-        "access_token": token,
-        "token_type": "bearer"
+
+        "access_token":
+        token,
+
+        "token_type":
+        "bearer"
+
     }

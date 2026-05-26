@@ -1,14 +1,9 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
-
-from app.database import Base
 from sqlalchemy.orm import relationship
 
-skills = relationship(
-    "Skill",
-    secondary="user_skills"
-)
+from app.database import Base
 
 
 class User(Base):
@@ -35,7 +30,23 @@ class User(Base):
     bio = Column(
         String
     )
+
     password = Column(
-    String,
-    nullable=False
-)
+        String,
+        nullable=False
+    )
+
+    skills = relationship(
+        "UserSkill",
+        back_populates="user"
+    )
+
+    projects = relationship(
+        "Project",
+        back_populates="owner"
+    )
+
+    applications = relationship(
+        "Application",
+        back_populates="user"
+    )

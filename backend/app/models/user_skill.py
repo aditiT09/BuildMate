@@ -1,8 +1,10 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.database import Base
+
 
 class UserSkill(Base):
 
@@ -22,4 +24,14 @@ class UserSkill(Base):
     skill_id = Column(
         Integer,
         ForeignKey("skills.id")
+    )
+
+    user = relationship(
+        "User",
+        back_populates="skills"
+    )
+
+    skill = relationship(
+        "Skill",
+        back_populates="users"
     )

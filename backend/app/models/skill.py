@@ -1,14 +1,10 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
-
-from app.database import Base
 from sqlalchemy.orm import relationship
 
-users = relationship(
-    "User",
-    secondary="user_skills"
-)
+from app.database import Base
+
 
 class Skill(Base):
 
@@ -24,4 +20,14 @@ class Skill(Base):
         String,
         unique=True,
         nullable=False
+    )
+
+    users = relationship(
+        "UserSkill",
+        back_populates="skill"
+    )
+
+    projects = relationship(
+        "ProjectSkill",
+        back_populates="skill"
     )

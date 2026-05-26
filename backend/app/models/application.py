@@ -2,6 +2,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -29,4 +30,14 @@ class Application(Base):
     status = Column(
         String,
         default="pending"
+    )
+
+    user = relationship(
+        "User",
+        back_populates="applications"
+    )
+
+    opportunity = relationship(
+        "Opportunity",
+        back_populates="applications"
     )

@@ -3,6 +3,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -38,4 +39,19 @@ class Project(Base):
     owner_id = Column(
         Integer,
         ForeignKey("users.id")
+    )
+
+    owner = relationship(
+        "User",
+        back_populates="projects"
+    )
+
+    skills = relationship(
+        "ProjectSkill",
+        back_populates="project"
+    )
+
+    opportunities = relationship(
+        "Opportunity",
+        back_populates="project"
     )

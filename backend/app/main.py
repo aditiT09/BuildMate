@@ -18,12 +18,29 @@ from app.routes.projects import router as projects_router
 from app.routes import opportunity
 from app.routes import application
 from app.routes import auth
-
+from app.routes import matching
+from app.routes import skill
+from app.routes import user_skill
+from app.routes import project_skill
 
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+app.include_router(
+    project_skill.router
+)
+app.include_router(
+    user_skill.router
+)
+app.include_router(
+    skill.router
+)
+app.include_router(
+    matching.router
+)
+
+
 app.include_router(
     auth.router
 )

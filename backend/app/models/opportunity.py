@@ -2,6 +2,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -34,4 +35,14 @@ class Opportunity(Base):
     status = Column(
         String,
         default="open"
+    )
+
+    project = relationship(
+        "Project",
+        back_populates="opportunities"
+    )
+
+    applications = relationship(
+        "Application",
+        back_populates="opportunity"
     )
