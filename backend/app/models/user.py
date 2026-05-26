@@ -35,3 +35,7 @@ class User(Base):
     bio = Column(
         String
     )
+    password = Column(
+    String,
+    nullable=False
+)

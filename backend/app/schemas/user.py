@@ -9,6 +9,8 @@ class UserCreate(BaseModel):
 
     bio: str
 
+    password: str
+
 
 class UserResponse(BaseModel):
 
