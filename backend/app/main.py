@@ -22,11 +22,16 @@ from app.routes import matching
 from app.routes import skill
 from app.routes import user_skill
 from app.routes import project_skill
+from app.routes import recommendation
+
 
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+app.include_router(
+    recommendation.router
+)
 app.include_router(
     project_skill.router
 )

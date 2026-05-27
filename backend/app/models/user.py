@@ -50,3 +50,12 @@ class User(Base):
         "Application",
         back_populates="user"
     )
+    activity_score = Column(
+    Integer,
+    default=50
+)
+
+reliability_score = Column(
+    Integer,
+    default=50
+)
