@@ -45,7 +45,9 @@ def create_user(
             detail="Email already exists"
         )
 
-    return new_user
+        return {
+    "message": "user created"
+}
 @router.get("/users")
 def get_users(
 
