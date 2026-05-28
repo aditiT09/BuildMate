@@ -11,6 +11,8 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 from app.utils.security import hash_password
 from fastapi import Query
+from sqlalchemy.exc import IntegrityError
+from fastapi import HTTPException
 
 
 router = APIRouter()
@@ -23,23 +25,25 @@ def create_user(
 ):
 
     new_user = User(
-
-    name=user.name,
-
-    email=user.email,
-
-    bio=user.bio,
-
-    password=hash_password(
-        user.password
+        name=user.name,
+        email=user.email,
+        bio=user.bio,
+        password=hash_password(user.password)
     )
-)
 
-    db.add(new_user)
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
 
-    db.commit()
+    except IntegrityError:
 
-    db.refresh(new_user)
+        db.rollback()
+
+        raise HTTPException(
+            status_code=400,
+            detail="Email already exists"
+        )
 
     return new_user
 @router.get("/users")
