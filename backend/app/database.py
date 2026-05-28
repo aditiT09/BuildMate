@@ -4,7 +4,7 @@ from sqlalchemy.orm import declarative_base
 
 
 DATABASE_URL = (
-    "postgresql://postgres:Aditi0909#@localhost:5432/BuildMate"
+    "postgresql://postgres:Aditi0909#@host.docker.internal/BuildMate"
 )
 
 
