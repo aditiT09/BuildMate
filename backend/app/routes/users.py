@@ -3,12 +3,14 @@ from fastapi import Depends
 
 from sqlalchemy.orm import Session
 
+
 from app.database import get_db
 
 from app.models.user import User
 
 from app.schemas.user import UserCreate
 from app.utils.security import hash_password
+from fastapi import Query
 
 
 router = APIRouter()
@@ -42,11 +44,17 @@ def create_user(
     return new_user
 @router.get("/users")
 def get_users(
+
+    limit: int = Query(10, le=100),
+    offset: int = 0,
+
     db: Session = Depends(get_db)
+
 ):
 
-    users = db.query(
-        User
-    ).all()
+    users = db.query(User)\
+        .offset(offset)\
+        .limit(limit)\
+        .all()
 
     return users

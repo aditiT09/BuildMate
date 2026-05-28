@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 
 from app.models.skill import Skill
+from fastapi import Query
 
 router = APIRouter(
     prefix="/skills",
@@ -47,13 +48,19 @@ def create_skill(
     return skill
 
 
-@router.get("/")
+@router.get("/skills")
 def get_skills(
+
+    limit: int = Query(10, le=100),
+    offset: int = 0,
 
     db: Session = Depends(get_db)
 
 ):
 
-    return db.query(
-        Skill
-    ).all()
+    skills = db.query(Skill)\
+        .offset(offset)\
+        .limit(limit)\
+        .all()
+
+    return skills

@@ -16,6 +16,7 @@ from app.schemas.project import (
     ProjectCreate,
     ProjectResponse
 )
+from fastapi import Query
 
 router = APIRouter()
 
@@ -59,17 +60,22 @@ def create_project(
     return new_project
 
 
-@router.get(
-    "/projects",
-    response_model=list[ProjectResponse]
-)
+@router.get("/projects")
 def get_projects(
+
+    limit: int = Query(10, le=100),
+    offset: int = 0,
 
     db: Session = Depends(get_db)
 
 ):
 
-    return db.query(Project).all()
+    projects = db.query(Project)\
+        .offset(offset)\
+        .limit(limit)\
+        .all()
+
+    return projects
 
 
 @router.put(

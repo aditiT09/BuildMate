@@ -12,6 +12,7 @@ from app.models.project_skill import (
 from app.schemas.project_skill import (
     ProjectSkillCreate
 )
+from app.utils.redis_client import redis_client
 
 router = APIRouter(
 
@@ -78,6 +79,7 @@ def add_project_skill(
     )
 
     db.commit()
+    redis_client.flushall()
 
     db.refresh(
         project_skill

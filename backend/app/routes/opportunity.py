@@ -7,6 +7,7 @@ from app.schemas.opportunity import (
     OpportunityCreate,
     OpportunityResponse
 )
+from fastapi import Query
 
 router = APIRouter(
     prefix="/opportunities",
@@ -38,18 +39,20 @@ def create_opportunity(
     db.refresh(new_opportunity)
 
     return new_opportunity
-@router.get(
-    "/",
-    response_model=list[OpportunityResponse]
-)
+@router.get("/opportunities")
 def get_opportunities(
+
+    limit: int = Query(10, le=100),
+    offset: int = 0,
+
     db: Session = Depends(get_db)
+
 ):
 
-    opportunities = (
-        db.query(Opportunity)
+    opportunities = db.query(Opportunity)\
+        .offset(offset)\
+        .limit(limit)\
         .all()
-    )
 
     return opportunities
 @router.put(

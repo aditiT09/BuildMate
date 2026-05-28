@@ -9,6 +9,7 @@ from app.schemas.application import (
     ApplicationCreate,
     ApplicationResponse
 )
+from fastapi import Query
 router = APIRouter(
     prefix="/applications",
     tags=["Applications"]
@@ -35,18 +36,20 @@ def create_application(
     db.refresh(new_application)
 
     return new_application
-@router.get(
-    "/",
-    response_model=list[ApplicationResponse]
-)
+@router.get("/applications")
 def get_applications(
+
+    limit: int = Query(10, le=100),
+    offset: int = 0,
+
     db: Session = Depends(get_db)
+
 ):
 
-    applications = (
-        db.query(Application)
+    applications = db.query(Application)\
+        .offset(offset)\
+        .limit(limit)\
         .all()
-    )
 
     return applications
 

@@ -8,6 +8,7 @@ from app.models.user_skill import UserSkill
 from app.schemas.user_skill import UserSkillCreate
 
 from app.utils.security import get_current_user
+from app.utils.redis_client import redis_client
 
 
 router = APIRouter(
@@ -42,6 +43,7 @@ def add_skill(
     )
 
     db.commit()
+    redis_client.flushall()
 
     db.refresh(
         new_skill
