@@ -1,8 +1,8 @@
-"""projects table
+"""initial docker schema
 
-Revision ID: 88a896377774
-Revises: d5744a0c35d9
-Create Date: 2026-05-25 08:49:29.059814
+Revision ID: d8ed2873e178
+Revises: 
+Create Date: 2026-05-28 07:00:35.494378
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '88a896377774'
-down_revision: Union[str, Sequence[str], None] = 'd5744a0c35d9'
+revision: str = 'd8ed2873e178'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
