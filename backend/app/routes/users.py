@@ -37,16 +37,16 @@ def create_user(
 
         db.refresh(new_user)
 
-        return {
-            "message": "user created"
-        }
+        return new_user
 
-    except Exception as e:
+    except Exception:
 
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
+     db.rollback()
+
+    raise HTTPException(
+        status_code=500,
+        detail="Something went wrong"
+    )
 @router.get("/users")
 def get_users(
 
