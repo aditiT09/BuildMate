@@ -16,38 +16,37 @@ from fastapi import HTTPException
 
 
 router = APIRouter()
-
-
 @router.post("/users")
 def create_user(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
 
-    new_user = User(
-        name=user.name,
-        email=user.email,
-        bio=user.bio,
-        password=hash_password(user.password)
-    )
-
     try:
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
 
-    except IntegrityError:
-
-        db.rollback()
-
-        raise HTTPException(
-            status_code=400,
-            detail="Email already exists"
+        new_user = User(
+            name=user.name,
+            email=user.email,
+            bio=user.bio,
+            password=hash_password(user.password)
         )
 
+        db.add(new_user)
+
+        db.commit()
+
+        db.refresh(new_user)
+
         return {
-    "message": "user created"
-}
+            "message": "user created"
+        }
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 @router.get("/users")
 def get_users(
 
