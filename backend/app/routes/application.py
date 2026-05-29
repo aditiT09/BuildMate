@@ -1,32 +1,73 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 
 from app.models.application import Application
+from app.models.opportunity import Opportunity
+from app.models.project import Project
+from app.models.user import User
 
 from app.schemas.application import (
     ApplicationCreate,
     ApplicationResponse
 )
-from fastapi import Query
+
+from app.utils.security import get_current_user
+
+
 router = APIRouter(
     prefix="/applications",
     tags=["Applications"]
 )
+
+
 @router.post(
     "/",
     response_model=ApplicationResponse
 )
 def create_application(
     application: ApplicationCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
 
+    opportunity = (
+        db.query(Opportunity)
+        .filter(
+            Opportunity.id == application.opportunity_id
+        )
+        .first()
+    )
+
+    if not opportunity:
+        raise HTTPException(
+            status_code=404,
+            detail="Opportunity not found"
+        )
+
+    existing_application = (
+        db.query(Application)
+        .filter(
+            Application.user_id == current_user.id,
+            Application.opportunity_id == application.opportunity_id
+        )
+        .first()
+    )
+
+    if existing_application:
+        raise HTTPException(
+            status_code=400,
+            detail="Already applied"
+        )
+
     new_application = Application(
-        user_id=application.user_id,
+        user_id=current_user.id,
         opportunity_id=application.opportunity_id,
-        status=application.status
+        status="pending"
     )
 
     db.add(new_application)
@@ -36,31 +77,85 @@ def create_application(
     db.refresh(new_application)
 
     return new_application
-@router.get("/applications")
-def get_applications(
 
-    limit: int = Query(10, le=100),
-    offset: int = 0,
 
-    db: Session = Depends(get_db)
-
+@router.get(
+    "/me",
+    response_model=list[ApplicationResponse]
+)
+def get_my_applications(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
 
-    applications = db.query(Application)\
-        .offset(offset)\
-        .limit(limit)\
+    applications = (
+        db.query(Application)
+        .filter(
+            Application.user_id == current_user.id
+        )
         .all()
+    )
 
     return applications
 
+
+@router.get(
+    "/opportunity/{opportunity_id}",
+    response_model=list[ApplicationResponse]
+)
+def get_opportunity_applications(
+    opportunity_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    opportunity = (
+        db.query(Opportunity)
+        .filter(
+            Opportunity.id == opportunity_id
+        )
+        .first()
+    )
+
+    if not opportunity:
+        raise HTTPException(
+            status_code=404,
+            detail="Opportunity not found"
+        )
+
+    project = (
+        db.query(Project)
+        .filter(
+            Project.id == opportunity.project_id
+        )
+        .first()
+    )
+
+    if project.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
+        )
+
+    applications = (
+        db.query(Application)
+        .filter(
+            Application.opportunity_id == opportunity_id
+        )
+        .all()
+    )
+
+    return applications
+
+
 @router.put(
-    "/{application_id}",
+    "/{application_id}/accept",
     response_model=ApplicationResponse
 )
-def update_application(
+def accept_application(
     application_id: int,
-    updated: ApplicationCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
 
     application = (
@@ -77,21 +172,45 @@ def update_application(
             detail="Application not found"
         )
 
-    application.user_id = updated.user_id
-    application.opportunity_id = updated.opportunity_id
-    application.status = updated.status
+    opportunity = (
+        db.query(Opportunity)
+        .filter(
+            Opportunity.id == application.opportunity_id
+        )
+        .first()
+    )
+
+    project = (
+        db.query(Project)
+        .filter(
+            Project.id == opportunity.project_id
+        )
+        .first()
+    )
+
+    if project.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
+        )
+
+    application.status = "accepted"
 
     db.commit()
 
     db.refresh(application)
 
     return application
-@router.delete(
-    "/{application_id}"
+
+
+@router.put(
+    "/{application_id}/reject",
+    response_model=ApplicationResponse
 )
-def delete_application(
+def reject_application(
     application_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
 
     application = (
@@ -108,11 +227,32 @@ def delete_application(
             detail="Application not found"
         )
 
-    db.delete(application)
+    opportunity = (
+        db.query(Opportunity)
+        .filter(
+            Opportunity.id == application.opportunity_id
+        )
+        .first()
+    )
+
+    project = (
+        db.query(Project)
+        .filter(
+            Project.id == opportunity.project_id
+        )
+        .first()
+    )
+
+    if project.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
+        )
+
+    application.status = "rejected"
 
     db.commit()
 
-    return {
-        "message":
-        "Application deleted"
-    }
+    db.refresh(application)
+
+    return application

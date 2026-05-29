@@ -2,9 +2,7 @@ from pydantic import BaseModel
 
 
 class ApplicationCreate(BaseModel):
-    user_id: int
     opportunity_id: int
-    status: str = "pending"
 
 
 class ApplicationResponse(BaseModel):
