@@ -8,7 +8,6 @@ from app.database import Base
 
 
 class Application(Base):
-
     __tablename__ = "applications"
 
     id = Column(
@@ -19,12 +18,14 @@ class Application(Base):
 
     user_id = Column(
         Integer,
-        ForeignKey("users.id")
+        ForeignKey("users.id"),
+        nullable=False
     )
 
     opportunity_id = Column(
         Integer,
-        ForeignKey("opportunities.id")
+        ForeignKey("opportunities.id"),
+        nullable=False
     )
 
     status = Column(

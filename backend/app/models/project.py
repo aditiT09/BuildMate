@@ -9,7 +9,6 @@ from app.database import Base
 
 
 class Project(Base):
-
     __tablename__ = "projects"
 
     id = Column(
@@ -38,7 +37,8 @@ class Project(Base):
 
     owner_id = Column(
         Integer,
-        ForeignKey("users.id")
+        ForeignKey("users.id"),
+        nullable=False
     )
 
     owner = relationship(
@@ -48,10 +48,12 @@ class Project(Base):
 
     skills = relationship(
         "ProjectSkill",
-        back_populates="project"
+        back_populates="project",
+        cascade="all, delete-orphan"
     )
 
     opportunities = relationship(
         "Opportunity",
-        back_populates="project"
+        back_populates="project",
+        cascade="all, delete-orphan"
     )

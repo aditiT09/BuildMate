@@ -8,7 +8,6 @@ from app.database import Base
 
 
 class Opportunity(Base):
-
     __tablename__ = "opportunities"
 
     id = Column(
@@ -24,7 +23,8 @@ class Opportunity(Base):
 
     project_id = Column(
         Integer,
-        ForeignKey("projects.id")
+        ForeignKey("projects.id"),
+        nullable=False
     )
 
     seats = Column(
@@ -44,5 +44,6 @@ class Opportunity(Base):
 
     applications = relationship(
         "Application",
-        back_populates="opportunity"
+        back_populates="opportunity",
+        cascade="all, delete-orphan"
     )

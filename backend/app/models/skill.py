@@ -7,7 +7,6 @@ from app.database import Base
 
 
 class Skill(Base):
-
     __tablename__ = "skills"
 
     id = Column(
@@ -24,10 +23,12 @@ class Skill(Base):
 
     users = relationship(
         "UserSkill",
-        back_populates="skill"
+        back_populates="skill",
+        cascade="all, delete-orphan"
     )
 
     projects = relationship(
         "ProjectSkill",
-        back_populates="skill"
+        back_populates="skill",
+        cascade="all, delete-orphan"
     )

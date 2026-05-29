@@ -7,7 +7,6 @@ from app.database import Base
 
 
 class ProjectSkill(Base):
-
     __tablename__ = "project_skills"
 
     id = Column(
@@ -18,12 +17,14 @@ class ProjectSkill(Base):
 
     project_id = Column(
         Integer,
-        ForeignKey("projects.id")
+        ForeignKey("projects.id"),
+        nullable=False
     )
 
     skill_id = Column(
         Integer,
-        ForeignKey("skills.id")
+        ForeignKey("skills.id"),
+        nullable=False
     )
 
     project = relationship(

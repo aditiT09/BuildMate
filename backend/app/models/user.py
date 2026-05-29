@@ -7,33 +7,22 @@ from app.database import Base
 
 
 class User(Base):
-
     __tablename__ = "users"
 
-    id = Column(
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    bio = Column(String)
+    password = Column(String, nullable=False)
+
+    activity_score = Column(
         Integer,
-        primary_key=True,
-        index=True
+        default=50
     )
 
-    name = Column(
-        String,
-        nullable=False
-    )
-
-    email = Column(
-        String,
-        unique=True,
-        nullable=False
-    )
-
-    bio = Column(
-        String
-    )
-
-    password = Column(
-        String,
-        nullable=False
+    reliability_score = Column(
+        Integer,
+        default=50
     )
 
     skills = relationship(
@@ -50,12 +39,3 @@ class User(Base):
         "Application",
         back_populates="user"
     )
-    activity_score = Column(
-    Integer,
-    default=50
-)
-
-reliability_score = Column(
-    Integer,
-    default=50
-)

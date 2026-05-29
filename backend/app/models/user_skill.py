@@ -7,7 +7,6 @@ from app.database import Base
 
 
 class UserSkill(Base):
-
     __tablename__ = "user_skills"
 
     id = Column(
@@ -18,12 +17,14 @@ class UserSkill(Base):
 
     user_id = Column(
         Integer,
-        ForeignKey("users.id")
+        ForeignKey("users.id"),
+        nullable=False
     )
 
     skill_id = Column(
         Integer,
-        ForeignKey("skills.id")
+        ForeignKey("skills.id"),
+        nullable=False
     )
 
     user = relationship(
