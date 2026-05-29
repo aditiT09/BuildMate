@@ -1,13 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import Query
+
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+
 from app.models.opportunity import Opportunity
+from app.models.project import Project
+from app.models.user import User
+
 from app.schemas.opportunity import (
     OpportunityCreate,
     OpportunityResponse
 )
-from fastapi import Query
+
+from app.utils.security import get_current_user
+
 
 router = APIRouter(
     prefix="/opportunities",
@@ -15,15 +25,35 @@ router = APIRouter(
 )
 
 
-# STEP 3 POST API GOES HERE
 @router.post(
     "/",
     response_model=OpportunityResponse
 )
 def create_opportunity(
     opportunity: OpportunityCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
+
+    project = (
+        db.query(Project)
+        .filter(
+            Project.id == opportunity.project_id
+        )
+        .first()
+    )
+
+    if not project:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found"
+        )
+
+    if project.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
+        )
 
     new_opportunity = Opportunity(
         role=opportunity.role,
@@ -39,29 +69,34 @@ def create_opportunity(
     db.refresh(new_opportunity)
 
     return new_opportunity
-@router.get("/opportunities")
-def get_opportunities(
 
+
+@router.get(
+    "/",
+    response_model=list[OpportunityResponse]
+)
+def get_opportunities(
     limit: int = Query(10, le=100),
     offset: int = 0,
-
     db: Session = Depends(get_db)
-
 ):
 
-    opportunities = db.query(Opportunity)\
-        .offset(offset)\
-        .limit(limit)\
+    opportunities = (
+        db.query(Opportunity)
+        .offset(offset)
+        .limit(limit)
         .all()
+    )
 
     return opportunities
-@router.put(
+
+
+@router.get(
     "/{opportunity_id}",
     response_model=OpportunityResponse
 )
-def update_opportunity(
+def get_opportunity(
     opportunity_id: int,
-    updated: OpportunityCreate,
     db: Session = Depends(get_db)
 ):
 
@@ -77,6 +112,48 @@ def update_opportunity(
         raise HTTPException(
             status_code=404,
             detail="Opportunity not found"
+        )
+
+    return opportunity
+
+
+@router.put(
+    "/{opportunity_id}",
+    response_model=OpportunityResponse
+)
+def update_opportunity(
+    opportunity_id: int,
+    updated: OpportunityCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    opportunity = (
+        db.query(Opportunity)
+        .filter(
+            Opportunity.id == opportunity_id
+        )
+        .first()
+    )
+
+    if not opportunity:
+        raise HTTPException(
+            status_code=404,
+            detail="Opportunity not found"
+        )
+
+    project = (
+        db.query(Project)
+        .filter(
+            Project.id == opportunity.project_id
+        )
+        .first()
+    )
+
+    if project.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
         )
 
     opportunity.role = updated.role
@@ -89,12 +166,15 @@ def update_opportunity(
     db.refresh(opportunity)
 
     return opportunity
+
+
 @router.delete(
     "/{opportunity_id}"
 )
 def delete_opportunity(
     opportunity_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
 
     opportunity = (
@@ -111,11 +191,24 @@ def delete_opportunity(
             detail="Opportunity not found"
         )
 
+    project = (
+        db.query(Project)
+        .filter(
+            Project.id == opportunity.project_id
+        )
+        .first()
+    )
+
+    if project.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
+        )
+
     db.delete(opportunity)
 
     db.commit()
 
     return {
-        "message":
-        "Opportunity deleted"
+        "message": "Opportunity deleted"
     }
