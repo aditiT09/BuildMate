@@ -10,6 +10,7 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
 from app.utils.security import hash_password
+from app.utils.security import get_current_user
 
 
 router = APIRouter()
@@ -70,3 +71,8 @@ def get_users(
     )
 
     return users
+@router.get("/users/me")
+def get_me(
+    current_user: User = Depends(get_current_user)
+):
+    return current_user
