@@ -2,6 +2,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -9,6 +10,14 @@ from app.database import Base
 
 class Application(Base):
     __tablename__ = "applications"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "opportunity_id",
+            name="uq_application"
+        ),
+    )
 
     id = Column(
         Integer,

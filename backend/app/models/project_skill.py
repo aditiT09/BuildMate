@@ -1,6 +1,7 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -8,6 +9,14 @@ from app.database import Base
 
 class ProjectSkill(Base):
     __tablename__ = "project_skills"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "project_id",
+            "skill_id",
+            name="uq_project_skill"
+        ),
+    )
 
     id = Column(
         Integer,
