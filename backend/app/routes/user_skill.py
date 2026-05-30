@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
@@ -29,6 +29,31 @@ def add_skill(
     )
 
 ):
+    existing = (
+
+    db.query(UserSkill)
+
+    .filter(
+
+        UserSkill.user_id == current_user.id,
+
+        UserSkill.skill_id == skill.skill_id
+
+    )
+
+    .first()
+
+)
+
+    if existing:
+
+     raise HTTPException(
+
+        status_code=400,
+
+        detail="Skill already added"
+
+    )
 
     new_skill = UserSkill(
 
@@ -43,7 +68,10 @@ def add_skill(
     )
 
     db.commit()
-    redis_client.flushall()
+    try:
+     redis_client.flushall()
+    except Exception:
+        pass
 
     db.refresh(
         new_skill

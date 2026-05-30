@@ -76,8 +76,11 @@ def create_application(
 
     db.refresh(new_application)
 
-    return new_application
+    current_user.activity_score += 2
 
+    db.commit()
+
+    return new_application
 
 @router.get(
     "/me",
@@ -195,6 +198,7 @@ def accept_application(
         )
 
     application.status = "accepted"
+    application.user.reliability_score += 5
 
     db.commit()
 
@@ -250,6 +254,10 @@ def reject_application(
         )
 
     application.status = "rejected"
+    application.user.reliability_score = max(
+    0,
+    application.user.reliability_score - 1
+)
 
     db.commit()
 

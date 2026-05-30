@@ -23,12 +23,24 @@ from app.routes import skill
 from app.routes import user_skill
 from app.routes import project_skill
 from app.routes import recommendation
-
-
-
-
-
+from app.routes import analytics
+from app.routes import ranking
+from app.routes import explanation
+from app.routes import applicant_ranking
 app = FastAPI()
+app.include_router(
+    applicant_ranking.router
+)
+app.include_router(
+    explanation.router
+)
+app.include_router(
+    ranking.router
+)
+
+
+app.include_router(analytics.router)
+
 app.include_router(
     recommendation.router
 )

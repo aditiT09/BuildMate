@@ -16,10 +16,16 @@ def get_project_matches(
 
     cache_key = f"project_matches:{project_id}"
 
-    cached_data = redis_client.get(cache_key)
+    try:
 
-    if cached_data:
+      cached_data = redis_client.get(cache_key)
+
+      if cached_data:
         return json.loads(cached_data)
+
+    except Exception as e:
+
+      print("Redis Error:", e)
 
     project = db.query(
         Project
@@ -35,12 +41,9 @@ def get_project_matches(
         )
 
     project_skill_ids = {
-
-        skill.id
-
-        for skill in project.skills
-
-    }
+    skill.skill_id
+    for skill in project.skills
+}
 
     users = db.query(
         User
@@ -51,13 +54,9 @@ def get_project_matches(
     for user in users:
 
         user_skill_ids = {
-
-            skill.id
-
-            for skill in user.skills
-
-        }
-
+          skill.skill_id
+          for skill in user.skills
+}
         common_skills = len(
 
             project_skill_ids
@@ -104,10 +103,16 @@ def get_project_matches(
         reverse=True
     )
 
-    redis_client.setex(
+    try:
+
+     redis_client.setex(
         cache_key,
         3600,
         json.dumps(matches)
     )
+
+    except Exception as e:
+
+     print("Redis Error:", e)
 
     return matches

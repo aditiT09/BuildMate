@@ -69,6 +69,7 @@ def create_opportunity(
     db.refresh(new_opportunity)
 
     return new_opportunity
+    
 
 
 @router.get(

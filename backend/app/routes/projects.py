@@ -56,6 +56,7 @@ def create_project(
     db.commit()
 
     db.refresh(new_project)
+    
 
     return new_project
 
