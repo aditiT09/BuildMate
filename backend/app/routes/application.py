@@ -175,6 +175,12 @@ def accept_application(
             detail="Application not found"
         )
 
+    if application.status != "pending":
+        raise HTTPException(
+            status_code=400,
+            detail="Application already processed"
+        )
+
     opportunity = (
         db.query(Opportunity)
         .filter(
@@ -205,8 +211,6 @@ def accept_application(
     db.refresh(application)
 
     return application
-
-
 @router.put(
     "/{application_id}/reject",
     response_model=ApplicationResponse
@@ -229,6 +233,12 @@ def reject_application(
         raise HTTPException(
             status_code=404,
             detail="Application not found"
+        )
+
+    if application.status != "pending":
+        raise HTTPException(
+            status_code=400,
+            detail="Application already processed"
         )
 
     opportunity = (
@@ -254,13 +264,15 @@ def reject_application(
         )
 
     application.status = "rejected"
+
     application.user.reliability_score = max(
-    0,
-    application.user.reliability_score - 1
-)
+        0,
+        application.user.reliability_score - 1
+    )
 
     db.commit()
 
     db.refresh(application)
 
     return application
+   
