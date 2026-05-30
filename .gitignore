@@ -2,14 +2,21 @@
 backend/venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+
+# Environment files
+.env
+
+# FastAPI / Alembic
+alembic/__pycache__/
+
+# SQLite
+*.sqlite3
 
 # Node
 frontend/node_modules/
 
-# Env files
-.env
-
-# Build
+# Build files
 dist/
 build/
 
@@ -17,5 +24,8 @@ build/
 .vscode/
 .idea/
 
-# OS
+# OS files
 .DS_Store
+
+# Docker override
+docker-compose.override.yml

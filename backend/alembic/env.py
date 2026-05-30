@@ -23,9 +23,7 @@ config.set_main_option(
     settings.DATABASE_URL
 )
 
-print("\nALEMBIC DATABASE URL:")
-print(settings.DATABASE_URL)
-print()
+
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
