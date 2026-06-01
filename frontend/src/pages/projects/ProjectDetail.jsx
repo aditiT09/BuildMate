@@ -124,6 +124,16 @@ const handleApply = async () => {
           >
             {applying ? "Applying..." : "Apply"}
           </button>
+          <button
+  onClick={() =>
+    navigate(
+      `/projects/${id}/create-opportunity`
+    )
+  }
+  className="border border-green-600 text-green-600 px-6 py-3 rounded-xl"
+>
+  Create Opportunity
+</button>
 
           <button
             onClick={() => navigate(`/projects/${id}/matches`)}

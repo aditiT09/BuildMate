@@ -15,6 +15,7 @@ import ProjectDetail from "../pages/projects/ProjectDetail";
 import MatchResults from "../pages/matching/MatchResults";
 import MyApplications from "../pages/applications/MyApplications";
 import CreateProject from "../pages/projects/CreateProject";
+import CreateOpportunity from "../pages/opportunities/CreateOpportunity";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -29,6 +30,10 @@ function AppRoutes() {
           path="/register"
           element={<Register />}
         />
+        <Route
+  path="/projects/:id/create-opportunity"
+  element={<CreateOpportunity />}
+/>
 
         <Route
           path="/"
