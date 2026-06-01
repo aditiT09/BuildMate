@@ -5,6 +5,8 @@ import { getProjectById } from "../../api/projects";
 import { createApplication } from "../../api/applications";
 import { getProjectOpportunities } from "../../api/opportunities";
 
+import Layout from "../../components/layout/Layout";
+
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();

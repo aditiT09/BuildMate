@@ -14,6 +14,7 @@ import ProjectSwipe from "../pages/discover/ProjectSwipe";
 import ProjectDetail from "../pages/projects/ProjectDetail";
 import MatchResults from "../pages/matching/MatchResults";
 import MyApplications from "../pages/applications/MyApplications";
+import CreateProject from "../pages/projects/CreateProject";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -55,6 +56,10 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/create-project"
+  element={<CreateProject />}
+/>
         <Route
   path="/applications"
   element={<MyApplications />}

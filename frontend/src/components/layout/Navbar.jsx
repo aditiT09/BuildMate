@@ -29,6 +29,9 @@ export default function Navbar() {
           <Link to="/applications">
             My Applications
           </Link>
+          <Link to="/create-project">
+  Create Project
+</Link>
 
           <button
             onClick={handleLogout}
