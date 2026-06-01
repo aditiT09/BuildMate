@@ -6,10 +6,12 @@ import {
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
-
 import Dashboard from "../pages/dashboard/Dashboard";
 
 import ProtectedRoute from "../components/layout/ProtectedRoute";
+
+import ProjectSwipe from "../pages/discover/ProjectSwipe";
+import ProjectDetail from "../pages/projects/ProjectDetail";
 
 function AppRoutes() {
   return (
@@ -31,6 +33,24 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/discover"
+          element={
+            <ProtectedRoute>
+              <ProjectSwipe />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projects/:id"
+          element={
+            <ProtectedRoute>
+              <ProjectDetail />
             </ProtectedRoute>
           }
         />
