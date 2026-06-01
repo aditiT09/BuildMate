@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { getProjectById } from "../../api/projects";
+import { createApplication } from "../../api/applications";
+import { getProjectOpportunities } from "../../api/opportunities";
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -9,21 +11,54 @@ export default function ProjectDetail() {
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [opportunities, setOpportunities] = useState([]);
+  const [applying, setApplying] = useState(false);
   useEffect(() => {
     loadProject();
   }, [id]);
 
   const loadProject = async () => {
-    try {
-      const data = await getProjectById(id);
-      setProject(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+  try {
+    const data = await getProjectById(id);
+
+    setProject(data);
+
+    const opps =
+      await getProjectOpportunities(id);
+
+    setOpportunities(opps);
+
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+const handleApply = async () => {
+  try {
+    setApplying(true);
+
+    if (opportunities.length === 0) {
+      alert("No open opportunities");
+      return;
     }
-  };
+
+    await createApplication(
+      opportunities[0].id
+    );
+
+    alert("Application submitted!");
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error?.response?.data?.detail ||
+      "Failed to apply"
+    );
+  } finally {
+    setApplying(false);
+  }
+};
 
   if (loading) {
     return (
@@ -79,9 +114,13 @@ export default function ProjectDetail() {
 
     <div className="flex gap-4 mt-8">
 
-      <button className="bg-[#E35336] text-white px-6 py-3 rounded-xl">
-        Apply
-      </button>
+    <button
+  onClick={handleApply}
+  disabled={applying}
+  className="bg-[#E35336] text-white px-6 py-3 rounded-xl"
+>
+  {applying ? "Applying..." : "Apply"}
+</button>
 
       <button
   onClick={() => navigate(`/projects/${id}/matches`)}
