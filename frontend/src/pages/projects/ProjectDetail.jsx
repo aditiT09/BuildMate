@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { getProjectById } from "../../api/projects";
 
 export default function ProjectDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -82,9 +83,12 @@ export default function ProjectDetail() {
         Apply
       </button>
 
-      <button className="border border-[#A0522D] text-[#A0522D] px-6 py-3 rounded-xl">
-        View Matches
-      </button>
+      <button
+  onClick={() => navigate(`/projects/${id}/matches`)}
+  className="border border-[#A0522D] text-[#A0522D] px-6 py-3 rounded-xl hover:bg-[#FBF8F2]"
+>
+  View Matches
+</button>
 
     </div>
 

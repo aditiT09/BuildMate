@@ -12,7 +12,8 @@ import ProtectedRoute from "../components/layout/ProtectedRoute";
 
 import ProjectSwipe from "../pages/discover/ProjectSwipe";
 import ProjectDetail from "../pages/projects/ProjectDetail";
-
+import MatchResults from "../pages/matching/MatchResults";
+import MyApplications from "../pages/applications/MyApplications";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -54,6 +55,18 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/applications"
+  element={<MyApplications />}
+/>
+        <Route
+  path="/projects/:id/matches"
+  element={
+    <ProtectedRoute>
+      <MatchResults />
+    </ProtectedRoute>
+  }
+/>
 
       </Routes>
     </BrowserRouter>
