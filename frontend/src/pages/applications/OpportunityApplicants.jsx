@@ -1,0 +1,122 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
+import Layout from "../../components/layout/Layout";
+
+import {
+  getOpportunityApplications,
+  acceptApplication,
+  rejectApplication,
+} from "../../api/applications";
+
+export default function OpportunityApplicants() {
+  const { opportunityId } = useParams();
+
+  const [applications, setApplications] =
+    useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadApplications();
+  }, []);
+
+  const loadApplications = async () => {
+    try {
+      const data =
+        await getOpportunityApplications(
+          opportunityId
+        );
+
+      setApplications(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAccept = async (id) => {
+    try {
+      await acceptApplication(id);
+
+      loadApplications();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      await rejectApplication(id);
+
+      loadApplications();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div>Loading...</div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <div className="max-w-5xl mx-auto">
+
+        <h1 className="text-4xl font-bold mb-8">
+          Applicants
+        </h1>
+
+        <div className="space-y-4">
+
+          {applications.map((app) => (
+            <div
+              key={app.id}
+              className="bg-white p-5 rounded-xl shadow"
+            >
+              <h2 className="text-xl font-bold">
+                Applicant #{app.user_id}
+              </h2>
+
+              <p>
+                Status: {app.status}
+              </p>
+
+              {app.status === "pending" && (
+                <div className="flex gap-3 mt-4">
+
+                  <button
+                    onClick={() =>
+                      handleAccept(app.id)
+                    }
+                    className="bg-green-600 text-white px-4 py-2 rounded"
+                  >
+                    Accept
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      handleReject(app.id)
+                    }
+                    className="bg-red-600 text-white px-4 py-2 rounded"
+                  >
+                    Reject
+                  </button>
+
+                </div>
+              )}
+
+            </div>
+          ))}
+
+        </div>
+
+      </div>
+    </Layout>
+  );
+}

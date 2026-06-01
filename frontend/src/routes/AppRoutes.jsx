@@ -16,6 +16,8 @@ import MatchResults from "../pages/matching/MatchResults";
 import MyApplications from "../pages/applications/MyApplications";
 import CreateProject from "../pages/projects/CreateProject";
 import CreateOpportunity from "../pages/opportunities/CreateOpportunity";
+import OpportunityApplicants
+from "../pages/applications/OpportunityApplicants";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -24,17 +26,46 @@ function AppRoutes() {
         <Route
           path="/login"
           element={<Login />}
+
         />
+      
 
         <Route
           path="/register"
           element={<Register />}
         />
-        <Route
-  path="/projects/:id/create-opportunity"
-  element={<CreateOpportunity />}
+    <Route
+  path="/create-project"
+  element={
+    <ProtectedRoute>
+      <CreateProject />
+    </ProtectedRoute>
+  }
 />
-
+<Route
+  path="/applications"
+  element={
+    <ProtectedRoute>
+      <MyApplications />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/projects/:id/create-opportunity"
+  element={
+    <ProtectedRoute>
+      <CreateOpportunity />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/opportunities/:opportunityId/applicants"
+  element={
+    <ProtectedRoute>
+      <OpportunityApplicants />
+    </ProtectedRoute>
+  }
+/>
         <Route
           path="/"
           element={
@@ -52,23 +83,17 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/projects/:id"
+  element={
+    <ProtectedRoute>
+      <ProjectDetail />
+    </ProtectedRoute>
+  }
+/>
 
-        <Route
-          path="/projects/:id"
-          element={
-            <ProtectedRoute>
-              <ProjectDetail />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-  path="/create-project"
-  element={<CreateProject />}
-/>
-        <Route
-  path="/applications"
-  element={<MyApplications />}
-/>
+   
+ 
         <Route
   path="/projects/:id/matches"
   element={

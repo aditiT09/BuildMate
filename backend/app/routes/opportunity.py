@@ -116,6 +116,21 @@ def get_opportunity(
         )
 
     return opportunity
+@router.get(
+    "/project/{project_id}",
+    response_model=list[OpportunityResponse]
+)
+def get_project_opportunities(
+    project_id: int,
+    db: Session = Depends(get_db)
+):
+    opportunities = (
+        db.query(Opportunity)
+        .filter(Opportunity.project_id == project_id)
+        .all()
+    )
+
+    return opportunities
 
 
 @router.put(

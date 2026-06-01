@@ -2,7 +2,10 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
 } from "react";
+
+import { getCurrentUser } from "../api/users";
 
 const AuthContext = createContext();
 
@@ -12,6 +15,8 @@ export const AuthProvider = ({
   const [token, setToken] = useState(
     localStorage.getItem("token")
   );
+
+  const [user, setUser] = useState(null);
 
   const login = (token) => {
     localStorage.setItem(
@@ -26,16 +31,42 @@ export const AuthProvider = ({
     localStorage.removeItem("token");
 
     setToken(null);
+    setUser(null);
   };
+useEffect(() => {
+  const loadUser = async () => {
+    try {
+      if (!token) return;
+
+      console.log("Loading user...");
+
+      const data =
+        await getCurrentUser();
+
+      console.log("User:", data);
+
+      setUser(data);
+    } catch (error) {
+      console.error(
+        "Failed loading user",
+        error
+      );
+    }
+  };
+
+  loadUser();
+}, [token]);
 
   return (
     <AuthContext.Provider
-      value={{
-        token,
-        login,
-        logout,
-        loading: false,
-      }}
+    value={{
+  token,
+  user,
+  setUser,
+  login,
+  logout,
+  loading: false,
+}}
     >
       {children}
     </AuthContext.Provider>

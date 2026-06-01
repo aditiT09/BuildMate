@@ -15,3 +15,32 @@ export const createApplication = async (opportunityId) => {
 
   return response.data;
 };
+export const getOpportunityApplications = async (
+  opportunityId
+) => {
+  const response = await api.get(
+    `/applications/opportunity/${opportunityId}`
+  );
+
+  return response.data;
+};
+
+export const acceptApplication = async (
+  applicationId
+) => {
+  const response = await api.put(
+    `/applications/${applicationId}/accept`
+  );
+
+  return response.data;
+};
+
+export const rejectApplication = async (
+  applicationId
+) => {
+  const response = await api.put(
+    `/applications/${applicationId}/reject`
+  );
+
+  return response.data;
+};
