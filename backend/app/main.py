@@ -27,7 +27,17 @@ from app.routes import analytics
 from app.routes import ranking
 from app.routes import explanation
 from app.routes import applicant_ranking
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(
     applicant_ranking.router
 )
