@@ -71,7 +71,10 @@ def get_users(
     )
 
     return users
-@router.get("/users/me")
+@router.get(
+    "/users/me",
+    response_model=UserResponse
+)
 def get_me(
     current_user: User = Depends(get_current_user)
 ):
