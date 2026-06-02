@@ -80,13 +80,28 @@ export default function OpportunityApplicants() {
               className="bg-white p-5 rounded-xl shadow"
             >
               <h2 className="text-xl font-bold">
-                Applicant #{app.user_id}
-              </h2>
+  {app.user.name}
+</h2>
 
-              <p>
-                Status: {app.status}
-              </p>
+<p className="text-gray-600">
+  {app.user.bio || "No bio provided"}
+</p>
 
+<p className="text-sm text-gray-500">
+  {app.user.email}
+</p>
+
+<p
+  className={`mt-2 font-semibold ${
+    app.status === "accepted"
+      ? "text-green-600"
+      : app.status === "rejected"
+      ? "text-red-600"
+      : "text-yellow-600"
+  }`}
+>
+  Status: {app.status}
+</p>
               {app.status === "pending" && (
                 <div className="flex gap-3 mt-4">
 
