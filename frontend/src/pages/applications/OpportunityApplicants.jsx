@@ -37,14 +37,19 @@ export default function OpportunityApplicants() {
   };
 
   const handleAccept = async (id) => {
-    try {
-      await acceptApplication(id);
+  try {
+    await acceptApplication(id);
 
-      loadApplications();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    loadApplications();
+  } catch (error) {
+    alert(
+      error?.response?.data?.detail ||
+      "Failed to accept application"
+    );
+
+    console.error(error);
+  }
+};
 
   const handleReject = async (id) => {
     try {
@@ -52,8 +57,13 @@ export default function OpportunityApplicants() {
 
       loadApplications();
     } catch (error) {
-      console.error(error);
-    }
+  alert(
+    error?.response?.data?.detail ||
+    "Failed to reject application"
+  );
+
+  console.error(error);
+}
   };
 
   if (loading) {
