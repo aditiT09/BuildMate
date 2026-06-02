@@ -181,6 +181,37 @@ export default function ProjectDetail() {
                 </button>
               </>
             )}
+            {isOwner && opportunities.length > 0 && (
+  <div className="mt-10">
+    <h2 className="text-2xl font-bold mb-4">
+      Opportunities
+    </h2>
+
+    <div className="space-y-3">
+      {opportunities.map((opportunity) => (
+        <div
+          key={opportunity.id}
+          className="border rounded-xl p-4 flex justify-between items-center"
+        >
+          <h3 className="font-semibold">
+            {opportunity.role}
+          </h3>
+
+          <button
+            onClick={() =>
+              navigate(
+                `/opportunities/${opportunity.id}/applicants`
+              )
+            }
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            View Applicants
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
           </div>
 
