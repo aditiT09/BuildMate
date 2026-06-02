@@ -202,9 +202,35 @@ def accept_application(
             status_code=403,
             detail="Not authorized"
         )
+    accepted_count = (
+        db.query(Application)
+        .filter(
+            Application.opportunity_id == opportunity.id,
+            Application.status == "accepted"
+        )
+        .count()
+)
+
+    if accepted_count >= opportunity.seats:
+        raise HTTPException(
+            status_code=400,
+            detail="No seats remaining"
+    )
 
     application.status = "accepted"
     application.user.reliability_score += 5
+
+    accepted_count = (
+        db.query(Application)
+        .filter(
+            Application.opportunity_id == opportunity.id,
+            Application.status == "accepted"
+        )
+        .count()
+)
+
+    if accepted_count + 1 >= opportunity.seats:
+        opportunity.status = "closed"
 
     db.commit()
 

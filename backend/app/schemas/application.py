@@ -21,12 +21,23 @@ class OpportunitySummary(BaseModel):
     class Config:
         from_attributes = True
 
+class UserSummary(BaseModel):
+    id: int
+    name: str
+    email: str
+    bio: str | None = None
+
+    class Config:
+        from_attributes = True
+
 
 class ApplicationResponse(BaseModel):
     id: int
     user_id: int
     opportunity_id: int
     status: str
+
+    user: UserSummary
 
     opportunity: OpportunitySummary
 
