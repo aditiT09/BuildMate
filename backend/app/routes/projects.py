@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 
+
 from app.models.project import Project
 
 from app.utils.security import (
@@ -63,6 +64,24 @@ def get_projects(
     )
 
     return projects
+
+@router.get(
+    "/projects/me",
+    response_model=list[ProjectResponse]
+)
+def get_my_projects(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+
+    projects = (
+        db.query(Project)
+        .filter(Project.owner_id == current_user.id)
+        .all()
+    )
+
+    return projects
+
 
 
 @router.get(
