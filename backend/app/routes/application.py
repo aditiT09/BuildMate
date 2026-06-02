@@ -225,8 +225,10 @@ def accept_application(
     )
 
     application.status = "accepted"
-    application.user.reliability_score += 5
 
+    application.user.reliability_score = (
+        application.user.reliability_score or 0
+    ) + 5
     accepted_count = (
         db.query(Application)
         .filter(
@@ -296,12 +298,14 @@ def reject_application(
             detail="Not authorized"
         )
 
-    application.status = "rejected"
+    current_score = (
+        application.user.reliability_score or 0
+)
 
     application.user.reliability_score = max(
         0,
-        application.user.reliability_score - 1
-    )
+        current_score - 1
+)
 
     db.commit()
 
