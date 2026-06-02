@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "secret"
 
     REDIS_URL: str
+    TEST_DATABASE_URL: str | None = None
 
     class Config:
         env_file = ".env"
