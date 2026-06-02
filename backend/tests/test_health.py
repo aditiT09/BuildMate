@@ -1,6 +1,7 @@
 from tests.conftest import client
 
 
+
 def test_health_check():
     response = client.get("/health")
 
@@ -8,3 +9,9 @@ def test_health_check():
     assert response.json() == {
         "status": "healthy"
     }
+
+
+
+
+
+ 

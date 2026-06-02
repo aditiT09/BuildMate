@@ -88,7 +88,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_applications_id'), 'applications', ['id'], unique=False)
-    op.drop_table('playing_with_neon')
+    #op.drop_table('playing_with_neon')
     # ### end Alembic commands ###
 
 
