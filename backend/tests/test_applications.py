@@ -363,3 +363,82 @@ def test_cannot_accept_twice():
         second_accept.json()["detail"]
         == "Application already processed"
     )
+def test_closed_opportunity():
+
+    owner = create_user()
+    owner_token = login_user(owner["email"])
+
+    project = client.post(
+        "/projects",
+        json={
+            "title": "Project A",
+            "description": "Test Project",
+            "timeline": "2 months",
+            "project_type": "Web"
+        },
+        headers=auth_headers(owner_token)
+    ).json()
+
+    opportunity = client.post(
+        "/opportunities/",
+        json={
+            "role": "Frontend Developer",
+            "project_id": project["id"],
+            "seats": 1,
+            "status": "closed"
+        },
+        headers=auth_headers(owner_token)
+    ).json()
+
+    applicant = create_user()
+    applicant_token = login_user(applicant["email"])
+
+    response = client.post(
+        "/applications/",
+        json={
+            "opportunity_id": opportunity["id"]
+        },
+        headers=auth_headers(applicant_token)
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Opportunity is closed"
+def test_apply_to_nonexistent_opportunity():
+
+    user = create_user()
+    token = login_user(user["email"])
+
+    response = client.post(
+        "/applications/",
+        json={
+            "opportunity_id": 999999
+        },
+        headers=auth_headers(token)
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Opportunity not found"
+def test_accept_nonexistent_application():
+
+    owner = create_user()
+    owner_token = login_user(owner["email"])
+
+    response = client.put(
+        "/applications/999999/accept",
+        headers=auth_headers(owner_token)
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Application not found"
+def test_reject_nonexistent_application():
+
+    owner = create_user()
+    owner_token = login_user(owner["email"])
+
+    response = client.put(
+        "/applications/999999/reject",
+        headers=auth_headers(owner_token)
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Application not found"

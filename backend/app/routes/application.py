@@ -48,6 +48,12 @@ def create_application(
             status_code=404,
             detail="Opportunity not found"
         )
+    if opportunity.status == "closed":
+        raise HTTPException(
+            status_code=400,
+            detail="Opportunity is closed"
+    )
+
 
     existing_application = (
         db.query(Application)
@@ -125,6 +131,7 @@ def get_opportunity_applications(
             status_code=404,
             detail="Opportunity not found"
         )
+    
 
     project = (
         db.query(Project)
