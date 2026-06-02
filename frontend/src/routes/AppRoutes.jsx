@@ -18,6 +18,7 @@ import CreateProject from "../pages/projects/CreateProject";
 import CreateOpportunity from "../pages/opportunities/CreateOpportunity";
 import OpportunityApplicants
 from "../pages/applications/OpportunityApplicants";
+import MyProjects from "../pages/projects/MyProjects";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -99,6 +100,14 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <MatchResults />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/my-projects"
+  element={
+    <ProtectedRoute>
+      <MyProjects />
     </ProtectedRoute>
   }
 />

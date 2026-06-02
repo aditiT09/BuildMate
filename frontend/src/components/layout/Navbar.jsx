@@ -12,15 +12,19 @@ export default function Navbar() {
     <nav className="bg-slate-900 text-white px-6 py-4 shadow">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
 
-        <Link
-          to="/dashboard"
-          className="text-xl font-bold"
-        >
-          BuildMate
-        </Link>
-
+       <Link
+  to="/"
+  className="text-xl font-bold"
+>
+  BuildMate
+</Link>
         <div className="flex gap-6 items-center">
-          <Link to="/dashboard">Dashboard</Link>
+         <Link to="/">
+  Dashboard
+</Link>
+<Link to="/my-projects">
+  My Projects
+</Link>
 
           <Link to="/discover">
             Discover
