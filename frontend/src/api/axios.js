@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://buildmate-5abm.onrender.com",
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 api.interceptors.request.use((config) => {
