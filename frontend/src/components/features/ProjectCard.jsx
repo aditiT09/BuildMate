@@ -1,8 +1,11 @@
+// ProjectCard.jsx
+
 import { Link } from "react-router-dom";
+import Card from "../ui/Card";
 
 export default function ProjectCard({ project }) {
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+    <Card>
 
       <h2 className="text-2xl font-bold text-[#2B1B12] mb-3">
         {project.title}
@@ -13,7 +16,6 @@ export default function ProjectCard({ project }) {
       </p>
 
       <div className="flex flex-wrap gap-3 mb-5">
-
         <span className="bg-[#F4A460] px-3 py-1 rounded-full text-sm">
           {project.project_type}
         </span>
@@ -21,7 +23,6 @@ export default function ProjectCard({ project }) {
         <span className="border border-[#D2B48C] px-3 py-1 rounded-full text-sm">
           {project.timeline}
         </span>
-
       </div>
 
       <Link
@@ -31,6 +32,6 @@ export default function ProjectCard({ project }) {
         View Details
       </Link>
 
-    </div>
+    </Card>
   );
 }
