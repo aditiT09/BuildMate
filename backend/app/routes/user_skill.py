@@ -9,6 +9,7 @@ from app.schemas.user_skill import UserSkillCreate
 
 from app.utils.security import get_current_user
 from app.utils.redis_client import redis_client
+from app.models.skill import Skill
 
 
 router = APIRouter(
@@ -82,23 +83,29 @@ def add_skill(
 
 @router.get("/")
 def get_my_skills(
-
     db: Session = Depends(get_db),
-
-    current_user=Depends(
-        get_current_user
-    )
-
+    current_user=Depends(get_current_user)
 ):
 
-    return db.query(
+    skills = (
+        db.query(
+            Skill.id,
+            Skill.name
+        )
+        .join(
+            UserSkill,
+            UserSkill.skill_id == Skill.id
+        )
+        .filter(
+            UserSkill.user_id == current_user.id
+        )
+        .all()
+    )
 
-        UserSkill
-
-    ).filter(
-
-        UserSkill.user_id
-        ==
-        current_user.id
-
-    ).all()
+    return [
+        {
+            "id": skill.id,
+            "name": skill.name
+        }
+        for skill in skills
+    ]
