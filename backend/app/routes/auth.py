@@ -17,6 +17,7 @@ from app.utils.security import (
 )
 
 
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
