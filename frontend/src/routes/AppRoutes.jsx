@@ -19,6 +19,7 @@ import CreateOpportunity from "../pages/opportunities/CreateOpportunity";
 import OpportunityApplicants
 from "../pages/applications/OpportunityApplicants";
 import MyProjects from "../pages/projects/MyProjects";
+import Profile from "../pages/profile/Profile";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -108,6 +109,14 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <MyProjects />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <Profile />
     </ProtectedRoute>
   }
 />
