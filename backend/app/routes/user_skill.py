@@ -109,3 +109,36 @@ def get_my_skills(
         }
         for skill in skills
     ]
+@router.delete("/{skill_id}")
+def remove_skill(
+    skill_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+
+    user_skill = (
+        db.query(UserSkill)
+        .filter(
+            UserSkill.user_id == current_user.id,
+            UserSkill.skill_id == skill_id
+        )
+        .first()
+    )
+
+    if not user_skill:
+        raise HTTPException(
+            status_code=404,
+            detail="Skill not found"
+        )
+
+    db.delete(user_skill)
+    db.commit()
+
+    try:
+        redis_client.flushall()
+    except Exception:
+        pass
+
+    return {
+        "message": "Skill removed"
+    }
