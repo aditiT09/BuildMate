@@ -229,14 +229,7 @@ def accept_application(
     application.user.reliability_score = (
         application.user.reliability_score or 0
     ) + 5
-    accepted_count = (
-        db.query(Application)
-        .filter(
-            Application.opportunity_id == opportunity.id,
-            Application.status == "accepted"
-        )
-        .count()
-)
+    
 
     if accepted_count + 1 >= opportunity.seats:
         opportunity.status = "closed"
@@ -306,7 +299,7 @@ def reject_application(
         0,
         current_score - 1
 )
-
+    application.status = "rejected"
     db.commit()
 
     db.refresh(application)
