@@ -1,0 +1,32 @@
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy.orm import relationship
+from app.database import Base
+
+class Profile(Base):
+    __tablename__ = "profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+
+    full_name = Column(String, nullable=True)
+
+    bio = Column(Text, nullable=True)
+
+    college = Column(String, nullable=True)
+
+    degree = Column(String, nullable=True)
+
+    skills = Column(Text, nullable=True)
+
+    github = Column(String, nullable=True)
+
+    linkedin = Column(String, nullable=True)
+
+    portfolio = Column(String, nullable=True)
+
+    avatar = Column(String, nullable=True)
+
+    availability = Column(String, nullable=True)
+
+    user = relationship("User")

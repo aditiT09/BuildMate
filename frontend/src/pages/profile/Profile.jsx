@@ -1,301 +1,526 @@
 import { useEffect, useState } from "react";
 
 import {
-getCurrentUser,
-updateCurrentUser,
+  getCurrentUser,
+  updateCurrentUser,
 } from "../../api/users";
 
 import {
-getMySkills,
-getSkills,
-addSkill,
-removeSkill
+  getMySkills,
+  getSkills,
+  addSkill,
+  removeSkill,
 } from "../../api/userSkills";
 
-
 function Profile() {
-const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-const [formData, setFormData] = useState({
-name: "",
-bio: "",
+  const [editing, setEditing] = useState(false);
+
+  const [formData, setFormData] = useState({
+  full_name: "",
+  bio: "",
+  college: "",
+  degree: "",
+  github: "",
+  linkedin: "",
+  portfolio: "",
+  avatar: "",
+  availability: "",
 });
 
-const [skills, setSkills] = useState([]);
-const [allSkills, setAllSkills] = useState([]);
-const [selectedSkill, setSelectedSkill] =
-useState("");
+  const [skills, setSkills] = useState([]);
+  const [allSkills, setAllSkills] = useState([]);
 
-useEffect(() => {
-loadProfile();
-}, []);
+  const [selectedSkill, setSelectedSkill] = useState("");
 
-const loadProfile = async () => {
-try {
-const data = await getCurrentUser();
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
 
-  setUser(data);
+      const [
+        userData,
+        mySkills,
+        availableSkills,
+      ] = await Promise.all([
+        getCurrentUser(),
+        getMySkills(),
+        getSkills(),
+      ]);
 
-  setFormData({
-    name: data.name || "",
-    bio: data.bio || "",
-  });
+      setUser(userData);
 
-  const mySkills = await getMySkills();
-  setSkills(mySkills);
+      setFormData({
+  full_name: userData.full_name || "",
+  bio: userData.bio || "",
+  college: userData.college || "",
+  degree: userData.degree || "",
+  github: userData.github || "",
+  linkedin: userData.linkedin || "",
+  portfolio: userData.portfolio || "",
+  avatar: userData.avatar || "",
+  availability: userData.availability || "",
+});
 
-  const availableSkills =
-    await getSkills();
+      setSkills(mySkills);
+      setAllSkills(availableSkills);
 
-  setAllSkills(availableSkills);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load profile.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-} catch (error) {
-  console.error(error);
-}
+  const handleSave = async () => {
+    try {
+      const updatedUser =
+        await updateCurrentUser(formData);
 
+      setUser(updatedUser);
 
-};
+      setEditing(false);
 
-const handleSave = async () => {
-try {
-const updatedUser =
-await updateCurrentUser(formData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
+  const handleCancel = () => {
+    setFormData({
+      name: user.name || "",
+      bio: user.bio || "",
+    });
 
-  setUser(updatedUser);
+    setEditing(false);
+  };
 
-  setEditing(false);
+  const handleAddSkill = async () => {
+    if (!selectedSkill) return;
 
-} catch (error) {
-  console.error(error);
-}
+    try {
+      await addSkill(Number(selectedSkill));
 
+      const updatedSkills =
+        await getMySkills();
 
-};
+      setSkills(updatedSkills);
 
-const handleAddSkill = async () => {
-if (!selectedSkill) return;
+      setSelectedSkill("");
 
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-try {
-  await addSkill(
-    Number(selectedSkill)
-  );
+  const handleRemoveSkill = async (
+    skillId
+  ) => {
+    try {
+      await removeSkill(skillId);
 
-  const updatedSkills =
-    await getMySkills();
+      const updatedSkills =
+        await getMySkills();
 
-  setSkills(updatedSkills);
+      setSkills(updatedSkills);
 
-  setSelectedSkill("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-} catch (error) {
-  console.error(error);
-}
-
-
-};
-const handleRemoveSkill = async (
-  skillId
-) => {
-  try {
-    await removeSkill(skillId);
-
-    const updatedSkills =
-      await getMySkills();
-
-    setSkills(updatedSkills);
-
-  } catch (error) {
-    console.error(error);
+  if (loading) {
+    return (
+      <div className="p-6">
+        Loading...
+      </div>
+    );
   }
-};
+
+  if (error) {
+    return (
+      <div className="p-6 text-red-600">
+        {error}
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto p-6">
+
+     <h1
+  className="
+    text-5xl
+    font-bold
+    mb-8
+    font-['Cormorant_Garamond']
+  "
+>
+        Profile
+      </h1>
+
+      <div
+  className="
+    rounded-3xl
+    border
+    border-[#d7c7b3]
+    bg-[#faf6ef]
+    p-6
+    shadow-sm
+  "
+>
+
+        {editing ? (
+          <>
+            <label className="block mb-2 font-medium">
+              Name
+            </label>
+
+            <input
+              type="text"
+              value={formData.full_name}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  full_name: e.target.value,
+                })
+              }
+              className="w-full border rounded p-2 mb-4"
+            />
+
+            <label className="block mb-2 font-medium">
+              Bio
+            </label>
+
+            <textarea
+              rows={4}
+              value={formData.bio}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  bio: e.target.value,
+                })
+              }
+              className="w-full border rounded p-2"
+            />
+
+            <label className="block mt-4 mb-2 font-medium">
+              College
+            </label>
+
+            <input
+              type="text"
+              value={formData.college}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  college: e.target.value,
+                })
+              }
+              className="w-full border rounded p-2"
+            />
+
+            <label className="block mt-4 mb-2 font-medium">
+              Degree
+            </label>
+
+            <input
+              type="text"
+              value={formData.degree}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  degree: e.target.value,
+                })
+              }
+              className="w-full border rounded p-2"
+            />
 
 
-if (!user) {
-return ( <div className="p-6"> <p>Loading...</p> </div>
-);
-}
-console.log("Skills:", skills);
-return ( <div className="max-w-3xl mx-auto p-6">
+<label className="block mt-4 mb-2 font-medium">
+  GitHub
+</label>
 
-  <h1 className="text-3xl font-bold mb-6">
-    Profile
-  </h1>
+<input
+  type="text"
+  value={formData.github}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      github: e.target.value,
+    })
+  }
+  className="w-full border rounded p-2"
+/>
 
-  <div className="bg-white rounded-xl shadow p-6">
+<label className="block mt-4 mb-2 font-medium">
+  LinkedIn
+</label>
 
-    {editing ? (
-      <>
-        <label className="block mb-2 font-medium">
-          Name
-        </label>
+<input
+  type="text"
+  value={formData.linkedin}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      linkedin: e.target.value,
+    })
+  }
+  className="w-full border rounded p-2"
+/>
 
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              name: e.target.value,
-            })
-          }
-          className="w-full border rounded p-2 mb-4"
-        />
+<label className="block mt-4 mb-2 font-medium">
+  Portfolio
+</label>
 
-        <label className="block mb-2 font-medium">
-          Bio
-        </label>
+<input
+  type="text"
+  value={formData.portfolio}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      portfolio: e.target.value,
+    })
+  }
+  className="w-full border rounded p-2"
+/>
 
-        <textarea
-          value={formData.bio}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              bio: e.target.value,
-            })
-          }
-          rows={4}
-          className="w-full border rounded p-2"
-        />
+<label className="block mt-4 mb-2 font-medium">
+  Avatar URL
+</label>
 
-        <div className="flex gap-3 mt-4">
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 bg-black text-white rounded"
-          >
-            Save
-          </button>
+<input
+  type="text"
+  value={formData.avatar}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      avatar: e.target.value,
+    })
+  }
+  className="w-full border rounded p-2"
+/>
 
-          <button
-            onClick={() =>
-              setEditing(false)
-            }
-            className="px-4 py-2 border rounded"
-          >
-            Cancel
-          </button>
-        </div>
-      </>
-    ) : (
-      <>
-        <h2 className="text-2xl font-semibold">
-          {user.name}
-        </h2>
+<label className="block mt-4 mb-2 font-medium">
+  Availability
+</label>
 
-        <p className="text-gray-600 mt-1">
-          {user.email}
-        </p>
+<input
+  type="text"
+  value={formData.availability}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      availability: e.target.value,
+    })
+  }
+  className="w-full border rounded p-2"
+/>
+           
 
-        <p className="mt-4">
-          {user.bio ||
-            "No bio added yet"}
-        </p>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-black text-white rounded"
+              >
+                Save
+              </button>
 
-        <button
-          onClick={() =>
-            setEditing(true)
-          }
-          className="mt-4 px-4 py-2 border rounded"
-        >
-          Edit Profile
-        </button>
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 border rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2
+  className="
+    text-3xl
+    font-bold
+    font-['Syne']
+  "
+>
+              {user.name}
+            </h2>
 
-        <div className="mt-6 grid grid-cols-2 gap-4">
-          <div className="border rounded-lg p-4">
-            <p className="font-medium">
-              Activity Score
+            <p className="text-gray-600 mt-1">
+              {user.email}
             </p>
 
-            <p className="text-2xl font-bold">
-              {user.activity_score}
+            <p className="mt-4">
+              {user.bio || "No bio added yet"}
             </p>
-          </div>
+            <div className="mt-4 space-y-2">
 
-          <div className="border rounded-lg p-4">
-            <p className="font-medium">
-              Reliability Score
-            </p>
+  {user.college && (
+    <p>
+      <strong>College:</strong> {user.college}
+    </p>
+  )}
 
-            <p className="text-2xl font-bold">
-              {user.reliability_score}
-            </p>
-          </div>
-        </div>
-      </>
-    )}
+  {user.degree && (
+    <p>
+      <strong>Degree:</strong> {user.degree}
+    </p>
+  )}
 
-  </div>
+  {user.github && (
+    <p>
+      <strong>GitHub:</strong> {user.github}
+    </p>
+  )}
 
-  <div className="bg-white rounded-xl shadow p-6 mt-6">
-    <h2 className="text-xl font-semibold mb-4">
-      Skills
-    </h2>
+  {user.linkedin && (
+    <p>
+      <strong>LinkedIn:</strong> {user.linkedin}
+    </p>
+  )}
 
-    <div className="space-y-2 mb-4">
-   {skills.map((skill) => (
-  <div
-    key={skill.id}
-    className="flex justify-between items-center border rounded px-3 py-2"
-  >
-    <span>
-      {skill.name}
-    </span>
+  {user.portfolio && (
+    <p>
+      <strong>Portfolio:</strong> {user.portfolio}
+    </p>
+  )}
 
-    <button
-      onClick={() =>
-        handleRemoveSkill(
-          skill.id
-        )
-      }
-      className="text-red-600"
-    >
-      Remove
-    </button>
-  </div>
-))}
-    </div>
-
-    <div className="flex gap-2">
-      <select
-        value={selectedSkill}
-        onChange={(e) =>
-          setSelectedSkill(
-            e.target.value
-          )
-        }
-        className="border rounded p-2"
-      >
-        <option value="">
-          Select Skill
-        </option>
-
-        {allSkills.map((skill) => (
-          <option
-            key={skill.id}
-            value={skill.id}
-          >
-            {skill.name}
-          </option>
-        ))}
-      </select>
-
-      <button
-        onClick={handleAddSkill}
-        className="px-4 py-2 bg-black text-white rounded"
-      >
-        Add
-      </button>
-    </div>
-  </div>
+  {user.availability && (
+    <p>
+      <strong>Availability:</strong> {user.availability}
+    </p>
+  )}
 
 </div>
 
+            <button
+              onClick={() =>
+                setEditing(true)
+              }
+              className="mt-4 px-4 py-2 border rounded"
+            >
+              Edit Profile
+            </button>
 
-);
+            <div className="grid grid-cols-2 gap-4 mt-6">
+
+              <div className="border rounded-lg p-4">
+                <p className="font-medium">
+                  Activity Score
+                </p>
+
+                <p className="text-2xl font-bold">
+                  {user.activity_score}
+                </p>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <p className="font-medium">
+                  Reliability Score
+                </p>
+
+                <p className="text-2xl font-bold">
+                  {user.reliability_score}
+                </p>
+              </div>
+
+            </div>
+          </>
+        )}
+
+      </div>
+
+      <div className="bg-white rounded-xl shadow p-6 mt-6">
+
+        <h2 className="text-xl font-semibold mb-4">
+          Skills
+        </h2>
+
+        {skills.length === 0 ? (
+          <p className="text-gray-500 mb-4">
+            No skills added yet.
+          </p>
+        ) : (
+          <div className="space-y-2 mb-4">
+            {skills.map((skill) => (
+              <div
+                key={skill.id}
+                className="flex justify-between items-center border rounded px-3 py-2"
+              >
+                <span>
+                  {skill.name}
+                </span>
+
+                <button
+                  onClick={() =>
+                    handleRemoveSkill(
+                      skill.id
+                    )
+                  }
+                  className="text-red-600"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex gap-2">
+
+          <select
+            value={selectedSkill}
+            onChange={(e) =>
+              setSelectedSkill(
+                e.target.value
+              )
+            }
+            className="border rounded p-2"
+          >
+            <option value="">
+              Select Skill
+            </option>
+
+            {allSkills.map((skill) => (
+              <option
+                key={skill.id}
+                value={skill.id}
+              >
+                {skill.name}
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={handleAddSkill}
+            className="
+px-5
+py-3
+rounded-full
+bg-[#c4622d]
+text-white
+font-medium
+hover:scale-105
+transition
+"
+          >
+            Add
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
 }
 
 export default Profile;

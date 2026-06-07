@@ -19,6 +19,7 @@ import CreateOpportunity from "../pages/opportunities/CreateOpportunity";
 import OpportunityApplicants
 from "../pages/applications/OpportunityApplicants";
 import MyProjects from "../pages/projects/MyProjects";
+import LandingPage from "../pages/landingpage/LandingPage";
 import Profile from "../pages/profile/Profile";
 function AppRoutes() {
   return (
@@ -68,14 +69,14 @@ function AppRoutes() {
     </ProtectedRoute>
   }
 />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+       <Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+/>
 
         <Route
           path="/discover"
@@ -111,6 +112,10 @@ function AppRoutes() {
       <MyProjects />
     </ProtectedRoute>
   }
+/>
+<Route
+  path="/"
+  element={<LandingPage />}
 />
 <Route
   path="/profile"

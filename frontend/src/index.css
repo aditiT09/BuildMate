@@ -1,47 +1,55 @@
 @import "tailwindcss";
-:root {
 
-  --bg: #F5F5DC;
-  --surface: #FFFFFF;
-  --surface-alt: #FBF8F2;
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,600;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap');
 
-  --border: #E9E2D6;
-  --border-light: #F2ECE3;
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  --text: #2B1B12;
-  --text-body: #4A372D;
-  --text-muted: #8C776A;
+html { scroll-behavior: smooth; }
 
-  --brand: #E35336;
-  --brand-hover: #D2472B;
-  --brand-bg: #FCE7E2;
-
-  --secondary: #F4A460;
-  --secondary-bg: #FDF3E8;
-
-  --accent-dark: #A0522D;
-
-  --success: #2E8B57;
-  --warning: #D48A2D;
-  --danger: #C94C4C;
+body {
+  background: #f5ede0;
+  color: #2c1810;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+::selection { background: #c4622d; color: white; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f5ede0; }
+::-webkit-scrollbar-thumb { background: #c4622d; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #8b3a1a; }
+
+/* ── Noise texture ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.2;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'DM Sans',sans-serif;
-}
+/* ── Global keyframes used by Hero inline styles ── */
+@keyframes fadeUp  { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse2  { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+@keyframes ticker  { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes float   { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
 
-h1,h2,h3,h4,h5,h6{
-  font-family:'Sora',sans-serif;
-}
-
-.mono{
-  font-family:'JetBrains Mono',monospace;
+/* ── Responsive grid fixes ── */
+@media (max-width: 768px) {
+  /* Cards: stack on mobile */
+  #cards > div { grid-template-columns: 1fr !important; }
+  /* Mission: stack on mobile */
+  #mission > div > div { grid-template-columns: 1fr !important; }
+  /* Bottom explainer row */
+  #mission > div:last-child { grid-template-columns: 1fr !important; }
 }

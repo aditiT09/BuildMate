@@ -47,11 +47,15 @@ useEffect(() => {
 
       setUser(data);
     } catch (error) {
-      console.error(
-        "Failed loading user",
-        error
-      );
-    }
+  console.error(
+    "Failed loading user",
+    error
+  );
+
+  localStorage.removeItem("token");
+  setToken(null);
+  setUser(null);
+}
   };
 
   loadUser();

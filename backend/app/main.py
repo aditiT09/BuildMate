@@ -28,6 +28,8 @@ from app.routes import ranking
 from app.routes import explanation
 from app.routes import applicant_ranking
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.routes import profile
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -84,6 +86,11 @@ app.include_router(
 app.include_router(users_router)
 
 app.include_router(projects_router)
+app.include_router(
+    profile.router,
+    prefix="/profile",
+    tags=["Profile"]
+)
 
 
 @app.get("/")
