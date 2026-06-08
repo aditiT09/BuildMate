@@ -28,9 +28,11 @@ from app.routes import ranking
 from app.routes import explanation
 from app.routes import applicant_ranking
 from fastapi.middleware.cors import CORSMiddleware
+from app.models.profile import Profile
 
 from app.routes import profile
 app = FastAPI()
+Base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
    allow_origins=[

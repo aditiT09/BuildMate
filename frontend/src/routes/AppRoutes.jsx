@@ -21,6 +21,8 @@ from "../pages/applications/OpportunityApplicants";
 import MyProjects from "../pages/projects/MyProjects";
 import LandingPage from "../pages/landingpage/LandingPage";
 import Profile from "../pages/profile/Profile";
+import PublicProfile from
+"../pages/profile/PublicProfile";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -95,7 +97,14 @@ function AppRoutes() {
   }
 />
 
-   
+   <Route
+  path="/profile/:userId"
+  element={
+    <ProtectedRoute>
+      <PublicProfile />
+    </ProtectedRoute>
+  }
+/>
  
         <Route
   path="/projects/:id/matches"

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
+import { Link } from
+"react-router-dom";
 
 import {
   getOpportunityApplications,
@@ -83,34 +85,34 @@ export default function OpportunityApplicants() {
         </h1>
 
         <div className="space-y-4">
+        
 
           {applications.map((app) => (
             <div
               key={app.id}
               className="bg-white p-5 rounded-xl shadow"
             >
-              <h2 className="text-xl font-bold">
+            <h2 className="text-xl font-bold">
   {app.user.name}
 </h2>
 
-<p className="text-gray-600">
+<p className="text-sm text-gray-500 mb-2">
+  User ID: {app.user.id}
+</p>
+
+<Link
+  to={`/profile/${app.user.id}`}
+  className="text-blue-600 hover:underline"
+>
+  View Profile
+</Link>
+
+<p className="text-gray-600 mt-2">
   {app.user.bio || "No bio provided"}
 </p>
 
 <p className="text-sm text-gray-500">
   {app.user.email}
-</p>
-
-<p
-  className={`mt-2 font-semibold ${
-    app.status === "accepted"
-      ? "text-green-600"
-      : app.status === "rejected"
-      ? "text-red-600"
-      : "text-yellow-600"
-  }`}
->
-  Status: {app.status}
 </p>
               {app.status === "pending" && (
                 <div className="flex gap-3 mt-4">

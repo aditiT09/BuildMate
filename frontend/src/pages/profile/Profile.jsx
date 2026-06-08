@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 import {
-  getCurrentUser,
-  updateCurrentUser,
-} from "../../api/users";
+  getMyProfile,
+  saveProfile,
+} from "../../api/profile";
 
 import {
   getMySkills,
@@ -11,16 +11,15 @@ import {
   addSkill,
   removeSkill,
 } from "../../api/userSkills";
-
 function Profile() {
-  const [user, setUser] = useState(null);
+ const [user, setUser] = useState(null);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState("");
 
-  const [editing, setEditing] = useState(false);
+const [editing, setEditing] = useState(false);
 
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
   full_name: "",
   bio: "",
   college: "",
@@ -32,95 +31,127 @@ function Profile() {
   availability: "",
 });
 
-  const [skills, setSkills] = useState([]);
-  const [allSkills, setAllSkills] = useState([]);
-
-  const [selectedSkill, setSelectedSkill] = useState("");
-
+const [skills, setSkills] = useState([]);
+const [allSkills, setAllSkills] = useState([]);
+const [selectedSkill, setSelectedSkill] =
+  useState("");
   useEffect(() => {
     loadProfile();
   }, []);
 
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
+const loadProfile = async () => {
+  try {
+    setLoading(true);
 
-      const [
-        userData,
-        mySkills,
-        availableSkills,
-      ] = await Promise.all([
-        getCurrentUser(),
+    let profileData = null;
+
+    try {
+      profileData = await getMyProfile();
+    } catch (err) {
+      if (err.response?.status !== 404) {
+        throw err;
+      }
+    }
+
+    const [mySkills, availableSkills] =
+      await Promise.all([
         getMySkills(),
         getSkills(),
       ]);
 
-      setUser(userData);
+    if (profileData) {
+      setUser(profileData);
 
       setFormData({
-  full_name: userData.full_name || "",
-  bio: userData.bio || "",
-  college: userData.college || "",
-  degree: userData.degree || "",
-  github: userData.github || "",
-  linkedin: userData.linkedin || "",
-  portfolio: userData.portfolio || "",
-  avatar: userData.avatar || "",
-  availability: userData.availability || "",
-});
-
-      setSkills(mySkills);
-      setAllSkills(availableSkills);
-
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load profile.");
-    } finally {
-      setLoading(false);
+        full_name:
+          profileData.full_name || "",
+        bio: profileData.bio || "",
+        college:
+          profileData.college || "",
+        degree:
+          profileData.degree || "",
+        github:
+          profileData.github || "",
+        linkedin:
+          profileData.linkedin || "",
+        portfolio:
+          profileData.portfolio || "",
+        avatar:
+          profileData.avatar || "",
+        availability:
+          profileData.availability || "",
+      });
     }
-  };
 
-  const handleSave = async () => {
-    try {
-      const updatedUser =
-        await updateCurrentUser(formData);
+    setSkills(mySkills);
+    setAllSkills(availableSkills);
 
-      setUser(updatedUser);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to load profile.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      setEditing(false);
+ const handleSave = async () => {
+  try {
 
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    console.log(formData);
 
-  const handleCancel = () => {
-    setFormData({
-      name: user.name || "",
-      bio: user.bio || "",
-    });
+    const updatedProfile =
+      await saveProfile(formData);
+
+    setUser(updatedProfile);
 
     setEditing(false);
-  };
 
-  const handleAddSkill = async () => {
-    if (!selectedSkill) return;
+  } catch (err) {
 
-    try {
-      await addSkill(Number(selectedSkill));
+    console.log(err.response.data);
 
-      const updatedSkills =
-        await getMySkills();
+    console.error(err);
+  }
+};
+ const handleCancel = () => {
+  if (!user) {
+    setEditing(false);
+    return;
+  }
 
-      setSkills(updatedSkills);
+  setFormData({
+    full_name: user.full_name || "",
+    bio: user.bio || "",
+    college: user.college || "",
+    degree: user.degree || "",
+    github: user.github || "",
+    linkedin: user.linkedin || "",
+    portfolio: user.portfolio || "",
+    avatar: user.avatar || "",
+    availability: user.availability || "",
+  });
 
-      setSelectedSkill("");
+  setEditing(false);
+};
+const handleAddSkill = async () => {
+  if (!selectedSkill) return;
 
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  try {
+    await addSkill(
+      Number(selectedSkill)
+    );
 
+    const updatedSkills =
+      await getMySkills();
+
+    setSkills(updatedSkills);
+
+    setSelectedSkill("");
+
+  } catch (error) {
+    console.error(error);
+  }
+};
   const handleRemoveSkill = async (
     skillId
   ) => {
@@ -351,12 +382,12 @@ function Profile() {
     font-['Syne']
   "
 >
-              {user.name}
+           {user.full_name || "Unnamed User"}
             </h2>
 
             <p className="text-gray-600 mt-1">
-              {user.email}
-            </p>
+  BuildMate Member
+</p>
 
             <p className="mt-4">
               {user.bio || "No bio added yet"}

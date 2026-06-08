@@ -14,26 +14,28 @@ from app.utils.security import get_current_user
 
 router = APIRouter()
 
-
-@router.get("/me", response_model=ProfileOut)
-def get_my_profile(
+@router.get("/{user_id}", response_model=ProfileOut)
+def get_profile(
+    user_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     profile = (
         db.query(Profile)
-        .filter(Profile.user_id == current_user.id)
+        .filter(Profile.user_id == user_id)
         .first()
     )
 
     if not profile:
-        raise HTTPException(
-            status_code=404,
-            detail="Profile not found",
+
+        profile = Profile(
+            user_id=user_id
         )
 
-    return profile
+        db.add(profile)
+        db.commit()
+        db.refresh(profile)
 
+    return profile
 
 @router.put("/me", response_model=ProfileOut)
 def save_profile(
@@ -84,21 +86,3 @@ def save_profile(
     return profile
 
 
-@router.get("/{user_id}", response_model=ProfileOut)
-def get_profile(
-    user_id: int,
-    db: Session = Depends(get_db),
-):
-    profile = (
-        db.query(Profile)
-        .filter(Profile.user_id == user_id)
-        .first()
-    )
-
-    if not profile:
-        raise HTTPException(
-            status_code=404,
-            detail="Profile not found",
-        )
-
-    return profile
