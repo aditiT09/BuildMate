@@ -8,25 +8,25 @@ export default function MyApplications() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const data = await getMyApplications();
-        setApplications(data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load applications");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchApplications();
   }, []);
+
+  const fetchApplications = async () => {
+    try {
+      const data = await getMyApplications();
+      setApplications(data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load applications.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
       <Layout>
-        <div className="p-6">
+        <div className="max-w-5xl mx-auto p-6">
           Loading applications...
         </div>
       </Layout>
@@ -36,18 +36,8 @@ export default function MyApplications() {
   if (error) {
     return (
       <Layout>
-        <div className="p-6 text-red-500">
+        <div className="max-w-5xl mx-auto p-6 text-red-500">
           {error}
-        </div>
-      </Layout>
-    );
-  }
-
-  if (applications.length === 0) {
-    return (
-      <Layout>
-        <div className="p-6">
-          No applications found.
         </div>
       </Layout>
     );
@@ -56,40 +46,66 @@ export default function MyApplications() {
   return (
     <Layout>
       <div className="max-w-5xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">
+
+        <h1 className="text-4xl font-bold mb-8">
           My Applications
         </h1>
 
-        <div className="space-y-4">
-          {applications.map((application) => (
-            <div
-              key={application.id}
-              className="border rounded-lg p-4 shadow-sm bg-white"
-            >
-              <h2 className="text-xl font-semibold">
-                {application.opportunity.project.title}
-              </h2>
+        {applications.length === 0 ? (
+          <div className="bg-white rounded-xl shadow p-6 text-center">
+            You haven't applied to any opportunities yet.
+          </div>
+        ) : (
+          <div className="space-y-5">
 
-              <p className="text-gray-600">
-                Role: {application.opportunity.role}
-              </p>
+            {applications.map((application) => (
 
-              <div className="mt-3">
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    application.status === "accepted"
-                      ? "bg-green-100 text-green-700"
-                      : application.status === "rejected"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {application.status}
-                </span>
+              <div
+                key={application.id}
+                className="bg-white rounded-xl shadow p-6"
+              >
+
+                <div className="flex justify-between items-start">
+
+                  <div>
+
+                    <h2 className="text-2xl font-bold">
+                      {application.opportunity.project.title}
+                    </h2>
+
+                    <p className="text-gray-500 mt-1">
+                      Role: {application.opportunity.role}
+                    </p>
+
+                  </div>
+
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                      application.status === "accepted"
+                        ? "bg-green-100 text-green-700"
+                        : application.status === "rejected"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {application.status.toUpperCase()}
+                  </span>
+
+                </div>
+
+                {application.opportunity.description && (
+                  <p className="mt-4 text-gray-700">
+                    {application.opportunity.description}
+                  </p>
+                )}
+
               </div>
-            </div>
-          ))}
-        </div>
+
+            ))}
+
+          </div>
+        )}
+
       </div>
     </Layout>
   );

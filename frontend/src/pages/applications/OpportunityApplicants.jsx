@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
-import { Link } from
-"react-router-dom";
 
 import {
   getOpportunityApplications,
@@ -14,9 +12,7 @@ import {
 export default function OpportunityApplicants() {
   const { opportunityId } = useParams();
 
-  const [applications, setApplications] =
-    useState([]);
-
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,10 +21,9 @@ export default function OpportunityApplicants() {
 
   const loadApplications = async () => {
     try {
-      const data =
-        await getOpportunityApplications(
-          opportunityId
-        );
+      const data = await getOpportunityApplications(
+        opportunityId
+      );
 
       setApplications(data);
     } catch (error) {
@@ -39,39 +34,39 @@ export default function OpportunityApplicants() {
   };
 
   const handleAccept = async (id) => {
-  try {
-    await acceptApplication(id);
+    try {
+      await acceptApplication(id);
+      loadApplications();
+    } catch (error) {
+      alert(
+        error?.response?.data?.detail ||
+          "Failed to accept application"
+      );
 
-    loadApplications();
-  } catch (error) {
-    alert(
-      error?.response?.data?.detail ||
-      "Failed to accept application"
-    );
-
-    console.error(error);
-  }
-};
+      console.error(error);
+    }
+  };
 
   const handleReject = async (id) => {
     try {
       await rejectApplication(id);
-
       loadApplications();
     } catch (error) {
-  alert(
-    error?.response?.data?.detail ||
-    "Failed to reject application"
-  );
+      alert(
+        error?.response?.data?.detail ||
+          "Failed to reject application"
+      );
 
-  console.error(error);
-}
+      console.error(error);
+    }
   };
 
   if (loading) {
     return (
       <Layout>
-        <div>Loading...</div>
+        <div className="text-center py-10">
+          Loading applicants...
+        </div>
       </Layout>
     );
   }
@@ -84,44 +79,78 @@ export default function OpportunityApplicants() {
           Applicants
         </h1>
 
-        <div className="space-y-4">
-        
+        {applications.length === 0 && (
+          <div className="bg-white rounded-xl shadow p-6 text-center">
+            No applications yet.
+          </div>
+        )}
+
+        <div className="space-y-5">
 
           {applications.map((app) => (
+
             <div
               key={app.id}
-              className="bg-white p-5 rounded-xl shadow"
+              className="bg-white rounded-xl shadow p-6"
             >
-            <h2 className="text-xl font-bold">
-  {app.user.name}
-</h2>
 
-<p className="text-sm text-gray-500 mb-2">
-  User ID: {app.user.id}
-</p>
+              <div className="flex justify-between items-start">
 
-<Link
-  to={`/profile/${app.user.id}`}
-  className="text-blue-600 hover:underline"
->
-  View Profile
-</Link>
+                <div>
 
-<p className="text-gray-600 mt-2">
-  {app.user.bio || "No bio provided"}
-</p>
+                  <h2 className="text-2xl font-bold">
+                    {app.user.name}
+                  </h2>
 
-<p className="text-sm text-gray-500">
-  {app.user.email}
-</p>
+                  <p className="text-gray-500 mt-1">
+                    {app.user.email}
+                  </p>
+
+                </div>
+
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    app.status === "pending"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : app.status === "accepted"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {app.status}
+                </span>
+
+              </div>
+
+              <div className="mt-4">
+
+                <p className="text-gray-700">
+                  {app.user.bio ||
+                    "No bio provided."}
+                </p>
+
+              </div>
+
+              <div className="mt-4">
+
+                <Link
+                  to={`/profile/${app.user.id}`}
+                  className="text-blue-600 font-medium hover:underline"
+                >
+                  View Full Profile →
+                </Link>
+
+              </div>
+
               {app.status === "pending" && (
-                <div className="flex gap-3 mt-4">
+
+                <div className="flex gap-3 mt-6">
 
                   <button
                     onClick={() =>
                       handleAccept(app.id)
                     }
-                    className="bg-green-600 text-white px-4 py-2 rounded"
+                    className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg"
                   >
                     Accept
                   </button>
@@ -130,15 +159,17 @@ export default function OpportunityApplicants() {
                     onClick={() =>
                       handleReject(app.id)
                     }
-                    className="bg-red-600 text-white px-4 py-2 rounded"
+                    className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg"
                   >
                     Reject
                   </button>
 
                 </div>
+
               )}
 
             </div>
+
           ))}
 
         </div>
