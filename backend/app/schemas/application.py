@@ -21,11 +21,16 @@ class OpportunitySummary(BaseModel):
     class Config:
         from_attributes = True
 
+
 class UserSummary(BaseModel):
     id: int
     name: str
     email: str
     bio: str | None = None
+
+    # New fields
+    activity_score: int
+    reliability_score: int
 
     class Config:
         from_attributes = True
@@ -38,7 +43,6 @@ class ApplicationResponse(BaseModel):
     status: str
 
     user: UserSummary
-
     opportunity: OpportunitySummary
 
     class Config:
