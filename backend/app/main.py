@@ -32,7 +32,8 @@ from app.models.profile import Profile
 
 from app.routes import profile
 app = FastAPI()
-Base.metadata.create_all(bind=engine)
+# Database schema managed by Alembic
+# Base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
    allow_origins=[
