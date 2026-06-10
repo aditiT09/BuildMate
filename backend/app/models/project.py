@@ -57,3 +57,8 @@ class Project(Base):
         back_populates="project",
         cascade="all, delete-orphan"
     )
+    resources = relationship(
+        "ProjectResource",
+        back_populates="project",
+        cascade="all, delete-orphan"
+)

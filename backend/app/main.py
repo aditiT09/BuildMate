@@ -31,7 +31,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.models.profile import Profile
 
 from app.routes import profile
+from app.models.project_resource import ProjectResource
+from app.routes import profile
+from app.routes import project_resource
 app = FastAPI()
+app.include_router(
+    project_resource.router
+)
 # Database schema managed by Alembic
 # Base.metadata.create_all(bind=engine)
 app.add_middleware(
