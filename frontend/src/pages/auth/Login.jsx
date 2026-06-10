@@ -78,10 +78,7 @@ function Login() {
       className="min-h-screen flex"
       style={{ backgroundColor: colors.background, fontFamily: "'DM Sans', sans-serif" }}
     >
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Fraunces:ital,wght@0,700;1,700&display=swap"
-        rel="stylesheet"
-      />
+     
 
       {/* ── Left Panel ── */}
 <div

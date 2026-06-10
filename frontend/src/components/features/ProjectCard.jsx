@@ -1,37 +1,54 @@
-// ProjectCard.jsx
-
 import { Link } from "react-router-dom";
-import Card from "../ui/Card";
 
 export default function ProjectCard({ project }) {
   return (
-    <Card>
+    <article className="bm-card">
 
-      <h2 className="text-2xl font-bold text-[#2B1B12] mb-3">
-        {project.title}
-      </h2>
+      <div className="bm-card__spine" />
 
-      <p className="text-[#4A372D] mb-4">
-        {project.description}
-      </p>
+      <div className="bm-card__inner">
 
-      <div className="flex flex-wrap gap-3 mb-5">
-        <span className="bg-[#F4A460] px-3 py-1 rounded-full text-sm">
-          {project.project_type}
-        </span>
+        <div>
 
-        <span className="border border-[#D2B48C] px-3 py-1 rounded-full text-sm">
-          {project.timeline}
-        </span>
+          <span className="bm-type-badge">
+            {project.project_type}
+          </span>
+
+          <h2 className="bm-card__title">
+            {project.title}
+          </h2>
+
+        </div>
+
+        <p className="bm-card__desc">
+          {project.description}
+        </p>
+
+        <div className="bm-card__timeline">
+
+          <span className="bm-section-label">
+            Timeline
+          </span>
+
+          <span className="bm-timeline-value">
+            {project.timeline}
+          </span>
+
+        </div>
+
+        <div className="bm-card__footer">
+
+          <Link
+            to={`/projects/${project.id}`}
+            className="bm-btn bm-btn--primary"
+          >
+            View Project
+          </Link>
+
+        </div>
+
       </div>
 
-      <Link
-        to={`/projects/${project.id}`}
-        className="inline-block bg-[#E35336] text-white px-5 py-2 rounded-lg hover:opacity-90 transition"
-      >
-        View Details
-      </Link>
-
-    </Card>
+    </article>
   );
 }

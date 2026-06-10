@@ -1,11 +1,11 @@
-import Navbar from "./Navbar";
+import DashboardNavbar from "./DashboardNavbar";
 
 export default function Layout({ children }) {
   return (
     <>
-      <Navbar />
-
-      <main className="max-w-7xl mx-auto p-6">
+      <DashboardNavbar />
+      {/* pt-[60px] to offset fixed navbar height */}
+      <main style={{ paddingTop: 60 }}>
         {children}
       </main>
     </>
