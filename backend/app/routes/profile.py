@@ -13,7 +13,9 @@ from app.schemas.profile import (
 from app.utils.security import get_current_user
 
 router = APIRouter()
-@router.get("/{user_id}")
+
+
+# Logged-in user's profile
 @router.get("/me", response_model=ProfileOut)
 def get_my_profile(
     db: Session = Depends(get_db),
@@ -21,26 +23,23 @@ def get_my_profile(
 ):
     profile = (
         db.query(Profile)
-        .filter(
-            Profile.user_id == current_user.id
-        )
+        .filter(Profile.user_id == current_user.id)
         .first()
     )
 
     if not profile:
-
         profile = Profile(
             user_id=current_user.id
         )
 
         db.add(profile)
-
         db.commit()
-
         db.refresh(profile)
 
     return profile
 
+
+# Public profile
 @router.get("/{user_id}", response_model=ProfileOut)
 def get_profile(
     user_id: int,
@@ -53,17 +52,15 @@ def get_profile(
     )
 
     if not profile:
-
-        profile = Profile(
-            user_id=user_id
+        raise HTTPException(
+            status_code=404,
+            detail="Profile not found"
         )
-
-        db.add(profile)
-        db.commit()
-        db.refresh(profile)
 
     return profile
 
+
+# Create / Update profile
 @router.put("/me", response_model=ProfileOut)
 def save_profile(
     profile_data: ProfileCreate,
@@ -77,7 +74,6 @@ def save_profile(
     )
 
     if profile:
-
         profile.full_name = profile_data.full_name
         profile.bio = profile_data.bio
         profile.college = profile_data.college
@@ -90,7 +86,6 @@ def save_profile(
         profile.availability = profile_data.availability
 
     else:
-
         profile = Profile(
             user_id=current_user.id,
             full_name=profile_data.full_name,
@@ -111,5 +106,3 @@ def save_profile(
     db.refresh(profile)
 
     return profile
-
-

@@ -14,7 +14,8 @@ from app.models.project_skill import ProjectSkill
 from app.models.opportunity import Opportunity
 from app.models.application import Application
 from app.config import settings
-
+from app.models.profile import Profile
+from app.models.project_resource import ProjectResource
 
 config = context.config
 

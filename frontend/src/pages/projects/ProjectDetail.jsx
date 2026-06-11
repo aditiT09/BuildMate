@@ -154,7 +154,20 @@ export default function ProjectDetail() {
           <p className="text-xl text-[#4A372D] mb-8">
             {project.description}
           </p>
+<div className="mb-6">
+  <p className="text-sm text-[#8C776A]">
+    Created by
+  </p>
 
+  <button
+    onClick={() =>
+      navigate(`/profile/${project.owner_id}`)
+    }
+    className="text-[#C4622D] font-semibold hover:underline"
+  >
+    View Creator Profile →
+  </button>
+</div>
           <div className="grid md:grid-cols-2 gap-6 mb-10">
             <div className="bg-[#FBF8F2] p-5 rounded-xl">
               <p className="text-sm text-[#8C776A]">Project Type</p>
