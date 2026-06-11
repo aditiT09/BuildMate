@@ -7,7 +7,11 @@ import { getProjectOpportunities } from "../../api/opportunities";
 import { useAuth } from "../../context/AuthContext";
 
 import Layout from "../../components/layout/Layout";
-
+import {
+  getProjectLinks,
+  createProjectLink,
+  deleteProjectLink,
+} from "../../api/projectLinks";
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -18,6 +22,14 @@ export default function ProjectDetail() {
   const [loading, setLoading] = useState(true);
   const [opportunities, setOpportunities] = useState([]);
   const [applying, setApplying] = useState(false);
+
+  const [links, setLinks] = useState([]);
+
+const [newLink, setNewLink] = useState({
+  title: "",
+  resource_type: "",
+  url: "",
+});
 
   const isOwner =
     user?.id === project?.owner_id;
@@ -36,6 +48,10 @@ export default function ProjectDetail() {
         await getProjectOpportunities(id);
 
       setOpportunities(opps);
+      const projectLinks =
+  await getProjectLinks(id);
+
+setLinks(projectLinks);
     } catch (error) {
       console.error(error);
     } finally {
@@ -96,7 +112,7 @@ export default function ProjectDetail() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-3xl shadow-lg p-10">
 
           <h1 className="text-4xl font-bold text-[#2B1B12] mb-4">
@@ -118,6 +134,47 @@ export default function ProjectDetail() {
                 {project.project_type}
               </p>
             </div>
+            {/* Project Resources */}
+
+<div className="mb-10">
+  <h2 className="text-2xl font-bold text-[#2B1B12] mb-4">
+    Project Resources
+  </h2>
+
+  {links.length === 0 ? (
+    <p className="text-[#8C776A]">
+      No resources added yet.
+    </p>
+  ) : (
+    <div className="space-y-3">
+      {links.map((link) => (
+        <div
+          key={link.id}
+          className="bg-[#FBF8F2] rounded-xl p-4 flex justify-between items-center"
+        >
+          <div>
+            <p className="font-semibold">
+              {link.title}
+            </p>
+
+            <p className="text-sm text-[#8C776A]">
+              {link.resource_type}
+            </p>
+          </div>
+
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noreferrer"
+            className="text-[#C4622D] font-semibold"
+          >
+            Open →
+          </a>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
             <div className="bg-[#FBF8F2] p-5 rounded-xl">
               <p className="text-sm text-[#8C776A]">
