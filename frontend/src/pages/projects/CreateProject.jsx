@@ -1,11 +1,16 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
-import { createProject } from "../../api/projects";
+import {
+  createProject,
+  getProjectById,
+  updateProject,
+} from "../../api/projects";
 
 export default function CreateProject() {
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const [form, setForm] = useState({
     title: "",
@@ -15,6 +20,32 @@ export default function CreateProject() {
   });
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      loadProject();
+    }
+    // eslint-disable-next-line
+  }, [id]);
+
+  const loadProject = async () => {
+    try {
+      const project = await getProjectById(id);
+
+      setForm({
+        title: project.title,
+        description: project.description,
+        timeline: project.timeline,
+        project_type: project.project_type,
+      });
+    } catch (error) {
+      console.error(error);
+      alert(
+        error?.response?.data?.detail ||
+          "Failed to load project."
+      );
+    }
+  };
 
   const handleChange = (e) => {
     setForm({
@@ -29,9 +60,15 @@ export default function CreateProject() {
     try {
       setLoading(true);
 
-      const project = await createProject(form);
+      let project;
 
-      alert("Project created successfully!");
+      if (id) {
+        project = await updateProject(id, form);
+        alert("Project updated successfully!");
+      } else {
+        project = await createProject(form);
+        alert("Project created successfully!");
+      }
 
       navigate(`/projects/${project.id}`);
     } catch (error) {
@@ -39,7 +76,7 @@ export default function CreateProject() {
 
       alert(
         error?.response?.data?.detail ||
-          "Failed to create project"
+          `Failed to ${id ? "update" : "create"} project`
       );
     } finally {
       setLoading(false);
@@ -50,35 +87,30 @@ export default function CreateProject() {
     <Layout>
       <div className="max-w-4xl mx-auto px-6 py-10">
         {/* Header */}
-
         <div className="mb-10">
           <h1 className="text-5xl font-bold text-[#24120C] mb-3">
-            Create Project
+            {id ? "Edit Project" : "Create Project"}
           </h1>
 
           <p className="text-[#4A372D] text-lg">
-            Publish an idea and find teammates to help build it.
+            {id
+              ? "Refine your idea and keep your team updated."
+              : "Publish an idea and find teammates to help build it."}
           </p>
         </div>
 
         {/* Form */}
-
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-8"
-        >
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div className="bg-[#FDFBF8] border border-[#D9D0C8] rounded-3xl p-8 shadow-sm">
             <h2 className="text-2xl font-semibold text-[#24120C] mb-6">
               Project Details
             </h2>
 
             {/* Title */}
-
             <div className="mb-5">
               <label className="block mb-2 font-medium text-[#24120C]">
                 Project Title
               </label>
-
               <input
                 type="text"
                 name="title"
@@ -103,12 +135,10 @@ export default function CreateProject() {
             </div>
 
             {/* Description */}
-
             <div className="mb-5">
               <label className="block mb-2 font-medium text-[#24120C]">
                 Description
               </label>
-
               <textarea
                 name="description"
                 placeholder="Tell potential teammates what you're building, why it matters, and what help you're looking for..."
@@ -133,12 +163,10 @@ export default function CreateProject() {
             </div>
 
             {/* Timeline */}
-
             <div className="mb-5">
               <label className="block mb-2 font-medium text-[#24120C]">
                 Timeline
               </label>
-
               <input
                 type="text"
                 name="timeline"
@@ -163,7 +191,6 @@ export default function CreateProject() {
             </div>
 
             {/* Project Type */}
-
             <div className="mb-8">
               <label className="block mb-2 font-medium text-[#24120C]">
                 Project Type
@@ -211,7 +238,11 @@ export default function CreateProject() {
               "
             >
               {loading
-                ? "Publishing..."
+                ? id
+                  ? "Saving..."
+                  : "Publishing..."
+                : id
+                ? "Save Changes"
                 : "+ Publish Project"}
             </button>
           </div>

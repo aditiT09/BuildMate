@@ -96,6 +96,14 @@ function AppRoutes() {
     </ProtectedRoute>
   }
 />
+<Route
+  path="/projects/:id/edit"
+  element={
+    <ProtectedRoute>
+      <CreateProject />
+    </ProtectedRoute>
+  }
+/>
 
    <Route
   path="/profile/:userId"
@@ -114,6 +122,7 @@ function AppRoutes() {
     </ProtectedRoute>
   }
 />
+
 
 <Route
   path="/my-projects"

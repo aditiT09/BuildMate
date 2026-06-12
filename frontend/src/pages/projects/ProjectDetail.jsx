@@ -12,6 +12,10 @@ import {
   createProjectLink,
   deleteProjectLink,
 } from "../../api/projectLinks";
+import {
+
+  deleteProject,
+} from "../../api/projects";
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -99,6 +103,42 @@ export default function ProjectDetail() {
       );
     }
   };
+  const handleDeleteProject =
+async () => {
+
+  const confirmed =
+    window.confirm(
+      "Delete this project?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    await deleteProject(id);
+
+    alert(
+      "Project deleted."
+    );
+
+    navigate(
+      "/my-projects"
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      error?.response?.data?.detail ||
+      "Failed to delete project."
+    );
+
+  }
+
+};
 
   const handleApply = async () => {
     try {
@@ -300,45 +340,77 @@ export default function ProjectDetail() {
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 mt-8">
-            {isOwner ? (
-              <>
-                <button
-                  onClick={() =>
-                    navigate(`/projects/${id}/create-opportunity`)
-                  }
-                  className="border border-green-600 text-green-600 px-6 py-3 rounded-xl font-semibold"
-                >
-                  Create Opportunity
-                </button>
+       {/* Project Description */}
 
-                <button
-                  onClick={() => navigate(`/projects/${id}/matches`)}
-                  className="border border-[#A0522D] text-[#A0522D] px-6 py-3 rounded-xl font-semibold"
-                >
-                  View Matches
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleApply}
-                  disabled={applying}
-                  className="bg-[#E35336] text-white px-6 py-3 rounded-xl font-semibold"
-                >
-                  {applying ? "Applying..." : "Apply"}
-                </button>
+<p className="text-xl text-[#4A372D] mb-8">
+  {project.description}
+</p>
 
-                <button
-                  onClick={() => navigate(`/projects/${id}/matches`)}
-                  className="border border-[#A0522D] text-[#A0522D] px-6 py-3 rounded-xl font-semibold"
-                >
-                  View Matches
-                </button>
-              </>
-            )}
-          </div>
+{/* Action Buttons */}
+
+<div className="flex gap-4 mt-8 flex-wrap">
+  {isOwner ? (
+    <>
+      <button
+        onClick={() =>
+          navigate(`/projects/${id}/create-opportunity`)
+        }
+        className="border border-green-600 text-green-600 px-6 py-3 rounded-xl font-semibold"
+      >
+        Create Opportunity
+      </button>
+
+      <button
+        onClick={() =>
+          navigate(`/projects/${id}/edit`)
+        }
+        className="border border-blue-600 text-blue-600 px-6 py-3 rounded-xl font-semibold"
+      >
+        Edit Project
+      </button>
+
+      <button
+        onClick={() =>
+          navigate(`/projects/${id}/matches`)
+        }
+        className="border border-[#A0522D] text-[#A0522D] px-6 py-3 rounded-xl font-semibold"
+      >
+        View Matches
+      </button>
+
+      <button
+        type="button"
+        onClick={
+         handleDeleteProject
+        }
+        className="border border-red-600 text-red-600 px-6 py-3 rounded-xl font-semibold"
+      >
+        Delete Project
+      </button>
+    </>
+  ) : (
+    <>
+      <button
+        onClick={handleApply}
+        disabled={applying}
+        className="bg-[#E35336] text-white px-6 py-3 rounded-xl font-semibold"
+      >
+        {applying ? "Applying..." : "Apply"}
+      </button>
+
+      <button
+        onClick={() =>
+          navigate(`/projects/${id}/matches`)
+        }
+        className="border border-[#A0522D] text-[#A0522D] px-6 py-3 rounded-xl font-semibold"
+      >
+        View Matches
+      </button>
+    </>
+  )}
+</div>
+            
+          
 
           {/* Owner-Specific Opportunities List */}
           {isOwner && opportunities.length > 0 && (
