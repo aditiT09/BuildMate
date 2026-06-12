@@ -148,18 +148,16 @@ export default function ProjectDetail() {
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-3xl shadow-lg p-10">
           <h1 className="text-4xl font-bold text-[#2B1B12] mb-4">
-            {project.title}
-          </h1>
+  {project.title}
+</h1>
 
-          <p className="text-xl text-[#4A372D] mb-8">
-            {project.description}
-          </p>
 <div className="mb-6">
   <p className="text-sm text-[#8C776A]">
     Created by
   </p>
 
   <button
+    type="button"
     onClick={() =>
       navigate(`/profile/${project.owner_id}`)
     }
@@ -168,6 +166,7 @@ export default function ProjectDetail() {
     View Creator Profile →
   </button>
 </div>
+
           <div className="grid md:grid-cols-2 gap-6 mb-10">
             <div className="bg-[#FBF8F2] p-5 rounded-xl">
               <p className="text-sm text-[#8C776A]">Project Type</p>
