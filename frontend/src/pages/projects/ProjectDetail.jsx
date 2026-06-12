@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import { getProjectById } from "../../api/projects";
+import { getProjectById, deleteProject } from "../../api/projects";
 import { createApplication } from "../../api/applications";
 import { getProjectOpportunities } from "../../api/opportunities";
 import { useAuth } from "../../context/AuthContext";
@@ -12,15 +12,61 @@ import {
   createProjectLink,
   deleteProjectLink,
 } from "../../api/projectLinks";
-import {
 
-  deleteProject,
-} from "../../api/projects";
+const C = {
+  brand:   "#E35336",
+  brandDk: "#B8391F",
+  orange:  "#F4A460",
+  dark:    "#2B1B12",
+  dark2:   "#4A372D",
+  muted:   "#8C776A",
+  border:  "#E9DDD0",
+  bg:      "#FFF8F0",
+  surface: "#FDFBF7",
+  sand:    "#F5EDE0",
+};
+
+const RESOURCE_ICONS = {
+  GitHub: "🐙",
+  Demo: "🎬",
+  Figma: "🎨",
+  "Google Drive": "📁",
+  Notion: "🗒️",
+  Presentation: "📽️",
+  Other: "🔗",
+};
+
+// rotate a tiny bit, deterministically, so cards feel hand-placed not grid-generated
+const tilt = (n) => {
+  const seq = [-1.6, 1.2, -0.8, 1.8, -1.2, 0.9];
+  return seq[n % seq.length];
+};
+
+const STYLES = `
+  @keyframes floatIn { from { opacity:0; transform: translateY(10px) } to { opacity:1; transform: translateY(0) } }
+  @keyframes wiggle { 0%,100% { transform: rotate(0deg) } 50% { transform: rotate(2deg) } }
+  .pd-fade { animation: floatIn .35s ease both; }
+  .pd-tape::before {
+    content: "";
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 64px; height: 22px;
+    background: repeating-linear-gradient(135deg, #F4A460 0 6px, #EDD5B8 6px 12px);
+    opacity: .85;
+    border: 1px solid rgba(43,27,18,.08);
+  }
+  .pd-link:hover { transform: translateX(3px); }
+  .pd-link { transition: transform .15s ease; }
+  .pd-btn-prime:hover { background:${C.brandDk}; transform: translateY(-2px); }
+  .pd-btn-ghost:hover { background:${C.dark}; color:${C.orange}; border-color:${C.dark}; }
+  .pd-chip:hover { transform: rotate(0deg) scale(1.04); }
+  .pd-res-card:hover { transform: translateY(-3px) rotate(0deg) !important; box-shadow: 0 10px 28px rgba(43,27,18,.10) !important; }
+`;
 
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const { user } = useAuth();
 
   const [project, setProject] = useState(null);
@@ -30,13 +76,11 @@ export default function ProjectDetail() {
 
   const [links, setLinks] = useState([]);
   const [showResourceForm, setShowResourceForm] = useState(false);
-
   const [resourceForm, setResourceForm] = useState({
     title: "",
     resource_type: "",
     url: "",
   });
-
   const [addingResource, setAddingResource] = useState(false);
 
   const isOwner = user?.id === project?.owner_id;
@@ -52,7 +96,7 @@ export default function ProjectDetail() {
 
       const opps = await getProjectOpportunities(id);
       setOpportunities(opps);
-      
+
       const projectLinks = await getProjectLinks(id);
       setLinks(projectLinks);
     } catch (error) {
@@ -65,98 +109,53 @@ export default function ProjectDetail() {
   const handleAddResource = async () => {
     try {
       setAddingResource(true);
-
       const created = await createProjectLink(id, resourceForm);
-
       setLinks((prev) => [...prev, created]);
-
-      setResourceForm({
-        title: "",
-        resource_type: "",
-        url: "",
-      });
-
+      setResourceForm({ title: "", resource_type: "", url: "" });
       setShowResourceForm(false);
     } catch (error) {
       console.error(error);
-      alert(
-        error?.response?.data?.detail || "Failed to add resource"
-      );
+      alert(error?.response?.data?.detail || "Failed to add resource");
     } finally {
       setAddingResource(false);
     }
   };
 
   const handleDeleteResource = async (linkId) => {
-    if (!window.confirm("Delete this resource?")) {
-      return;
-    }
-
+    if (!window.confirm("Delete this resource?")) return;
     try {
       await deleteProjectLink(id, linkId);
-
       setLinks((prev) => prev.filter((link) => link.id !== linkId));
     } catch (error) {
       console.error(error);
-      alert(
-        error?.response?.data?.detail || "Failed to delete resource"
-      );
+      alert(error?.response?.data?.detail || "Failed to delete resource");
     }
   };
-  const handleDeleteProject =
-async () => {
 
-  const confirmed =
-    window.confirm(
-      "Delete this project?"
-    );
-
-  if (!confirmed) {
-    return;
-  }
-
-  try {
-
-    await deleteProject(id);
-
-    alert(
-      "Project deleted."
-    );
-
-    navigate(
-      "/my-projects"
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      error?.response?.data?.detail ||
-      "Failed to delete project."
-    );
-
-  }
-
-};
+  const handleDeleteProject = async () => {
+    if (!window.confirm("Delete this project?")) return;
+    try {
+      await deleteProject(id);
+      alert("Project deleted.");
+      navigate("/my-projects");
+    } catch (error) {
+      console.error(error);
+      alert(error?.response?.data?.detail || "Failed to delete project.");
+    }
+  };
 
   const handleApply = async () => {
     try {
       setApplying(true);
-
       if (opportunities.length === 0) {
         alert("No open opportunities");
         return;
       }
-
       await createApplication(opportunities[0].id);
-
       alert("Application submitted!");
     } catch (error) {
       console.error(error);
-      alert(
-        error?.response?.data?.detail || "Failed to apply"
-      );
+      alert(error?.response?.data?.detail || "Failed to apply");
     } finally {
       setApplying(false);
     }
@@ -165,7 +164,21 @@ async () => {
   if (loading) {
     return (
       <Layout>
-        <div className="p-10">Loading project...</div>
+        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{
+            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
+            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
+            display: "flex", alignItems: "center", gap: 10,
+          }}>
+            <span style={{
+              width: 16, height: 16, borderRadius: "50%",
+              border: `2px solid ${C.border}`, borderTopColor: C.brand,
+              animation: "spin 0.8s linear infinite",
+            }} />
+            loading the goods...
+          </div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        </div>
       </Layout>
     );
   }
@@ -173,164 +186,365 @@ async () => {
   if (!project) {
     return (
       <Layout>
-        <div className="p-10">Project not found.</div>
+        <div style={{
+          minHeight: "60vh", display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: 8,
+          fontFamily: '"DM Sans", sans-serif', color: C.dark2,
+        }}>
+          <span style={{ fontSize: 40 }}>🫥</span>
+          <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark }}>
+            nothing here
+          </p>
+          <p style={{ fontSize: 13, color: C.muted }}>this project doesn't exist (or got deleted)</p>
+        </div>
       </Layout>
     );
   }
 
-  console.log("Current User:", user);
-  console.log("Project:", project);
-  console.log("Project Owner:", project?.owner_id);
-  console.log("Is Owner:", isOwner);
-
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-lg p-10">
-          <h1 className="text-4xl font-bold text-[#2B1B12] mb-4">
-  {project.title}
-</h1>
+      <style>{STYLES}</style>
+      <div style={{ background: C.bg, minHeight: "100vh", paddingBottom: 80 }}>
+        <div style={{ maxWidth: 880, margin: "0 auto", padding: "36px 20px 0" }}>
 
-<div className="mb-6">
-  <p className="text-sm text-[#8C776A]">
-    Created by
-  </p>
+          {/* breadcrumb / back */}
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontFamily: '"DM Sans", sans-serif', fontSize: 13, fontWeight: 700,
+              color: C.muted, marginBottom: 18, padding: 0,
+              display: "flex", alignItems: "center", gap: 6,
+            }}
+          >
+            ← back
+          </button>
 
-  <button
-    type="button"
-    onClick={() =>
-      navigate(`/profile/${project.owner_id}`)
-    }
-    className="text-[#C4622D] font-semibold hover:underline"
-  >
-    View Creator Profile →
-  </button>
-</div>
-
-          <div className="grid md:grid-cols-2 gap-6 mb-10">
-            <div className="bg-[#FBF8F2] p-5 rounded-xl">
-              <p className="text-sm text-[#8C776A]">Project Type</p>
-              <p className="text-2xl font-semibold">
-                {project.project_type}
-              </p>
+          {/* HERO BLOCK */}
+          <div className="pd-fade pd-tape" style={{
+            position: "relative",
+            background: C.dark,
+            color: C.bg,
+            borderRadius: 28,
+            padding: "44px 36px",
+            marginBottom: 28,
+            boxShadow: "0 14px 40px rgba(43,27,18,0.18)",
+            transform: `rotate(${tilt(0)}deg)`,
+          }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              background: C.orange, color: C.dark,
+              padding: "4px 12px", borderRadius: 999,
+              fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+              letterSpacing: "0.1em", textTransform: "uppercase",
+              marginBottom: 18,
+            }}>
+              {project.project_type || "project"}
             </div>
 
-            <div className="bg-[#FBF8F2] p-5 rounded-xl">
-              <p className="text-sm text-[#8C776A]">Timeline</p>
-              <p className="text-2xl font-semibold">{project.timeline}</p>
+            <h1 style={{
+              fontFamily: '"Syne", sans-serif', fontWeight: 800,
+              fontSize: "clamp(32px, 6vw, 52px)", lineHeight: 1.05,
+              letterSpacing: "-0.02em", margin: 0,
+              wordBreak: "break-word",
+            }}>
+              {project.title}
+            </h1>
+
+            <div style={{
+              display: "flex", flexWrap: "wrap", gap: 10,
+              marginTop: 22, alignItems: "center",
+            }}>
+              <span style={{
+                fontFamily: '"DM Sans", sans-serif', fontSize: 13,
+                color: "rgba(255,248,240,0.6)",
+              }}>
+                cooked up by
+              </span>
+              <button
+                type="button"
+                onClick={() => navigate(`/profile/${project.owner_id}`)}
+                style={{
+                  background: "rgba(244,164,96,0.16)", border: `1px solid rgba(244,164,96,0.35)`,
+                  color: C.orange, borderRadius: 999, padding: "5px 14px",
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 700, fontSize: 13,
+                  cursor: "pointer",
+                }}
+              >
+                view profile →
+              </button>
             </div>
+
+            {project.timeline && (
+              <div style={{
+                marginTop: 26, display: "flex", alignItems: "center", gap: 10,
+                fontFamily: '"DM Sans", sans-serif', fontSize: 13,
+                color: "rgba(255,248,240,0.75)",
+              }}>
+                <span style={{ fontSize: 16 }}>⏳</span>
+                <span>{project.timeline}</span>
+              </div>
+            )}
           </div>
 
-          {/* Project Resources */}
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold text-[#2B1B12] mb-4">
-              Project Resources
-            </h2>
+          {/* DESCRIPTION — torn paper note */}
+          <div className="pd-fade" style={{
+            background: C.surface,
+            border: `1.5px solid ${C.border}`,
+            borderRadius: 22,
+            padding: "28px 30px",
+            marginBottom: 28,
+            position: "relative",
+            transform: `rotate(${tilt(1)}deg)`,
+          }}>
+            <span style={{
+              position: "absolute", top: -14, left: 24,
+              fontSize: 28, transform: `rotate(${tilt(2)}deg)`,
+            }}>📌</span>
+            <p style={{
+              fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+              color: C.muted, textTransform: "uppercase", letterSpacing: "0.14em",
+              marginBottom: 12,
+            }}>
+              the lowdown
+            </p>
+            <p style={{
+              fontFamily: '"DM Sans", sans-serif', fontSize: 16, lineHeight: 1.75,
+              color: C.dark2, margin: 0, whiteSpace: "pre-wrap",
+            }}>
+              {project.description || "no description yet — owner's keeping it mysterious 👀"}
+            </p>
+          </div>
 
-            {isOwner && (
+          {/* ACTION ROW */}
+          <div className="pd-fade" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36 }}>
+            {isOwner ? (
               <>
                 <button
-                  type="button"
-                  className="mb-4 bg-[#A0522D] text-white px-4 py-2 rounded-xl text-sm font-semibold"
-                  onClick={() => setShowResourceForm(!showResourceForm)}
+                  className="pd-btn-prime"
+                  onClick={() => navigate(`/projects/${id}/create-opportunity`)}
+                  style={{
+                    background: C.brand, color: "white", border: "none",
+                    borderRadius: 999, padding: "13px 24px",
+                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                    cursor: "pointer", transition: "all .18s",
+                    display: "flex", alignItems: "center", gap: 8,
+                  }}
                 >
-                  {showResourceForm ? "Cancel" : "+ Add Resource"}
+                  ✨ open a role
                 </button>
-
-                {showResourceForm && (
-                  <div className="mb-6 p-4 border rounded-xl bg-gray-50 flex flex-col gap-3">
-                    <input
-                      type="text"
-                      placeholder="Title"
-                      className="border p-2 rounded"
-                      value={resourceForm.title}
-                      onChange={(e) =>
-                        setResourceForm({
-                          ...resourceForm,
-                          title: e.target.value,
-                        })
-                      }
-                    />
-
-                    <select
-                      className="border p-2 rounded"
-                      value={resourceForm.resource_type}
-                      onChange={(e) =>
-                        setResourceForm({
-                          ...resourceForm,
-                          resource_type: e.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Select Type</option>
-                      <option value="GitHub">GitHub</option>
-                      <option value="Demo">Demo</option>
-                      <option value="Figma">Figma</option>
-                      <option value="Google Drive">Google Drive</option>
-                      <option value="Notion">Notion</option>
-                      <option value="Presentation">Presentation</option>
-                      <option value="Other">Other</option>
-                    </select>
-
-                    <input
-                      type="text"
-                      placeholder="URL"
-                      className="border p-2 rounded"
-                      value={resourceForm.url}
-                      onChange={(e) =>
-                        setResourceForm({
-                          ...resourceForm,
-                          url: e.target.value,
-                        })
-                      }
-                    />
-
-                    <button
-                      type="button"
-                      disabled={addingResource}
-                      className="bg-green-600 text-white px-4 py-2 rounded font-semibold self-start"
-                      onClick={handleAddResource}
-                    >
-                      {addingResource ? "Adding..." : "Add"}
-                    </button>
-                  </div>
-                )}
+                <button
+                  className="pd-btn-ghost"
+                  onClick={() => navigate(`/projects/${id}/edit`)}
+                  style={{
+                    background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
+                    borderRadius: 999, padding: "13px 24px",
+                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                    cursor: "pointer", transition: "all .18s",
+                  }}
+                >
+                  ✏️ edit
+                </button>
+                <button
+                  className="pd-btn-ghost"
+                  onClick={() => navigate(`/projects/${id}/matches`)}
+                  style={{
+                    background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
+                    borderRadius: 999, padding: "13px 24px",
+                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                    cursor: "pointer", transition: "all .18s",
+                  }}
+                >
+                  🤝 matches
+                </button>
+                <button
+                  onClick={handleDeleteProject}
+                  style={{
+                    background: "transparent", color: C.brand, border: `1.5px solid ${C.brand}33`,
+                    borderRadius: 999, padding: "13px 24px",
+                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                    cursor: "pointer", marginLeft: "auto",
+                  }}
+                >
+                  delete 🗑️
+                </button>
               </>
+            ) : (
+              <>
+                <button
+                  className="pd-btn-prime"
+                  onClick={handleApply}
+                  disabled={applying}
+                  style={{
+                    background: C.brand, color: "white", border: "none",
+                    borderRadius: 999, padding: "14px 28px",
+                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 15,
+                    cursor: applying ? "wait" : "pointer", transition: "all .18s",
+                    opacity: applying ? 0.7 : 1,
+                  }}
+                >
+                  {applying ? "sending..." : "🙋 i'm in, let me apply"}
+                </button>
+                <button
+                  className="pd-btn-ghost"
+                  onClick={() => navigate(`/projects/${id}/matches`)}
+                  style={{
+                    background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
+                    borderRadius: 999, padding: "14px 24px",
+                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                    cursor: "pointer", transition: "all .18s",
+                  }}
+                >
+                  see who fits 🤝
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* RESOURCES — scattered pinboard */}
+          <div className="pd-fade" style={{ marginBottom: 36 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <h2 style={{
+                fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
+                color: C.dark, margin: 0,
+              }}>
+                🧷 stuff you'll need
+              </h2>
+              {isOwner && (
+                <button
+                  onClick={() => setShowResourceForm((s) => !s)}
+                  style={{
+                    background: showResourceForm ? C.dark : C.sand,
+                    color: showResourceForm ? C.orange : C.dark,
+                    border: "none", borderRadius: 999, padding: "8px 16px",
+                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 12,
+                    cursor: "pointer",
+                  }}
+                >
+                  {showResourceForm ? "nvm, close" : "+ drop a link"}
+                </button>
+              )}
+            </div>
+
+            {showResourceForm && (
+              <div className="pd-fade" style={{
+                background: C.surface, border: `1.5px dashed ${C.border}`,
+                borderRadius: 18, padding: 20, marginBottom: 16,
+                display: "flex", flexDirection: "column", gap: 10,
+              }}>
+                <input
+                  type="text"
+                  placeholder="what is it called?"
+                  value={resourceForm.title}
+                  onChange={(e) => setResourceForm({ ...resourceForm, title: e.target.value })}
+                  style={{
+                    border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "10px 14px",
+                    fontFamily: '"DM Sans", sans-serif', fontSize: 14, background: C.bg, color: C.dark,
+                  }}
+                />
+                <select
+                  value={resourceForm.resource_type}
+                  onChange={(e) => setResourceForm({ ...resourceForm, resource_type: e.target.value })}
+                  style={{
+                    border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "10px 14px",
+                    fontFamily: '"DM Sans", sans-serif', fontSize: 14, background: C.bg, color: C.dark,
+                  }}
+                >
+                  <option value="">type?</option>
+                  <option value="GitHub">GitHub</option>
+                  <option value="Demo">Demo</option>
+                  <option value="Figma">Figma</option>
+                  <option value="Google Drive">Google Drive</option>
+                  <option value="Notion">Notion</option>
+                  <option value="Presentation">Presentation</option>
+                  <option value="Other">Other</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="paste the link"
+                  value={resourceForm.url}
+                  onChange={(e) => setResourceForm({ ...resourceForm, url: e.target.value })}
+                  style={{
+                    border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "10px 14px",
+                    fontFamily: '"DM Sans", sans-serif', fontSize: 14, background: C.bg, color: C.dark,
+                  }}
+                />
+                <button
+                  disabled={addingResource}
+                  onClick={handleAddResource}
+                  style={{
+                    alignSelf: "flex-start", background: C.brand, color: "white", border: "none",
+                    borderRadius: 999, padding: "10px 22px",
+                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                    cursor: addingResource ? "wait" : "pointer", opacity: addingResource ? 0.7 : 1,
+                  }}
+                >
+                  {addingResource ? "adding..." : "pin it"}
+                </button>
+              </div>
             )}
 
             {links.length === 0 ? (
-              <p className="text-[#8C776A]">No resources added yet.</p>
+              <div style={{
+                border: `1.5px dashed ${C.border}`, borderRadius: 18, padding: "26px 20px",
+                textAlign: "center", fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 14,
+              }}>
+                empty board so far — nothing pinned yet 🕸️
+              </div>
             ) : (
-              <div className="space-y-3">
-                {links.map((link) => (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
+                {links.map((link, i) => (
                   <div
                     key={link.id}
-                    className="bg-[#FBF8F2] rounded-xl p-4 flex justify-between items-center"
+                    className="pd-res-card"
+                    style={{
+                      background: C.surface, border: `1.5px solid ${C.border}`,
+                      borderRadius: 18, padding: "16px 18px",
+                      transform: `rotate(${tilt(i)}deg)`,
+                      transition: "all .18s ease",
+                      display: "flex", flexDirection: "column", gap: 10,
+                    }}
                   >
-                    <div>
-                      <p className="font-semibold">{link.title}</p>
-                      <p className="text-sm text-[#8C776A]">
-                        {link.resource_type}
-                      </p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 20 }}>
+                        {RESOURCE_ICONS[link.resource_type] || "🔗"}
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{
+                          fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14,
+                          color: C.dark, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                        }}>
+                          {link.title}
+                        </p>
+                        <p style={{
+                          fontFamily: '"DM Sans", sans-serif', fontSize: 11, color: C.muted,
+                          margin: 0, textTransform: "uppercase", letterSpacing: "0.06em",
+                        }}>
+                          {link.resource_type}
+                        </p>
+                      </div>
                     </div>
-
-                    <div className="flex flex-col items-end gap-2">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[#C4622D] font-semibold"
+                        href={link.url} target="_blank" rel="noreferrer"
+                        className="pd-link"
+                        style={{
+                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                          color: C.brand, textDecoration: "none",
+                        }}
                       >
-                        Open →
+                        open →
                       </a>
-                      
                       {isOwner && (
                         <button
-                          type="button"
                           onClick={() => handleDeleteResource(link.id)}
-                          className="text-red-600 text-sm font-semibold hover:underline"
+                          style={{
+                            background: "none", border: "none", cursor: "pointer",
+                            fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 700,
+                            color: C.muted,
+                          }}
                         >
-                          Delete
+                          remove
                         </button>
                       )}
                     </div>
@@ -340,100 +554,53 @@ async () => {
             )}
           </div>
 
-       {/* Project Description */}
-
-<p className="text-xl text-[#4A372D] mb-8">
-  {project.description}
-</p>
-
-{/* Action Buttons */}
-
-<div className="flex gap-4 mt-8 flex-wrap">
-  {isOwner ? (
-    <>
-      <button
-        onClick={() =>
-          navigate(`/projects/${id}/create-opportunity`)
-        }
-        className="border border-green-600 text-green-600 px-6 py-3 rounded-xl font-semibold"
-      >
-        Create Opportunity
-      </button>
-
-      <button
-        onClick={() =>
-          navigate(`/projects/${id}/edit`)
-        }
-        className="border border-blue-600 text-blue-600 px-6 py-3 rounded-xl font-semibold"
-      >
-        Edit Project
-      </button>
-
-      <button
-        onClick={() =>
-          navigate(`/projects/${id}/matches`)
-        }
-        className="border border-[#A0522D] text-[#A0522D] px-6 py-3 rounded-xl font-semibold"
-      >
-        View Matches
-      </button>
-
-      <button
-        type="button"
-        onClick={
-         handleDeleteProject
-        }
-        className="border border-red-600 text-red-600 px-6 py-3 rounded-xl font-semibold"
-      >
-        Delete Project
-      </button>
-    </>
-  ) : (
-    <>
-      <button
-        onClick={handleApply}
-        disabled={applying}
-        className="bg-[#E35336] text-white px-6 py-3 rounded-xl font-semibold"
-      >
-        {applying ? "Applying..." : "Apply"}
-      </button>
-
-      <button
-        onClick={() =>
-          navigate(`/projects/${id}/matches`)
-        }
-        className="border border-[#A0522D] text-[#A0522D] px-6 py-3 rounded-xl font-semibold"
-      >
-        View Matches
-      </button>
-    </>
-  )}
-</div>
-            
-          
-
-          {/* Owner-Specific Opportunities List */}
+          {/* OWNER: OPEN ROLES */}
           {isOwner && opportunities.length > 0 && (
-            <div className="mt-10 border-t pt-10">
-              <h2 className="text-2xl font-bold mb-4">Opportunities</h2>
-
-              <div className="space-y-3">
+            <div className="pd-fade" style={{ marginTop: 8 }}>
+              <h2 style={{
+                fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
+                color: C.dark, marginBottom: 16,
+              }}>
+                📬 who's knocking
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {opportunities.map((opportunity) => (
                   <div
                     key={opportunity.id}
-                    className="border rounded-xl p-4 flex justify-between items-center"
+                    style={{
+                      background: C.surface, border: `1.5px solid ${C.border}`,
+                      borderRadius: 16, padding: "16px 20px",
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      flexWrap: "wrap", gap: 10,
+                    }}
                   >
-                    <h3 className="font-semibold">{opportunity.role}</h3>
-
+                    <div>
+                      <p style={{
+                        fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 16,
+                        color: C.dark, margin: 0,
+                      }}>
+                        {opportunity.role}
+                      </p>
+                      {(opportunity.seats != null || opportunity.status) && (
+                        <p style={{
+                          fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: C.muted, margin: "2px 0 0",
+                        }}>
+                          {opportunity.seats != null ? `${opportunity.seats} seat${opportunity.seats !== 1 ? "s" : ""}` : ""}
+                          {opportunity.seats != null && opportunity.status ? " · " : ""}
+                          {opportunity.status}
+                        </p>
+                      )}
+                    </div>
                     <button
-                      onClick={() =>
-                        navigate(
-                          `/opportunities/${opportunity.id}/applicants`
-                        )
-                      }
-                      className="bg-blue-600 text-white px-4 py-2 rounded font-semibold"
+                      onClick={() => navigate(`/opportunities/${opportunity.id}/applicants`)}
+                      style={{
+                        background: C.dark, color: C.orange, border: "none",
+                        borderRadius: 999, padding: "9px 18px",
+                        fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                        cursor: "pointer",
+                      }}
                     >
-                      View Applicants
+                      view applicants
                     </button>
                   </div>
                 ))}
