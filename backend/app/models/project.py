@@ -34,6 +34,15 @@ class Project(Base):
     project_type = Column(
         String
     )
+    problem = Column(Text)
+
+    goal = Column(Text)
+
+    tech_stack = Column(Text)
+
+    current_progress = Column(Text)
+
+    contribution_guide = Column(Text)
 
     owner_id = Column(
         Integer,

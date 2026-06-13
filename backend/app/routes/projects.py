@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 
-
 from app.models.project import Project
 
 from app.utils.security import (
@@ -65,6 +64,7 @@ def get_projects(
 
     return projects
 
+
 @router.get(
     "/projects/me",
     response_model=list[ProjectResponse]
@@ -81,7 +81,6 @@ def get_my_projects(
     )
 
     return projects
-
 
 
 @router.get(

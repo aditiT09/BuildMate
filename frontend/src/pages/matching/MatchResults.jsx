@@ -1,14 +1,54 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { getProjectMatches } from "../../api/matching";
 import Layout from "../../components/layout/Layout";
 
+const C = {
+  brand:   "#E35336",
+  brandDk: "#B8391F",
+  orange:  "#F4A460",
+  dark:    "#2B1B12",
+  dark2:   "#4A372D",
+  muted:   "#8C776A",
+  border:  "#E9DDD0",
+  bg:      "#FFF8F0",
+  surface: "#FDFBF7",
+  sand:    "#F5EDE0",
+  green:   "#5C8A52",
+};
+
+const MEDALS = ["🥇", "🥈", "🥉"];
+
+const tilt = (n) => {
+  const seq = [-1.4, 1.1, -0.7, 1.6, -1.1, 0.8];
+  return seq[n % seq.length];
+};
+
+const scoreColor = (score) => {
+  if (score >= 70) return C.green;
+  if (score >= 40) return C.brand;
+  return C.muted;
+};
+
+const STYLES = `
+  @keyframes floatIn { from { opacity:0; transform: translateY(10px) } to { opacity:1; transform: translateY(0) } }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  @keyframes fillBar { from { width: 0% } }
+  .mr-fade { animation: floatIn .35s ease both; }
+  .mr-card { transition: transform .18s ease, box-shadow .18s ease; }
+  .mr-card:hover { transform: rotate(0deg) translateY(-3px) !important; box-shadow: 0 14px 32px rgba(43,27,18,0.12) !important; }
+  .mr-bar-fill { animation: fillBar .7s ease both; }
+  .mr-pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 12px; font-family: "DM Sans", sans-serif; font-size: 12px; font-weight: 800; }
+`;
+
 export default function MatchResults() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadMatches();
@@ -18,8 +58,9 @@ export default function MatchResults() {
     try {
       const data = await getProjectMatches(id);
       setMatches(data);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setError(err?.response?.data?.detail || "Failed to load matches");
     } finally {
       setLoading(false);
     }
@@ -32,18 +73,58 @@ export default function MatchResults() {
   if (loading) {
     return (
       <Layout>
-        <div className="p-10">
-          Loading matches...
+        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{
+            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
+            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
+            display: "flex", alignItems: "center", gap: 10,
+          }}>
+            <span style={{
+              width: 16, height: 16, borderRadius: "50%",
+              border: `2px solid ${C.border}`, borderTopColor: C.brand,
+              animation: "spin 0.8s linear infinite",
+            }} />
+            crunching the numbers...
+          </div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
         </div>
       </Layout>
     );
   }
 
-  if (matches.length === 0) {
+  if (error) {
     return (
       <Layout>
-        <div className="p-10">
-          No matches found.
+        <div style={{
+          minHeight: "60vh", display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: 8,
+          fontFamily: '"DM Sans", sans-serif', color: C.dark2, textAlign: "center", padding: 20,
+        }}>
+          <span style={{ fontSize: 40 }}>🚫</span>
+          <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark }}>
+            can't show this
+          </p>
+          <p style={{ fontSize: 13, color: C.muted }}>{error}</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (sortedMatches.length === 0) {
+    return (
+      <Layout>
+        <div style={{
+          minHeight: "60vh", display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: 8,
+          fontFamily: '"DM Sans", sans-serif', color: C.dark2, textAlign: "center", padding: 20,
+        }}>
+          <span style={{ fontSize: 40 }}>🔍</span>
+          <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark }}>
+            no matches yet
+          </p>
+          <p style={{ fontSize: 13, color: C.muted, maxWidth: 320 }}>
+            nobody's skills line up well enough rn — check back once more people fill out their profiles 🌱
+          </p>
         </div>
       </Layout>
     );
@@ -51,159 +132,220 @@ export default function MatchResults() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#F5F5DC] py-10 px-6">
-        <div className="max-w-4xl mx-auto">
+      <style>{STYLES}</style>
+      <div style={{ background: C.bg, minHeight: "100vh", paddingBottom: 80 }}>
+        <div style={{ maxWidth: 880, margin: "0 auto", padding: "36px 20px 0" }}>
 
-          <h1 className="text-4xl font-bold text-[#2B1B12] mb-2">
-            Top Matches
-          </h1>
+          {/* back */}
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontFamily: '"DM Sans", sans-serif', fontSize: 13, fontWeight: 700,
+              color: C.muted, marginBottom: 18, padding: 0,
+              display: "flex", alignItems: "center", gap: 6,
+            }}
+          >
+            ← back
+          </button>
 
-          <p className="text-gray-600 mt-2 mb-8">
-            Ranked by skills, activity and reliability.
-          </p>
+          {/* HERO */}
+          <div className="mr-fade" style={{
+            position: "relative",
+            background: C.dark, color: C.bg,
+            borderRadius: 28, padding: "40px 36px",
+            marginBottom: 28,
+            boxShadow: "0 14px 40px rgba(43,27,18,0.18)",
+            transform: "rotate(-1deg)",
+          }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              background: C.orange, color: C.dark,
+              padding: "4px 12px", borderRadius: 999,
+              fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+              letterSpacing: "0.1em", textTransform: "uppercase",
+              marginBottom: 18,
+            }}>
+              match results
+            </div>
 
-          <div className="space-y-5">
+            <h1 style={{
+              fontFamily: '"Syne", sans-serif', fontWeight: 800,
+              fontSize: "clamp(28px, 5.5vw, 46px)", lineHeight: 1.08,
+              letterSpacing: "-0.02em", margin: 0,
+            }}>
+              who's actually a fit 🔎
+            </h1>
 
+            <p style={{
+              fontFamily: '"DM Sans", sans-serif', fontSize: 14,
+              color: "rgba(255,248,240,0.7)", marginTop: 14, maxWidth: 480, lineHeight: 1.6,
+            }}>
+              ranked by skill overlap, activity, and how reliable they've been. top picks first.
+            </p>
+          </div>
+
+          {/* MATCH CARDS */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             {sortedMatches.map((match, index) => {
-
-              const matchingSkills =
-                match.matching_skills ?? [];
-
-              const missingSkills =
-                match.missing_skills ?? [];
+              const matchingSkills = match.matching_skills ?? [];
+              const missingSkills = match.missing_skills ?? [];
+              const color = scoreColor(match.overall_score);
 
               return (
                 <div
                   key={match.user_id}
-                  className="bg-white rounded-2xl shadow-md p-6"
+                  className="mr-fade mr-card"
+                  style={{
+                    background: C.surface, border: `1.5px solid ${C.border}`,
+                    borderRadius: 22, padding: "24px 26px",
+                    transform: `rotate(${tilt(index)}deg)`,
+                  }}
                 >
-                  <div className="flex justify-between items-center mb-4">
-
-                    <div className="flex items-center gap-3">
-
-                      <span className="bg-[#E35336] text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""} #{index + 1}
+                  {/* header */}
+                  <div style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                    flexWrap: "wrap", gap: 12, marginBottom: 18,
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span className="mr-pill" style={{
+                        background: index < 3 ? C.orange : C.sand,
+                        color: C.dark,
+                      }}>
+                        {MEDALS[index] || `#${index + 1}`} {index >= 3 ? `rank ${index + 1}` : ""}
                       </span>
-
-                      <h2 className="text-xl font-semibold text-[#2B1B12]">
+                      <h2 style={{
+                        fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20,
+                        color: C.dark, margin: 0,
+                      }}>
                         {match.name}
                       </h2>
-
                     </div>
 
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">
-                        Overall Compatibility
+                    <div style={{ textAlign: "right" }}>
+                      <p style={{
+                        fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+                        color: C.muted, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0,
+                      }}>
+                        overall vibe
                       </p>
-
-                      <p className="text-lg font-bold text-[#2B1B12]">
+                      <p style={{
+                        fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 26,
+                        color, margin: 0,
+                      }}>
                         {match.overall_score.toFixed(1)}%
                       </p>
                     </div>
-
                   </div>
 
-                  <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-
+                  {/* progress bar */}
+                  <div style={{
+                    width: "100%", background: C.sand, borderRadius: 999,
+                    height: 12, overflow: "hidden", marginBottom: 20,
+                  }}>
                     <div
-                      className={`h-4 rounded-full transition-all duration-500 ${
-                        match.overall_score >= 70
-                          ? "bg-green-500"
-                          : match.overall_score >= 40
-                          ? "bg-[#E35336]"
-                          : "bg-gray-400"
-                      }`}
+                      className="mr-bar-fill"
                       style={{
+                        height: "100%", borderRadius: 999,
                         width: `${match.overall_score}%`,
+                        background: color,
                       }}
                     />
-
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 mt-5 text-center">
-
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Skill Match
-                      </p>
-
-                      <p className="font-bold">
-                        {match.skill_match.toFixed(1)}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Activity
-                      </p>
-
-                      <p className="font-bold">
-                        {match.activity_score}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Reliability
-                      </p>
-
-                      <p className="font-bold">
-                        {match.reliability_score}
-                      </p>
-                    </div>
-
+                  {/* stat row */}
+                  <div style={{
+                    display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12,
+                    marginBottom: 22,
+                  }}>
+                    {[
+                      { label: "skill match", value: match.skill_match.toFixed(1), emoji: "🧠" },
+                      { label: "activity", value: match.activity_score, emoji: "⚡" },
+                      { label: "reliability", value: match.reliability_score, emoji: "🤝" },
+                    ].map((stat) => (
+                      <div key={stat.label} style={{
+                        background: C.bg, border: `1.5px solid ${C.border}`,
+                        borderRadius: 14, padding: "12px 10px", textAlign: "center",
+                      }}>
+                        <p style={{ fontSize: 18, margin: "0 0 4px" }}>{stat.emoji}</p>
+                        <p style={{
+                          fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 17,
+                          color: C.dark, margin: 0,
+                        }}>
+                          {stat.value}
+                        </p>
+                        <p style={{
+                          fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 700,
+                          color: C.muted, textTransform: "uppercase", letterSpacing: "0.06em", margin: "2px 0 0",
+                        }}>
+                          {stat.label}
+                        </p>
+                      </div>
+                    ))}
                   </div>
 
-                  <div className="mt-5 grid md:grid-cols-2 gap-6">
-
+                  {/* skills */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <div>
-                      <h3 className="font-semibold text-green-700 mb-2">
-                        Matching Skills
-                      </h3>
-
+                      <p style={{
+                        fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+                        color: C.green, textTransform: "uppercase", letterSpacing: "0.1em",
+                        marginBottom: 8,
+                      }}>
+                        brings to the table
+                      </p>
                       {matchingSkills.length > 0 ? (
-                        <ul className="space-y-1">
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                           {matchingSkills.map((skill) => (
-                            <li key={skill}>
+                            <span key={skill} style={{
+                              background: "#EAF3E7", color: C.green,
+                              border: "1px solid #CDE3C7",
+                              borderRadius: 999, padding: "4px 10px",
+                              fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 700,
+                            }}>
                               ✅ {skill}
-                            </li>
+                            </span>
                           ))}
-                        </ul>
+                        </div>
                       ) : (
-                        <p className="text-gray-500">
-                          No matching skills
+                        <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: C.muted, margin: 0 }}>
+                          no overlap here
                         </p>
                       )}
                     </div>
 
                     <div>
-                      <h3 className="font-semibold text-red-600 mb-2">
-                        Missing Skills
-                      </h3>
-
+                      <p style={{
+                        fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+                        color: C.brand, textTransform: "uppercase", letterSpacing: "0.1em",
+                        marginBottom: 8,
+                      }}>
+                        gaps to fill
+                      </p>
                       {missingSkills.length > 0 ? (
-                        <ul className="space-y-1">
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                           {missingSkills.map((skill) => (
-                            <li key={skill}>
+                            <span key={skill} style={{
+                              background: "#FBEAE6", color: C.brandDk,
+                              border: "1px solid #F4CFC6",
+                              borderRadius: 999, padding: "4px 10px",
+                              fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 700,
+                            }}>
                               ❌ {skill}
-                            </li>
+                            </span>
                           ))}
-                        </ul>
+                        </div>
                       ) : (
-                        <p className="text-gray-500">
-                          🎉 Complete skill match
+                        <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: C.muted, margin: 0 }}>
+                          🎉 nothing missing
                         </p>
                       )}
                     </div>
-
                   </div>
-
                 </div>
               );
             })}
-
           </div>
-
         </div>
       </div>
     </Layout>
