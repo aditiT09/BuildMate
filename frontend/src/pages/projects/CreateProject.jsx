@@ -7,8 +7,64 @@ import {
   getProjectById,
   updateProject,
 } from "../../api/projects";
-import { getSkills } from "../../api/userSkills";
-import { addProjectSkill } from "../../api/projectSkills";
+
+const C = {
+  brand:   "#E35336",
+  brandDk: "#B8391F",
+  orange:  "#F4A460",
+  dark:    "#2B1B12",
+  dark2:   "#4A372D",
+  muted:   "#8C776A",
+  border:  "#E9DDD0",
+  bg:      "#FFF8F0",
+  surface: "#FDFBF7",
+  sand:    "#F5EDE0",
+};
+
+const TYPE_PRESETS = [
+  { label: "Web App", emoji: "🌐" },
+  { label: "Mobile App", emoji: "📱" },
+  { label: "AI / ML", emoji: "🤖" },
+  { label: "Design", emoji: "🎨" },
+  { label: "Hackathon", emoji: "⚡" },
+  { label: "Open Source", emoji: "🔓" },
+];
+
+const STYLES = `
+  @keyframes floatIn { from { opacity:0; transform: translateY(10px) } to { opacity:1; transform: translateY(0) } }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .cp-fade { animation: floatIn .35s ease both; }
+  .cp-input {
+    width: 100%;
+    border: 1.5px solid ${C.border};
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    color: ${C.dark};
+    background: ${C.bg};
+    transition: all .15s ease;
+    box-sizing: border-box;
+  }
+  .cp-input:focus {
+    outline: none;
+    border-color: ${C.brand};
+    background: white;
+    box-shadow: 0 0 0 4px ${C.brand}1A;
+  }
+  .cp-input::placeholder { color: ${C.muted}; opacity: .7; }
+  .cp-chip {
+    cursor: pointer; border: 1.5px solid ${C.border};
+    background: ${C.bg}; border-radius: 999px;
+    padding: 8px 16px; font-family: "DM Sans", sans-serif;
+    font-size: 13px; font-weight: 700; color: ${C.dark2};
+    transition: all .15s ease; display: flex; align-items: center; gap: 6px;
+  }
+  .cp-chip:hover { border-color: ${C.brand}; transform: translateY(-1px); }
+  .cp-chip.on { background: ${C.dark}; color: ${C.orange}; border-color: ${C.dark}; }
+  .cp-submit:hover { background: ${C.brandDk}; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(227,83,54,0.28); }
+  .cp-submit:disabled { opacity: .6; cursor: wait; transform: none; }
+`;
 
 export default function CreateProject() {
   const navigate = useNavigate();
@@ -22,37 +78,18 @@ export default function CreateProject() {
   });
 
   const [loading, setLoading] = useState(false);
-
-  // State Management
-  const [allSkills, setAllSkills] = useState([]);
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  const [selectedSkill, setSelectedSkill] = useState("");
+  const [loadingProject, setLoadingProject] = useState(!!id);
 
   useEffect(() => {
-    loadSkills();
-
     if (id) {
       loadProject();
     }
     // eslint-disable-next-line
   }, [id]);
 
-  // Clean Readability Helper for API property fallback variations
-  const getSkillName = (skill) => skill?.name || skill?.skill_name || "";
-
-  const loadSkills = async () => {
-    try {
-      const skills = await getSkills();
-      setAllSkills(skills);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const loadProject = async () => {
     try {
       const project = await getProjectById(id);
-
       setForm({
         title: project.title,
         description: project.description,
@@ -62,216 +99,214 @@ export default function CreateProject() {
     } catch (error) {
       console.error(error);
       alert(error?.response?.data?.detail || "Failed to load project.");
+    } finally {
+      setLoadingProject(false);
     }
   };
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       setLoading(true);
 
       let project;
-
       if (id) {
         project = await updateProject(id, form);
         alert("Project updated successfully!");
       } else {
         project = await createProject(form);
-
-        // Execute skill associations concurrently instead of sequentially
-        if (selectedSkills.length > 0) {
-          await Promise.all(
-            selectedSkills.map((skill) =>
-              addProjectSkill(project.id, skill.id)
-            )
-          );
-        }
-
         alert("Project created successfully!");
       }
 
       navigate(`/projects/${project.id}`);
     } catch (error) {
       console.error(error);
-      alert(
-        error?.response?.data?.detail ||
-          `Failed to ${id ? "update" : "create"} project`
-      );
+      alert(error?.response?.data?.detail || `Failed to ${id ? "update" : "create"} project`);
     } finally {
       setLoading(false);
     }
   };
 
+  if (loadingProject) {
+    return (
+      <Layout>
+        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{
+            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
+            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
+            display: "flex", alignItems: "center", gap: 10,
+          }}>
+            <span style={{
+              width: 16, height: 16, borderRadius: "50%",
+              border: `2px solid ${C.border}`, borderTopColor: C.brand,
+              animation: "spin 0.8s linear infinite",
+            }} />
+            pulling up your draft...
+          </div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-6 py-10">
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-5xl font-bold text-[#24120C] mb-3">
-            {id ? "Edit Project" : "Create Project"}
-          </h1>
+      <style>{STYLES}</style>
+      <div style={{ background: C.bg, minHeight: "100vh", paddingBottom: 80 }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "36px 20px 0" }}>
 
-          <p className="text-[#4A372D] text-lg">
-            {id
-              ? "Refine your idea and keep your team updated."
-              : "Publish an idea and find teammates to help build it."}
-          </p>
-        </div>
+          {/* back */}
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontFamily: '"DM Sans", sans-serif', fontSize: 13, fontWeight: 700,
+              color: C.muted, marginBottom: 18, padding: 0,
+              display: "flex", alignItems: "center", gap: 6,
+            }}
+          >
+            ← back
+          </button>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="bg-[#FDFBF8] border border-[#D9D0C8] rounded-3xl p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold text-[#24120C] mb-6">
-              Project Details
-            </h2>
-
-            {/* Title */}
-            <div className="mb-5">
-              <label className="block mb-2 font-medium text-[#24120C]">
-                Project Title
-              </label>
-              <input
-                type="text"
-                name="title"
-                placeholder="AI Resume Builder"
-                value={form.title}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-[#D9D0C8] bg-white p-4 focus:outline-none focus:ring-2 focus:ring-[#C4622D] focus:border-[#C4622D] transition"
-                required
-              />
+          {/* HERO */}
+          <div className="cp-fade" style={{
+            position: "relative",
+            background: C.dark, color: C.bg,
+            borderRadius: 28, padding: "40px 36px",
+            marginBottom: 28,
+            boxShadow: "0 14px 40px rgba(43,27,18,0.18)",
+            transform: "rotate(-1deg)",
+          }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              background: C.orange, color: C.dark,
+              padding: "4px 12px", borderRadius: 999,
+              fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+              letterSpacing: "0.1em", textTransform: "uppercase",
+              marginBottom: 18,
+            }}>
+              {id ? "editing" : "new drop"}
             </div>
 
-            {/* Description */}
-            <div className="mb-5">
-              <label className="block mb-2 font-medium text-[#24120C]">
-                Description
-              </label>
-              <textarea
-                name="description"
-                placeholder="Tell potential teammates what you're building, why it matters, and what help you're looking for..."
-                value={form.description}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-[#D9D0C8] bg-white p-4 min-h-[180px] focus:outline-none focus:ring-2 focus:ring-[#C4622D] focus:border-[#C4622D] transition"
-                required
-              />
-            </div>
+            <h1 style={{
+              fontFamily: '"Syne", sans-serif', fontWeight: 800,
+              fontSize: "clamp(28px, 5.5vw, 46px)", lineHeight: 1.08,
+              letterSpacing: "-0.02em", margin: 0,
+            }}>
+              {id ? "tweak your project" : "put your idea out there"}
+            </h1>
 
-            {/* Timeline */}
-            <div className="mb-5">
-              <label className="block mb-2 font-medium text-[#24120C]">
-                Timeline
-              </label>
-              <input
-                type="text"
-                name="timeline"
-                placeholder="8 weeks"
-                value={form.timeline}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-[#D9D0C8] bg-white p-4 focus:outline-none focus:ring-2 focus:ring-[#C4622D] focus:border-[#C4622D] transition"
-                required
-              />
-            </div>
+            <p style={{
+              fontFamily: '"DM Sans", sans-serif', fontSize: 14,
+              color: "rgba(255,248,240,0.7)", marginTop: 14, maxWidth: 480, lineHeight: 1.6,
+            }}>
+              {id
+                ? "update the details — your team will see the latest version instantly."
+                : "give it a name, a vibe, and a rough plan. teammates will find their way in 🚀"}
+            </p>
+          </div>
 
-            {/* Project Type */}
-            <div className="mb-8">
-              <label className="block mb-2 font-medium text-[#24120C]">
-                Project Type
-              </label>
-              <input
-                type="text"
-                name="project_type"
-                placeholder="Web App, AI, Mobile App..."
-                value={form.project_type}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-[#D9D0C8] bg-white p-4 focus:outline-none focus:ring-2 focus:ring-[#C4622D] focus:border-[#C4622D] transition"
-                required
-              />
-            </div>
+          {/* FORM */}
+          <form onSubmit={handleSubmit}>
+            <div className="cp-fade" style={{
+              background: C.surface, border: `1.5px solid ${C.border}`,
+              borderRadius: 22, padding: "30px 30px", marginBottom: 28,
+              transform: "rotate(0.6deg)",
+            }}>
 
-            {/* Required Skills Section */}
-            <div className="mb-8 border-t border-[#D9D0C8] pt-8">
-              <label className="block mb-2 font-medium text-[#24120C]">
-                Required Skills
-              </label>
-
-              <p className="text-sm text-[#4A372D] mb-3">
-                Add project skills to improve teammate recommendations.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-3">
-                <select
-                  value={selectedSkill}
-                  onChange={(e) => setSelectedSkill(e.target.value)}
-                  className="w-full sm:flex-1 rounded-xl border border-[#D9D0C8] bg-white p-4"
-                >
-                  <option value="">Select Skill</option>
-                  {allSkills.map((skill) => (
-                    <option key={skill.id} value={skill.id}>
-                      {getSkillName(skill)}
-                    </option>
-                  ))}
-                </select>
-
-                <button
-                  type="button"
-                  className="px-6 py-4 bg-[#C4622D] text-white hover:bg-[#8B3A1A] rounded-xl font-semibold transition"
-                  onClick={() => {
-                    if (!selectedSkill) return;
-
-                    const skill = allSkills.find(
-                      (s) => s.id === Number(selectedSkill)
-                    );
-
-                    if (skill) {
-                      // Fix: Functional update to prevent closure stale state bugs
-                      setSelectedSkills((prev) => {
-                        if (!prev.some((s) => s.id === skill.id)) {
-                          return [...prev, skill];
-                        }
-                        return prev;
-                      });
-                    }
-
-                    setSelectedSkill("");
-                  }}
-                >
-                  Add Skill
-                </button>
+              {/* Title */}
+              <div style={{ marginBottom: 22 }}>
+                <label style={{
+                  display: "block", marginBottom: 8,
+                  fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
+                }}>
+                  what's it called? 🏷️
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="e.g. campus carpool app"
+                  value={form.title}
+                  onChange={handleChange}
+                  className="cp-input"
+                  required
+                />
               </div>
 
-              {/* Tag style dynamic layout representation */}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {selectedSkills.map((skill) => (
-                  <div
-                    key={skill.id}
-                    className="flex justify-between items-center bg-[#F4F1EE] border border-[#D9D0C8] rounded-full px-4 py-2"
-                  >
-                    <span className="text-sm font-medium text-[#24120C] mr-2">
-                      {getSkillName(skill)}
-                    </span>
+              {/* Description */}
+              <div style={{ marginBottom: 22 }}>
+                <label style={{
+                  display: "block", marginBottom: 8,
+                  fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
+                }}>
+                  what's the pitch? 💬
+                </label>
+                <textarea
+                  name="description"
+                  placeholder="what are you building, why does it matter, and what kind of help are you after?"
+                  value={form.description}
+                  onChange={handleChange}
+                  className="cp-input"
+                  style={{ minHeight: 160, resize: "vertical", fontFamily: '"DM Sans", sans-serif', lineHeight: 1.6 }}
+                  required
+                />
+              </div>
 
+              {/* Timeline */}
+              <div style={{ marginBottom: 22 }}>
+                <label style={{
+                  display: "block", marginBottom: 8,
+                  fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
+                }}>
+                  how long's the grind? ⏳
+                </label>
+                <input
+                  type="text"
+                  name="timeline"
+                  placeholder="e.g. 6-8 weeks"
+                  value={form.timeline}
+                  onChange={handleChange}
+                  className="cp-input"
+                  required
+                />
+              </div>
+
+              {/* Project Type */}
+              <div>
+                <label style={{
+                  display: "block", marginBottom: 8,
+                  fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
+                }}>
+                  what kind of project? 🗂️
+                </label>
+
+                {/* preset chips */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+                  {TYPE_PRESETS.map((t) => (
                     <button
+                      key={t.label}
                       type="button"
-                      className="text-red-600 hover:text-red-800 text-xs font-bold pl-1"
-                      // Fix: Functional update state filter wrapper
-                      onClick={() =>
-                        setSelectedSkills((prev) =>
-                          prev.filter((s) => s.id !== skill.id)
-                        )
-                      }
+                      className={`cp-chip ${form.project_type === t.label ? "on" : ""}`}
+                      onClick={() => setForm({ ...form, project_type: t.label })}
                     >
-                      ✕
+                      <span>{t.emoji}</span> {t.label}
                     </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                <input
+                  type="text"
+                  name="project_type"
+                  placeholder="...or type your own"
+                  value={form.project_type}
+                  onChange={handleChange}
+                  className="cp-input"
+                  required
+                />
               </div>
             </div>
 
@@ -279,18 +314,21 @@ export default function CreateProject() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-[#C4622D] hover:bg-[#8B3A1A] text-white px-8 py-4 rounded-2xl text-lg font-semibold transition disabled:opacity-50"
+              className="cp-submit"
+              style={{
+                background: C.brand, color: "white", border: "none",
+                borderRadius: 999, padding: "16px 32px",
+                fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 16,
+                cursor: loading ? "wait" : "pointer", transition: "all .18s ease",
+                display: "inline-flex", alignItems: "center", gap: 8,
+              }}
             >
               {loading
-                ? id
-                  ? "Saving..."
-                  : "Publishing..."
-                : id
-                ? "Save Changes"
-                : "+ Publish Project"}
+                ? (id ? "saving..." : "publishing...")
+                : (id ? "💾 save changes" : "🚀 publish it")}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </Layout>
   );
