@@ -3,30 +3,28 @@ from pydantic import BaseModel
 
 class ProjectCreate(BaseModel):
 
-    problem: str = ""
+    title: str
 
-    goal: str = ""
+    description: str
 
-    tech_stack: str = ""
+    timeline: str
 
-    current_progress: str = ""
-
-    contribution_guide: str = ""
-    
+    project_type: str
 
 
 class ProjectResponse(BaseModel):
 
-    problem: str | None
+    id: int
 
-    goal: str | None
+    title: str
 
-    tech_stack: str | None
+    description: str
 
-    current_progress: str | None
+    timeline: str
 
-    contribution_guide: str | None
+    project_type: str
+
+    owner_id: int
 
     class Config:
-
         from_attributes = True
