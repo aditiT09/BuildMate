@@ -88,3 +88,24 @@ def get_project_skills(
         db.query(ProjectSkill)
         .all()
     )
+@router.get("/{project_id}")
+def get_project_skills_by_project(
+    project_id: int,
+    db: Session = Depends(get_db)
+):
+
+    skills = (
+        db.query(ProjectSkill)
+        .filter(
+            ProjectSkill.project_id == project_id
+        )
+        .all()
+    )
+
+    return [
+        {
+            "id": item.skill.id,
+            "name": item.skill.name
+        }
+        for item in skills
+    ]

@@ -44,3 +44,12 @@ export const deleteProject = async (
 
   return response.data;
 };
+export const getProjectSkills = async (
+  projectId
+) => {
+  const response = await api.get(
+    `/project-skills/${projectId}`
+  );
+
+  return response.data;
+};

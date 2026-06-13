@@ -12,6 +12,9 @@ import {
   createProjectLink,
   deleteProjectLink,
 } from "../../api/projectLinks";
+import {
+  getProjectSkills,
+} from "../../api/projectSkills";
 
 const C = {
   brand:   "#E35336",
@@ -36,7 +39,6 @@ const RESOURCE_ICONS = {
   Other: "🔗",
 };
 
-// rotate a tiny bit, deterministically, so cards feel hand-placed not grid-generated
 const tilt = (n) => {
   const seq = [-1.6, 1.2, -0.8, 1.8, -1.2, 0.9];
   return seq[n % seq.length];
@@ -62,6 +64,8 @@ const STYLES = `
   .pd-btn-ghost:hover { background:${C.dark}; color:${C.orange}; border-color:${C.dark}; }
   .pd-chip:hover { transform: rotate(0deg) scale(1.04); }
   .pd-res-card:hover { transform: translateY(-3px) rotate(0deg) !important; box-shadow: 0 10px 28px rgba(43,27,18,.10) !important; }
+  .pd-skill-chip { transition: transform .15s ease, box-shadow .15s ease; }
+  .pd-skill-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(227,83,54,0.15); }
 `;
 
 export default function ProjectDetail() {
@@ -83,7 +87,7 @@ export default function ProjectDetail() {
   });
   const [addingResource, setAddingResource] = useState(false);
 
-  const isOwner = user?.id === project?.owner_id;
+  const isOwner = !!(user && project && user.id === project.owner_id);
 
   useEffect(() => {
     loadProject();
@@ -99,6 +103,10 @@ export default function ProjectDetail() {
 
       const projectLinks = await getProjectLinks(id);
       setLinks(projectLinks);
+      const skills =
+await getProjectSkills(id);
+
+setProjectSkills(skills);
     } catch (error) {
       console.error(error);
     } finally {
@@ -160,6 +168,8 @@ export default function ProjectDetail() {
       setApplying(false);
     }
   };
+  const [projectSkills, setProjectSkills] =
+  useState([]);
 
   if (loading) {
     return (
@@ -200,6 +210,8 @@ export default function ProjectDetail() {
       </Layout>
     );
   }
+
+ 
 
   return (
     <Layout>
@@ -251,6 +263,7 @@ export default function ProjectDetail() {
               {project.title}
             </h1>
 
+            {/* FIX: differentiated label for owner vs visitor */}
             <div style={{
               display: "flex", flexWrap: "wrap", gap: 10,
               marginTop: 22, alignItems: "center",
@@ -259,7 +272,7 @@ export default function ProjectDetail() {
                 fontFamily: '"DM Sans", sans-serif', fontSize: 13,
                 color: "rgba(255,248,240,0.6)",
               }}>
-                cooked up by
+                {isOwner ? "your project" : "cooked up by"}
               </span>
               <button
                 type="button"
@@ -271,7 +284,7 @@ export default function ProjectDetail() {
                   cursor: "pointer",
                 }}
               >
-                view profile →
+                {isOwner ? "my profile →" : "view creator profile →"}
               </button>
             </div>
 
@@ -287,7 +300,7 @@ export default function ProjectDetail() {
             )}
           </div>
 
-          {/* DESCRIPTION — torn paper note */}
+          {/* DESCRIPTION */}
           <div className="pd-fade" style={{
             background: C.surface,
             border: `1.5px solid ${C.border}`,
@@ -315,6 +328,51 @@ export default function ProjectDetail() {
               {project.description || "no description yet — owner's keeping it mysterious 👀"}
             </p>
           </div>
+
+          {/* REQUIRED SKILLS */}
+          {projectSkills.length > 0 && (
+            <div className="pd-fade" style={{
+              background: C.surface,
+              border: `1.5px solid ${C.border}`,
+              borderRadius: 22,
+              padding: "24px 28px",
+              marginBottom: 28,
+              position: "relative",
+              transform: `rotate(${tilt(3)}deg)`,
+            }}>
+              <p style={{
+                fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+                color: C.muted, textTransform: "uppercase", letterSpacing: "0.14em",
+                marginBottom: 14, margin: "0 0 14px",
+              }}>
+                🎯 skills they're looking for
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {projectSkills.map((skill) => (
+                  <span
+                    key={skill.id ?? skill.name}
+                    className="pd-skill-chip"
+                    style={{
+                      background: `${C.brand}12`,
+                      color: C.brand,
+                      border: `1.5px solid ${C.brand}30`,
+                      borderRadius: 999,
+                      padding: "6px 14px",
+                      fontFamily: '"DM Sans", sans-serif',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <span style={{ fontSize: 11, opacity: 0.7 }}>●</span>
+                    {skill.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ACTION ROW */}
           <div className="pd-fade" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36 }}>
@@ -370,38 +428,25 @@ export default function ProjectDetail() {
                 </button>
               </>
             ) : (
-              <>
-                <button
-                  className="pd-btn-prime"
-                  onClick={handleApply}
-                  disabled={applying}
-                  style={{
-                    background: C.brand, color: "white", border: "none",
-                    borderRadius: 999, padding: "14px 28px",
-                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 15,
-                    cursor: applying ? "wait" : "pointer", transition: "all .18s",
-                    opacity: applying ? 0.7 : 1,
-                  }}
-                >
-                  {applying ? "sending..." : "🙋 i'm in, let me apply"}
-                </button>
-                <button
-                  className="pd-btn-ghost"
-                  onClick={() => navigate(`/projects/${id}/matches`)}
-                  style={{
-                    background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
-                    borderRadius: 999, padding: "14px 24px",
-                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
-                    cursor: "pointer", transition: "all .18s",
-                  }}
-                >
-                  see who fits 🤝
-                </button>
-              </>
+              // FIX: removed "see who fits" button — matches are owner-only
+              <button
+                className="pd-btn-prime"
+                onClick={handleApply}
+                disabled={applying}
+                style={{
+                  background: C.brand, color: "white", border: "none",
+                  borderRadius: 999, padding: "14px 28px",
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 15,
+                  cursor: applying ? "wait" : "pointer", transition: "all .18s",
+                  opacity: applying ? 0.7 : 1,
+                }}
+              >
+                {applying ? "sending..." : "🙋 i'm in, let me apply"}
+              </button>
             )}
           </div>
 
-          {/* RESOURCES — scattered pinboard */}
+          {/* RESOURCES */}
           <div className="pd-fade" style={{ marginBottom: 36 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
               <h2 style={{
@@ -607,6 +652,7 @@ export default function ProjectDetail() {
               </div>
             </div>
           )}
+
         </div>
       </div>
     </Layout>
