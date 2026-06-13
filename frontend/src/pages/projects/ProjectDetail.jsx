@@ -76,7 +76,7 @@ export default function ProjectDetail() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [opportunities, setOpportunities] = useState([]);
-  const [applying, setApplying] = useState(false);
+  const [applyingId, setApplyingId] = useState(null);
 
   const [links, setLinks] = useState([]);
   const [showResourceForm, setShowResourceForm] = useState(false);
@@ -86,6 +86,7 @@ export default function ProjectDetail() {
     url: "",
   });
   const [addingResource, setAddingResource] = useState(false);
+  const [projectSkills, setProjectSkills] = useState([]);
 
   const isOwner = !!(user && project && user.id === project.owner_id);
 
@@ -103,10 +104,9 @@ export default function ProjectDetail() {
 
       const projectLinks = await getProjectLinks(id);
       setLinks(projectLinks);
-      const skills =
-await getProjectSkills(id);
 
-setProjectSkills(skills);
+      const skills = await getProjectSkills(id);
+      setProjectSkills(skills);
     } catch (error) {
       console.error(error);
     } finally {
@@ -152,24 +152,18 @@ setProjectSkills(skills);
     }
   };
 
-  const handleApply = async () => {
+  const handleApply = async (opportunityId) => {
     try {
-      setApplying(true);
-      if (opportunities.length === 0) {
-        alert("No open opportunities");
-        return;
-      }
-      await createApplication(opportunities[0].id);
+      setApplyingId(opportunityId);
+      await createApplication(opportunityId);
       alert("Application submitted!");
     } catch (error) {
       console.error(error);
       alert(error?.response?.data?.detail || "Failed to apply");
     } finally {
-      setApplying(false);
+      setApplyingId(null);
     }
   };
-  const [projectSkills, setProjectSkills] =
-  useState([]);
 
   if (loading) {
     return (
@@ -210,8 +204,6 @@ setProjectSkills(skills);
       </Layout>
     );
   }
-
- 
 
   return (
     <Layout>
@@ -263,7 +255,6 @@ setProjectSkills(skills);
               {project.title}
             </h1>
 
-            {/* FIX: differentiated label for owner vs visitor */}
             <div style={{
               display: "flex", flexWrap: "wrap", gap: 10,
               marginTop: 22, alignItems: "center",
@@ -343,7 +334,7 @@ setProjectSkills(skills);
               <p style={{
                 fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
                 color: C.muted, textTransform: "uppercase", letterSpacing: "0.14em",
-                marginBottom: 14, margin: "0 0 14px",
+                margin: "0 0 14px",
               }}>
                 🎯 skills they're looking for
               </p>
@@ -374,77 +365,127 @@ setProjectSkills(skills);
             </div>
           )}
 
-          {/* ACTION ROW */}
-          <div className="pd-fade" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36 }}>
-            {isOwner ? (
-              <>
-                <button
-                  className="pd-btn-prime"
-                  onClick={() => navigate(`/projects/${id}/create-opportunity`)}
-                  style={{
-                    background: C.brand, color: "white", border: "none",
-                    borderRadius: 999, padding: "13px 24px",
-                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
-                    cursor: "pointer", transition: "all .18s",
-                    display: "flex", alignItems: "center", gap: 8,
-                  }}
-                >
-                  ✨ open a role
-                </button>
-                <button
-                  className="pd-btn-ghost"
-                  onClick={() => navigate(`/projects/${id}/edit`)}
-                  style={{
-                    background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
-                    borderRadius: 999, padding: "13px 24px",
-                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
-                    cursor: "pointer", transition: "all .18s",
-                  }}
-                >
-                  ✏️ edit
-                </button>
-                <button
-                  className="pd-btn-ghost"
-                  onClick={() => navigate(`/projects/${id}/matches`)}
-                  style={{
-                    background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
-                    borderRadius: 999, padding: "13px 24px",
-                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
-                    cursor: "pointer", transition: "all .18s",
-                  }}
-                >
-                  🤝 matches
-                </button>
-                <button
-                  onClick={handleDeleteProject}
-                  style={{
-                    background: "transparent", color: C.brand, border: `1.5px solid ${C.brand}33`,
-                    borderRadius: 999, padding: "13px 24px",
-                    fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
-                    cursor: "pointer", marginLeft: "auto",
-                  }}
-                >
-                  delete 🗑️
-                </button>
-              </>
-            ) : (
-              // FIX: removed "see who fits" button — matches are owner-only
+          {/* ACTION ROW — owner buttons */}
+          {isOwner && (
+            <div className="pd-fade" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36 }}>
               <button
                 className="pd-btn-prime"
-                onClick={handleApply}
-                disabled={applying}
+                onClick={() => navigate(`/projects/${id}/create-opportunity`)}
                 style={{
                   background: C.brand, color: "white", border: "none",
-                  borderRadius: 999, padding: "14px 28px",
-                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 15,
-                  cursor: applying ? "wait" : "pointer", transition: "all .18s",
-                  opacity: applying ? 0.7 : 1,
+                  borderRadius: 999, padding: "13px 24px",
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                  cursor: "pointer", transition: "all .18s",
+                  display: "flex", alignItems: "center", gap: 8,
                 }}
               >
-                {applying ? "sending..." : "🙋 i'm in, let me apply"}
+                ✨ open a role
               </button>
-            )}
-          </div>
+              <button
+                className="pd-btn-ghost"
+                onClick={() => navigate(`/projects/${id}/edit`)}
+                style={{
+                  background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
+                  borderRadius: 999, padding: "13px 24px",
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                  cursor: "pointer", transition: "all .18s",
+                }}
+              >
+                ✏️ edit
+              </button>
+              <button
+                className="pd-btn-ghost"
+                onClick={() => navigate(`/projects/${id}/matches`)}
+                style={{
+                  background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
+                  borderRadius: 999, padding: "13px 24px",
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                  cursor: "pointer", transition: "all .18s",
+                }}
+              >
+                🤝 matches
+              </button>
+              <button
+                onClick={handleDeleteProject}
+                style={{
+                  background: "transparent", color: C.brand, border: `1.5px solid ${C.brand}33`,
+                  borderRadius: 999, padding: "13px 24px",
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                  cursor: "pointer", marginLeft: "auto",
+                }}
+              >
+                delete 🗑️
+              </button>
+            </div>
+          )}
+
+          {/* VISITOR: OPEN ROLES */}
+          {!isOwner && opportunities.length > 0 && (
+            <div className="pd-fade" style={{ marginBottom: 36 }}>
+              <h2 style={{
+                fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
+                color: C.dark, marginBottom: 16,
+              }}>
+                🚪 open roles
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {opportunities.map((opportunity) => (
+                  <div
+                    key={opportunity.id}
+                    style={{
+                      background: C.surface, border: `1.5px solid ${C.border}`,
+                      borderRadius: 18, padding: "18px 22px",
+                      display: "flex", justifyContent: "space-between",
+                      alignItems: "center", flexWrap: "wrap", gap: 12,
+                    }}
+                  >
+                    <div>
+                      <p style={{
+                        fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 16,
+                        color: C.dark, margin: 0,
+                      }}>
+                        {opportunity.role}
+                      </p>
+                      {opportunity.seats != null && (
+                        <p style={{
+                          fontFamily: '"DM Sans", sans-serif', fontSize: 12,
+                          color: C.muted, margin: "3px 0 0",
+                        }}>
+                          {opportunity.seats} seat{opportunity.seats !== 1 ? "s" : ""}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      className="pd-btn-prime"
+                      onClick={() => handleApply(opportunity.id)}
+                      disabled={applyingId === opportunity.id}
+                      style={{
+                        background: C.brand, color: "white", border: "none",
+                        borderRadius: 999, padding: "10px 22px",
+                        fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                        cursor: applyingId === opportunity.id ? "wait" : "pointer",
+                        transition: "all .18s",
+                        opacity: applyingId === opportunity.id ? 0.7 : 1,
+                      }}
+                    >
+                      {applyingId === opportunity.id ? "sending..." : "🙋 apply"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* VISITOR: no open roles */}
+          {!isOwner && opportunities.length === 0 && (
+            <div className="pd-fade" style={{
+              marginBottom: 36,
+              border: `1.5px dashed ${C.border}`, borderRadius: 18, padding: "26px 20px",
+              textAlign: "center", fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 14,
+            }}>
+              no open roles right now — check back later 👀
+            </div>
+          )}
 
           {/* RESOURCES */}
           <div className="pd-fade" style={{ marginBottom: 36 }}>
@@ -599,7 +640,7 @@ setProjectSkills(skills);
             )}
           </div>
 
-          {/* OWNER: OPEN ROLES */}
+          {/* OWNER: OPEN ROLES / APPLICANTS */}
           {isOwner && opportunities.length > 0 && (
             <div className="pd-fade" style={{ marginTop: 8 }}>
               <h2 style={{
