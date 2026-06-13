@@ -17,10 +17,6 @@ export default function MatchResults() {
   const loadMatches = async () => {
     try {
       const data = await getProjectMatches(id);
-
-      console.log("First match:", data[0]);
-      console.log(JSON.stringify(data[0], null, 2));
-
       setMatches(data);
     } catch (error) {
       console.error(error);
@@ -30,7 +26,7 @@ export default function MatchResults() {
   };
 
   const sortedMatches = [...matches].sort(
-    (a, b) => b.match_score - a.match_score
+    (a, b) => b.overall_score - a.overall_score
   );
 
   if (loading) {
@@ -58,9 +54,13 @@ export default function MatchResults() {
       <div className="min-h-screen bg-[#F5F5DC] py-10 px-6">
         <div className="max-w-4xl mx-auto">
 
-          <h1 className="text-4xl font-bold text-[#2B1B12] mb-8">
+          <h1 className="text-4xl font-bold text-[#2B1B12] mb-2">
             Top Matches
           </h1>
+
+          <p className="text-gray-600 mt-2 mb-8">
+            Ranked by skills, activity and reliability.
+          </p>
 
           <div className="space-y-5">
 
@@ -82,7 +82,7 @@ export default function MatchResults() {
                     <div className="flex items-center gap-3">
 
                       <span className="bg-[#E35336] text-white px-3 py-1 rounded-full text-sm font-medium">
-                        #{index + 1}
+                        {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""} #{index + 1}
                       </span>
 
                       <h2 className="text-xl font-semibold text-[#2B1B12]">
@@ -91,9 +91,15 @@ export default function MatchResults() {
 
                     </div>
 
-                    <span className="text-lg font-bold text-[#2B1B12]">
-                      {match.match_score}%
-                    </span>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-500">
+                        Overall Compatibility
+                      </p>
+
+                      <p className="text-lg font-bold text-[#2B1B12]">
+                        {match.overall_score.toFixed(1)}%
+                      </p>
+                    </div>
 
                   </div>
 
@@ -101,16 +107,50 @@ export default function MatchResults() {
 
                     <div
                       className={`h-4 rounded-full transition-all duration-500 ${
-                        match.match_score >= 70
+                        match.overall_score >= 70
                           ? "bg-green-500"
-                          : match.match_score >= 40
+                          : match.overall_score >= 40
                           ? "bg-[#E35336]"
                           : "bg-gray-400"
                       }`}
                       style={{
-                        width: `${match.match_score}%`,
+                        width: `${match.overall_score}%`,
                       }}
                     />
+
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 mt-5 text-center">
+
+                    <div>
+                      <p className="text-sm text-gray-500">
+                        Skill Match
+                      </p>
+
+                      <p className="font-bold">
+                        {match.skill_match.toFixed(1)}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-500">
+                        Activity
+                      </p>
+
+                      <p className="font-bold">
+                        {match.activity_score}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-500">
+                        Reliability
+                      </p>
+
+                      <p className="font-bold">
+                        {match.reliability_score}
+                      </p>
+                    </div>
 
                   </div>
 
@@ -151,7 +191,7 @@ export default function MatchResults() {
                         </ul>
                       ) : (
                         <p className="text-gray-500">
-                          No missing skills
+                          🎉 Complete skill match
                         </p>
                       )}
                     </div>

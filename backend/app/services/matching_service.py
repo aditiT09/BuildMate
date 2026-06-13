@@ -94,10 +94,10 @@ def get_project_matches(
         )
 
         if total_project_skills == 0:
-            score = 0
+            skill_match = 0
 
         else:
-            score = round(
+            skill_match = round(
                 (
                     common_skills /
                     total_project_skills
@@ -105,9 +105,22 @@ def get_project_matches(
                 2
             )
 
-        # Hide weak matches
-        if score < MIN_MATCH_SCORE:
+        # Filter on skill_match only
+        if skill_match < MIN_MATCH_SCORE:
             continue
+
+        activity_score = user.activity_score or 0
+
+        reliability_score = user.reliability_score or 0
+
+        overall_score = round(
+            (
+                skill_match * 0.7
+                + activity_score * 0.2
+                + reliability_score * 0.1
+            ),
+            2
+        )
 
         matches.append({
 
@@ -117,8 +130,17 @@ def get_project_matches(
             "name":
                 user.name,
 
-            "match_score":
-                score,
+            "overall_score":
+                overall_score,
+
+            "skill_match":
+                skill_match,
+
+            "activity_score":
+                activity_score,
+
+            "reliability_score":
+                reliability_score,
 
             "matching_skills":
                 matching_skills,
@@ -130,7 +152,7 @@ def get_project_matches(
 
     matches.sort(
         key=lambda x:
-        x["match_score"],
+        x["overall_score"],
         reverse=True
     )
 
