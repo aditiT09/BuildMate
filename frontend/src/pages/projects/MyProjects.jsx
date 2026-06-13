@@ -1,11 +1,51 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
 import { getMyProjects } from "../../api/projects";
 
-function MyProjects() {
+const C = {
+  brand:   "#E35336",
+  brandDk: "#B8391F",
+  orange:  "#F4A460",
+  dark:    "#2B1B12",
+  dark2:   "#4A372D",
+  muted:   "#8C776A",
+  border:  "#E9DDD0",
+  bg:      "#FFF8F0",
+  surface: "#FDFBF7",
+  sand:    "#F5EDE0",
+};
+
+const TYPE_EMOJI = {
+  "Web App": "🌐",
+  "Mobile App": "📱",
+  "AI / ML": "🤖",
+  "Design": "🎨",
+  "Hackathon": "⚡",
+  "Open Source": "🔓",
+};
+
+const tilt = (n) => {
+  const seq = [-1.6, 1.2, -0.8, 1.8, -1.2, 0.9];
+  return seq[n % seq.length];
+};
+
+const STYLES = `
+  @keyframes floatIn { from { opacity:0; transform: translateY(10px) } to { opacity:1; transform: translateY(0) } }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .mp-fade { animation: floatIn .35s ease both; }
+  .mp-card { transition: transform .18s ease, box-shadow .18s ease; cursor: pointer; }
+  .mp-card:hover { transform: rotate(0deg) translateY(-4px) !important; box-shadow: 0 14px 32px rgba(43,27,18,0.12) !important; }
+  .mp-new:hover { background: ${C.brandDk}; transform: translateY(-2px); }
+`;
+
+export default function MyProjects() {
+  const navigate = useNavigate();
+
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadProjects();
@@ -15,42 +55,205 @@ function MyProjects() {
     try {
       const data = await getMyProjects();
       setProjects(data);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setError(err?.response?.data?.detail || "Failed to load your projects");
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return (
+      <Layout>
+        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{
+            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
+            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
+            display: "flex", alignItems: "center", gap: 10,
+          }}>
+            <span style={{
+              width: 16, height: 16, borderRadius: "50%",
+              border: `2px solid ${C.border}`, borderTopColor: C.brand,
+              animation: "spin 0.8s linear infinite",
+            }} />
+            digging up your projects...
+          </div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <h1 className="text-3xl font-bold mb-6">
-        My Projects
-      </h1>
+      <style>{STYLES}</style>
+      <div style={{ background: C.bg, minHeight: "100vh", paddingBottom: 80 }}>
+        <div style={{ maxWidth: 880, margin: "0 auto", padding: "36px 20px 0" }}>
 
-      {projects.length === 0 ? (
-        <p>No projects found.</p>
-      ) : (
-        <div className="space-y-4">
-          {projects.map((project) => (
-            <Link
-              key={project.id}
-              to={`/projects/${project.id}`}
-              className="block border rounded p-4 hover:bg-gray-50"
-            >
-              <h2 className="font-semibold text-xl">
-                {project.title}
-              </h2>
+          {/* HERO */}
+          <div className="mp-fade" style={{
+            position: "relative",
+            background: C.dark, color: C.bg,
+            borderRadius: 28, padding: "40px 36px",
+            marginBottom: 28,
+            boxShadow: "0 14px 40px rgba(43,27,18,0.18)",
+            transform: "rotate(-1deg)",
+            display: "flex", flexWrap: "wrap", justifyContent: "space-between",
+            alignItems: "center", gap: 20,
+          }}>
+            <div>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: C.orange, color: C.dark,
+                padding: "4px 12px", borderRadius: 999,
+                fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+                letterSpacing: "0.1em", textTransform: "uppercase",
+                marginBottom: 18,
+              }}>
+                your stuff
+              </div>
 
-              <p>{project.description}</p>
+              <h1 style={{
+                fontFamily: '"Syne", sans-serif', fontWeight: 800,
+                fontSize: "clamp(28px, 5.5vw, 46px)", lineHeight: 1.08,
+                letterSpacing: "-0.02em", margin: 0,
+              }}>
+                your project shelf 📚
+              </h1>
 
-              <p className="text-sm text-gray-500">
-                {project.project_type}
+              <p style={{
+                fontFamily: '"DM Sans", sans-serif', fontSize: 14,
+                color: "rgba(255,248,240,0.7)", marginTop: 14, maxWidth: 440, lineHeight: 1.6,
+              }}>
+                everything you've started lives here. jump back in or start something new.
               </p>
-            </Link>
-          ))}
+            </div>
+
+            <button
+              className="mp-new"
+              onClick={() => navigate("/projects/create")}
+              style={{
+                background: C.brand, color: "white", border: "none",
+                borderRadius: 999, padding: "13px 24px",
+                fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                cursor: "pointer", transition: "all .18s ease",
+                whiteSpace: "nowrap",
+              }}
+            >
+              + new project
+            </button>
+          </div>
+
+          {error && (
+            <div className="mp-fade" style={{
+              border: `1.5px solid ${C.border}`, borderRadius: 18, padding: "20px",
+              textAlign: "center", fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 14,
+              marginBottom: 24,
+            }}>
+              🚫 {error}
+            </div>
+          )}
+
+          {!error && projects.length === 0 ? (
+            <div className="mp-fade" style={{
+              border: `1.5px dashed ${C.border}`, borderRadius: 22, padding: "50px 24px",
+              textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+            }}>
+              <span style={{ fontSize: 40 }}>🗒️</span>
+              <p style={{
+                fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark, margin: 0,
+              }}>
+                shelf's empty
+              </p>
+              <p style={{
+                fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: C.muted, maxWidth: 320, margin: 0,
+              }}>
+                you haven't posted anything yet. drop your first idea and start building your team 🚀
+              </p>
+              <button
+                className="mp-new"
+                onClick={() => navigate("/projects/create")}
+                style={{
+                  background: C.brand, color: "white", border: "none",
+                  borderRadius: 999, padding: "13px 26px", marginTop: 6,
+                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
+                  cursor: "pointer", transition: "all .18s ease",
+                }}
+              >
+                + post your first project
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {projects.map((project, i) => (
+                <div
+                  key={project.id}
+                  className="mp-fade mp-card"
+                  onClick={() => navigate(`/projects/${project.id}`)}
+                  style={{
+                    background: C.surface, border: `1.5px solid ${C.border}`,
+                    borderRadius: 20, padding: "22px 24px",
+                    transform: `rotate(${tilt(i)}deg)`,
+                  }}
+                >
+                  <div style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                    gap: 12, flexWrap: "wrap",
+                  }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                        {project.project_type && (
+                          <span style={{
+                            background: C.sand, color: C.dark,
+                            borderRadius: 999, padding: "4px 12px",
+                            fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+                            letterSpacing: "0.06em", textTransform: "uppercase",
+                            display: "inline-flex", alignItems: "center", gap: 6,
+                          }}>
+                            {TYPE_EMOJI[project.project_type] || "🗂️"} {project.project_type}
+                          </span>
+                        )}
+                        {project.timeline && (
+                          <span style={{
+                            fontFamily: '"DM Sans", sans-serif', fontSize: 12,
+                            color: C.muted,
+                          }}>
+                            ⏳ {project.timeline}
+                          </span>
+                        )}
+                      </div>
+
+                      <h2 style={{
+                        fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
+                        color: C.dark, margin: "0 0 6px",
+                      }}>
+                        {project.title}
+                      </h2>
+
+                      <p style={{
+                        fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: C.dark2,
+                        margin: 0, lineHeight: 1.6,
+                        display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}>
+                        {project.description || "no description yet."}
+                      </p>
+                    </div>
+
+                    <span style={{
+                      fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                      color: C.brand, whiteSpace: "nowrap", flexShrink: 0,
+                    }}>
+                      open →
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </Layout>
   );
 }
-
-export default MyProjects;
