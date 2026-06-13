@@ -9,6 +9,8 @@ from app.utils.redis_client import redis_client
 
 import json
 
+MIN_MATCH_SCORE = 40
+
 
 def get_project_matches(
     project_id: int,
@@ -18,26 +20,17 @@ def get_project_matches(
     cache_key = f"project_matches:{project_id}"
 
     # try:
-    #     cached_data = redis_client.get(
-    #         cache_key
-    #     )
-
+    #     cached_data = redis_client.get(cache_key)
+    #
     #     if cached_data:
-    #         return json.loads(
-    #             cached_data
-    #         )
-
+    #         return json.loads(cached_data)
+    #
     # except Exception as e:
-    #     print(
-    #         "Redis Error:",
-    #         e
-    #     )
+    #     print("Redis Error:", e)
 
     project = (
         db.query(Project)
-        .filter(
-            Project.id == project_id
-        )
+        .filter(Project.id == project_id)
         .first()
     )
 
@@ -47,12 +40,9 @@ def get_project_matches(
             detail="Project not found"
         )
 
-    # Load all skills once
     skill_map = {
         skill.id: skill.name
-        for skill in db.query(
-            Skill
-        ).all()
+        for skill in db.query(Skill).all()
     }
 
     project_skill_ids = {
@@ -60,13 +50,15 @@ def get_project_matches(
         for skill in project.skills
     }
 
-    users = db.query(
-        User
-    ).all()
+    users = db.query(User).all()
 
     matches = []
 
     for user in users:
+
+        # Don't recommend the project owner
+        if user.id == project.owner_id:
+            continue
 
         user_skill_ids = {
             skill.skill_id
@@ -74,14 +66,12 @@ def get_project_matches(
         }
 
         common_ids = (
-            project_skill_ids
-            &
+            project_skill_ids &
             user_skill_ids
         )
 
         missing_ids = (
-            project_skill_ids
-            -
+            project_skill_ids -
             user_skill_ids
         )
 
@@ -97,9 +87,7 @@ def get_project_matches(
             if sid in skill_map
         ]
 
-        common_skills = len(
-            common_ids
-        )
+        common_skills = len(common_ids)
 
         total_project_skills = len(
             project_skill_ids
@@ -111,13 +99,15 @@ def get_project_matches(
         else:
             score = round(
                 (
-                    common_skills
-                    /
+                    common_skills /
                     total_project_skills
-                )
-                * 100,
+                ) * 100,
                 2
             )
+
+        # Hide weak matches
+        if score < MIN_MATCH_SCORE:
+            continue
 
         matches.append({
 
@@ -145,18 +135,13 @@ def get_project_matches(
     )
 
     # try:
-
     #     redis_client.setex(
     #         cache_key,
     #         3600,
     #         json.dumps(matches)
     #     )
-
+    #
     # except Exception as e:
-
-    #     print(
-    #         "Redis Error:",
-    #         e
-    #     )
+    #     print("Redis Error:", e)
 
     return matches
