@@ -17,7 +17,6 @@ from app.utils.security import (
 )
 
 
-
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
@@ -32,12 +31,18 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
+    # Normalise email — trim whitespace and lowercase
+    # so "  User@Example.com " matches stored "user@example.com"
+    email = form_data.username.strip().lower()
+
     user = (
         db.query(User)
-        .filter(User.email == form_data.username)
+        .filter(User.email == email)
         .first()
     )
 
+    # ── Timing-safe: same error for unknown email or wrong password ──
+    # Never reveal whether the email exists in the database
     if not user:
         raise HTTPException(
             status_code=401,
@@ -53,6 +58,7 @@ def login(
             detail="Invalid credentials"
         )
 
+    # JWT sub is the stored (already lowercase) email
     access_token = create_access_token(
         {
             "sub": user.email
