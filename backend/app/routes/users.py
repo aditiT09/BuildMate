@@ -1,22 +1,22 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import Query
-from fastapi import HTTPException
+
+from fastapi import APIRouter, Depends, Query, HTTPException
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse
-from app.utils.security import hash_password
-from app.utils.security import get_current_user
+
+from app.utils.security import (
+    hash_password,
+    get_current_user,
+)
+
 from app.schemas.user import (
     UserCreate,
     UserResponse,
-    UserUpdate
+    UserUpdate,
 )
-
 
 router = APIRouter()
 
@@ -24,18 +24,19 @@ router = APIRouter()
 @router.post(
     "/users",
     response_model=UserResponse,
-    status_code=201
+    status_code=201,
 )
 def create_user(
     user: UserCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     try:
+        # UserCreate schema already validates and normalizes
         new_user = User(
             name=user.name,
             email=user.email,
             bio=user.bio,
-            password=hash_password(user.password)
+            password=hash_password(user.password),
         )
 
         db.add(new_user)
@@ -48,25 +49,27 @@ def create_user(
         db.rollback()
 
         raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
+            status_code=409,
+            detail="Email already registered",
         )
 
-    except Exception as e:
+    except Exception:
         db.rollback()
 
         raise HTTPException(
             status_code=500,
-            detail=str(e)
+            detail="Internal server error",
         )
+
+
 @router.get(
     "/users",
-    response_model=list[UserResponse]
+    response_model=list[UserResponse],
 )
 def get_users(
     limit: int = Query(10, le=100),
     offset: int = 0,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     users = (
         db.query(User)
@@ -76,16 +79,18 @@ def get_users(
     )
 
     return users
+
+
 @router.put(
     "/users/me",
-    response_model=UserResponse
+    response_model=UserResponse,
 )
 def update_me(
     payload: UserUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-
+    # UserUpdate schema already validates and normalizes
     current_user.name = payload.name
     current_user.bio = payload.bio
 
@@ -93,11 +98,13 @@ def update_me(
     db.refresh(current_user)
 
     return current_user
+
+
 @router.get(
     "/users/me",
-    response_model=UserResponse
+    response_model=UserResponse,
 )
 def get_me(
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     return current_user
