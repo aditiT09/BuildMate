@@ -810,17 +810,30 @@ export default function ProjectDetail() {
                         </div>
                       )}
                     </div>
-                    <button
-                      onClick={() => navigate(`/opportunities/${opportunity.id}/applicants`)}
-                      style={{
-                        background: C.dark, color: C.orange, border: "none",
-                        borderRadius: 999, padding: "9px 18px",
-                        fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
-                        cursor: "pointer",
-                      }}
-                    >
-                      view applicants
-                    </button>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        onClick={() => navigate(`/opportunities/${opportunity.id}/edit`)}
+                        style={{
+                          background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
+                          borderRadius: 999, padding: "8px 18px",
+                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                          cursor: "pointer", transition: "all .15s ease",
+                        }}
+                      >
+                        ✏️ edit
+                      </button>
+                      <button
+                        onClick={() => navigate(`/opportunities/${opportunity.id}/applicants`)}
+                        style={{
+                          background: C.dark, color: C.orange, border: "none",
+                          borderRadius: 999, padding: "9px 18px",
+                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                          cursor: "pointer",
+                        }}
+                      >
+                        view applicants
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

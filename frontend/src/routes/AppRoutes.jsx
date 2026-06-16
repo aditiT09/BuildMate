@@ -64,6 +64,14 @@ function AppRoutes() {
   }
 />
 <Route
+  path="/opportunities/:opportunityId/edit"
+  element={
+    <ProtectedRoute>
+      <CreateOpportunity />
+    </ProtectedRoute>
+  }
+/>
+<Route
   path="/opportunities/:opportunityId/applicants"
   element={
     <ProtectedRoute>

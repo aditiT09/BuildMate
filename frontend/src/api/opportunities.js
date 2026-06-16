@@ -16,3 +16,20 @@ export const createOpportunity = async (data) => {
 
   return response.data;
 };
+
+export const getOpportunity = async (opportunityId) => {
+  const response = await api.get(
+    `/opportunities/${opportunityId}`
+  );
+
+  return response.data;
+};
+
+export const updateOpportunity = async (opportunityId, data) => {
+  const response = await api.put(
+    `/opportunities/${opportunityId}`,
+    data
+  );
+
+  return response.data;
+};

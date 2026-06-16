@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
-import { createOpportunity } from "../../api/opportunities";
+import { createOpportunity, getOpportunity, updateOpportunity } from "../../api/opportunities";
 import { getSkills, createSkill } from "../../api/userSkills";
 
 const C = {
@@ -148,7 +148,7 @@ const STYLES = `
 `;
 
 export default function CreateOpportunity() {
-  const { id } = useParams();
+  const { id, opportunityId } = useParams();
   const navigate = useNavigate();
 
   const [allSkills, setAllSkills] = useState([]);
@@ -156,10 +156,15 @@ export default function CreateOpportunity() {
   const [skillQ, setSkillQ] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [loadingOpportunity, setLoadingOpportunity] = useState(!!opportunityId);
 
   useEffect(() => {
     loadSkills();
-  }, []);
+    if (opportunityId) {
+      loadOpportunity();
+    }
+    // eslint-disable-next-line
+  }, [opportunityId]);
 
   const loadSkills = async () => {
     try {
@@ -167,6 +172,29 @@ export default function CreateOpportunity() {
       setAllSkills(list);
     } catch (error) {
       console.error("Failed to load skills list:", error);
+    }
+  };
+
+  const loadOpportunity = async () => {
+    try {
+      const opp = await getOpportunity(opportunityId);
+      setForm({
+        role: opp.role,
+        seats: opp.seats,
+        status: opp.status,
+        project_id: opp.project_id,
+      });
+      if (opp.skills) {
+        setSelectedSkills(opp.skills.map((s) => ({
+          id: s.skill.id,
+          name: s.skill.name,
+        })));
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to load role details.");
+    } finally {
+      setLoadingOpportunity(false);
     }
   };
 
@@ -187,6 +215,7 @@ export default function CreateOpportunity() {
     role: "",
     seats: 1,
     status: "open",
+    project_id: id ? Number(id) : null,
   });
 
   const handleChange = (e) => {
@@ -209,26 +238,55 @@ export default function CreateOpportunity() {
     try {
       setLoading(true);
 
-      await createOpportunity({
-        ...form,
-        project_id: Number(id),
+      const payload = {
+        role: form.role,
+        seats: form.seats,
+        status: form.status,
+        project_id: Number(form.project_id),
         required_skills: selectedSkills.map(s => s.id),
-      });
+      };
 
-      alert("Opportunity created!");
-
-      navigate(`/projects/${id}`);
+      if (opportunityId) {
+        await updateOpportunity(opportunityId, payload);
+        alert("Role updated successfully!");
+        navigate(`/projects/${form.project_id}`);
+      } else {
+        await createOpportunity(payload);
+        alert("Role created successfully!");
+        navigate(`/projects/${id}`);
+      }
     } catch (error) {
       console.error(error);
-
       alert(
         error?.response?.data?.detail ||
-        "Failed to create opportunity"
+        `Failed to ${opportunityId ? "update" : "create"} opportunity`
       );
     } finally {
       setLoading(false);
     }
   };
+
+  if (loadingOpportunity) {
+    return (
+      <Layout>
+        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{
+            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
+            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
+            display: "flex", alignItems: "center", gap: 10,
+          }}>
+            <span style={{
+              width: 16, height: 16, borderRadius: "50%",
+              border: `2px solid ${C.border}`, borderTopColor: C.brand,
+              animation: "spin 0.8s linear infinite",
+            }} />
+            loading role details...
+          </div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -266,7 +324,7 @@ export default function CreateOpportunity() {
               letterSpacing: "0.1em", textTransform: "uppercase",
               marginBottom: 18,
             }}>
-              new role
+              {opportunityId ? "edit role" : "new role"}
             </div>
 
             <h1 style={{
@@ -274,7 +332,7 @@ export default function CreateOpportunity() {
               fontSize: "clamp(28px, 5.5vw, 46px)", lineHeight: 1.08,
               letterSpacing: "-0.02em", margin: 0,
             }}>
-              open up a spot 🪧
+              {opportunityId ? "tweak the role 🪧" : "open up a spot 🪧"}
             </h1>
 
             <p style={{
@@ -493,7 +551,9 @@ export default function CreateOpportunity() {
                 display: "inline-flex", alignItems: "center", gap: 8,
               }}
             >
-              {loading ? "posting..." : "📬 post this role"}
+              {loading 
+                ? (opportunityId ? "saving..." : "posting...") 
+                : (opportunityId ? "💾 save changes" : "📬 post this role")}
             </button>
           </form>
         </div>
