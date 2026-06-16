@@ -1,25 +1,19 @@
 from fastapi import APIRouter
 from fastapi import Depends
-
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-
-from app.services.matching_service import get_project_matches
 from app.models.project import Project
-from app.utils.security import get_current_user
 from app.models.user import User
-from fastapi import HTTPException
-
-
-
+from app.utils.security import get_current_user
+from app.services.matching_service import get_project_matches
+from app.services.skill_gap_service import get_skill_gap
 
 router = APIRouter(
     prefix="/matching",
     tags=["Matching"]
 )
-
-
 
 @router.get(
     "/projects/{project_id}/matches"
@@ -29,7 +23,6 @@ def get_matches(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-
     project = (
         db.query(Project)
         .filter(Project.id == project_id)
@@ -42,7 +35,6 @@ def get_matches(
             detail="Project not found"
         )
 
-
     if project.owner_id != current_user.id:
         raise HTTPException(
             status_code=403,
@@ -51,5 +43,38 @@ def get_matches(
 
     return get_project_matches(
         project_id,
+        db
+    )
+
+@router.get(
+    "/projects/{project_id}/users/{user_id}/skill-gap"
+)
+def get_project_user_skill_gap(
+    project_id: int,
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Only allow the user themselves OR the project owner to inspect the skill gap
+    if current_user.id != user_id:
+        project = (
+            db.query(Project)
+            .filter(Project.id == project_id)
+            .first()
+        )
+        if not project:
+            raise HTTPException(
+                status_code=404,
+                detail="Project not found"
+            )
+        if project.owner_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized to view this skill gap analysis"
+            )
+
+    return get_skill_gap(
+        project_id,
+        user_id,
         db
     )

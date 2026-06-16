@@ -15,6 +15,7 @@ import {
 import {
   getProjectSkills,
 } from "../../api/projectSkills";
+import { getSkillGap } from "../../api/matching";
 
 const C = {
   brand:   "#E35336",
@@ -87,6 +88,7 @@ export default function ProjectDetail() {
   });
   const [addingResource, setAddingResource] = useState(false);
   const [projectSkills, setProjectSkills] = useState([]);
+  const [skillGap, setSkillGap] = useState(null);
 
   const isOwner = !!(user && project && user.id === project.owner_id);
 
@@ -107,6 +109,15 @@ export default function ProjectDetail() {
 
       const skills = await getProjectSkills(id);
       setProjectSkills(skills);
+
+      if (user && user.id) {
+        try {
+          const gap = await getSkillGap(id, user.id);
+          setSkillGap(gap);
+        } catch (err) {
+          console.error("Failed loading skill gap:", err);
+        }
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -362,6 +373,86 @@ export default function ProjectDetail() {
                   </span>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* SKILL GAP ANALYSIS */}
+          {!isOwner && skillGap && (
+            <div className="pd-fade" style={{
+              background: C.surface,
+              border: `1.5px solid ${C.border}`,
+              borderRadius: 22,
+              padding: "26px 28px",
+              marginBottom: 28,
+              position: "relative",
+              transform: `rotate(${tilt(4)}deg)`,
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                <p style={{
+                  fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+                  color: C.brand, textTransform: "uppercase", letterSpacing: "0.14em",
+                  margin: 0,
+                }}>
+                  📊 your matching stats
+                </p>
+                <span style={{
+                  fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 15,
+                  color: skillGap.match_percentage >= 70 ? "#2E7D32" : C.brand,
+                }}>
+                  {skillGap.match_percentage}% overlap
+                </span>
+              </div>
+
+              {/* Progress bar */}
+              <div style={{
+                width: "100%", background: C.sand, borderRadius: 999,
+                height: 8, overflow: "hidden", marginBottom: 20,
+              }}>
+                <div style={{
+                  height: "100%", borderRadius: 999,
+                  width: `${skillGap.match_percentage}%`,
+                  background: skillGap.match_percentage >= 70 ? "#2E7D32" : C.brand,
+                  transition: "width 0.8s ease",
+                }} />
+              </div>
+
+              {/* Recommendations */}
+              {skillGap.recommendations && skillGap.recommendations.length > 0 ? (
+                <div>
+                  <p style={{
+                    fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 700,
+                    color: C.dark, marginBottom: 8,
+                  }}>
+                    💡 priority gaps to learn:
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {skillGap.recommendations.map((rec) => (
+                      <div key={rec.skill_name} style={{
+                        background: C.bg, border: `1.5px solid ${C.border}`,
+                        borderRadius: 14, padding: "10px 14px",
+                        display: "flex", alignItems: "flex-start", gap: 10,
+                      }}>
+                        <span style={{ fontSize: 16 }}>🎯</span>
+                        <div>
+                          <p style={{ fontWeight: 700, fontSize: 13, color: C.dark, margin: 0 }}>
+                            {rec.skill_name}
+                          </p>
+                          <p style={{ fontSize: 11, color: C.muted, margin: "2px 0 0" }}>
+                            {rec.reason}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p style={{
+                  fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#2E7D32",
+                  margin: 0, fontStyle: "italic",
+                }}>
+                  🎉 you have all the required skills for this project! You're ready to ship.
+                </p>
+              )}
             </div>
           )}
 
