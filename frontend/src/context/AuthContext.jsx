@@ -17,6 +17,7 @@ export const AuthProvider = ({
   );
 
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(!!token);
 
   const login = (token) => {
     localStorage.setItem(
@@ -25,6 +26,7 @@ export const AuthProvider = ({
     );
 
     setToken(token);
+    setLoading(true);
   };
 
   const logout = () => {
@@ -32,12 +34,16 @@ export const AuthProvider = ({
 
     setToken(null);
     setUser(null);
+    setLoading(false);
   };
 useEffect(() => {
   const loadUser = async () => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     try {
-      if (!token) return;
-
+      setLoading(true);
       console.log("Loading user...");
 
       const data =
@@ -47,15 +53,17 @@ useEffect(() => {
 
       setUser(data);
     } catch (error) {
-  console.error(
-    "Failed loading user",
-    error
-  );
+      console.error(
+        "Failed loading user",
+        error
+      );
 
-  localStorage.removeItem("token");
-  setToken(null);
-  setUser(null);
-}
+      localStorage.removeItem("token");
+      setToken(null);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   loadUser();
@@ -69,7 +77,7 @@ useEffect(() => {
   setUser,
   login,
   logout,
-  loading: false,
+  loading,
 }}
     >
       {children}

@@ -41,12 +41,7 @@ def get_matches(
             status_code=404,
             detail="Project not found"
         )
-    print("==========")
-    print("PROJECT ID:", project.id)
-    print("PROJECT OWNER:", project.owner_id)
-    print("CURRENT USER:", current_user.id)
-    print("CURRENT EMAIL:", current_user.email)
-    print("==========")
+
 
     if project.owner_id != current_user.id:
         raise HTTPException(

@@ -19,14 +19,12 @@ def get_project_matches(
 
     cache_key = f"project_matches:{project_id}"
 
-    # try:
-    #     cached_data = redis_client.get(cache_key)
-    #
-    #     if cached_data:
-    #         return json.loads(cached_data)
-    #
-    # except Exception as e:
-    #     print("Redis Error:", e)
+    try:
+        cached_data = redis_client.get(cache_key)
+        if cached_data:
+            return json.loads(cached_data)
+    except Exception as e:
+        print("Redis Read Error (falling back to database):", e)
 
     project = (
         db.query(Project)
@@ -156,14 +154,13 @@ def get_project_matches(
         reverse=True
     )
 
-    # try:
-    #     redis_client.setex(
-    #         cache_key,
-    #         3600,
-    #         json.dumps(matches)
-    #     )
-    #
-    # except Exception as e:
-    #     print("Redis Error:", e)
+    try:
+        redis_client.setex(
+            cache_key,
+            3600,
+            json.dumps(matches)
+        )
+    except Exception as e:
+        print("Redis Write Error:", e)
 
     return matches
