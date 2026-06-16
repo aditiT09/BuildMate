@@ -51,7 +51,7 @@ def create_skill(
 @router.get("/skills")
 def get_skills(
 
-    limit: int = Query(10, le=100),
+    limit: int = Query(100, le=1000),
     offset: int = 0,
 
     db: Session = Depends(get_db)

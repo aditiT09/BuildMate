@@ -181,38 +181,7 @@ export default function CreateOpportunity() {
     setSelectedSkills(selectedSkills.filter((s) => s.id !== skillId));
   };
 
-  const handleCreateNewSkill = async () => {
-    const trimmed = skillQ.trim();
-    if (!trimmed) return;
-    
-    const match = allSkills.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
-    if (match) {
-      handleSelectSkill(match);
-      return;
-    }
 
-    try {
-      setLoading(true);
-      const newSkill = await createSkill(trimmed);
-      if (newSkill && newSkill.id) {
-        setAllSkills([...allSkills, newSkill]);
-        setSelectedSkills([...selectedSkills, newSkill]);
-      } else {
-        const skList = await getSkills();
-        setAllSkills(skList);
-        const existing = skList.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
-        if (existing) {
-          setSelectedSkills([...selectedSkills, existing]);
-        }
-      }
-      setSkillQ("");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to create skill");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const [form, setForm] = useState({
     role: "",
@@ -459,14 +428,19 @@ export default function CreateOpportunity() {
                 <div style={{ position: "relative" }}>
                   <input
                     type="text"
-                    placeholder="search or type required skill..."
+                    placeholder="search required skill..."
                     value={skillQ}
                     onChange={(e) => setSkillQ(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        if (skillQ.trim()) {
-                          handleCreateNewSkill();
+                        const matches = allSkills.filter(
+                          (s) =>
+                            s.name.toLowerCase().includes(skillQ.toLowerCase()) &&
+                            !selectedSkills.some((sel) => sel.id === s.id)
+                        );
+                        if (matches.length > 0) {
+                          handleSelectSkill(matches[0]);
                         }
                       }
                     }}
@@ -474,28 +448,31 @@ export default function CreateOpportunity() {
                   />
                   {skillQ.trim().length > 0 && (
                     <div className="co-suggest-box">
-                      {allSkills
-                        .filter(
-                          (s) =>
-                            s.name.toLowerCase().includes(skillQ.toLowerCase()) &&
-                            !selectedSkills.some((sel) => sel.id === s.id)
-                        )
-                        .slice(0, 5)
-                        .map((skill) => (
-                          <div
-                            key={skill.id}
-                            className="co-suggest-item"
-                            onClick={() => handleSelectSkill(skill)}
-                          >
-                            {skill.name}
-                          </div>
-                        ))}
-                      {!allSkills.some(
-                        (s) => s.name.toLowerCase() === skillQ.toLowerCase().trim()
-                      ) && (
-                        <div className="co-suggest-create" onClick={handleCreateNewSkill}>
-                          + Create new skill "{skillQ.trim()}"
+                      {allSkills.filter(
+                        (s) =>
+                          s.name.toLowerCase().includes(skillQ.toLowerCase()) &&
+                          !selectedSkills.some((sel) => sel.id === s.id)
+                      ).length === 0 ? (
+                        <div style={{ padding: "12px 16px", color: C.muted, fontSize: 13, fontFamily: "DM Sans" }}>
+                          No matching skills found
                         </div>
+                      ) : (
+                        allSkills
+                          .filter(
+                            (s) =>
+                              s.name.toLowerCase().includes(skillQ.toLowerCase()) &&
+                              !selectedSkills.some((sel) => sel.id === s.id)
+                          )
+                          .slice(0, 5)
+                          .map((skill) => (
+                            <div
+                              key={skill.id}
+                              className="co-suggest-item"
+                              onClick={() => handleSelectSkill(skill)}
+                            >
+                              {skill.name}
+                            </div>
+                          ))
                       )}
                     </div>
                   )}
