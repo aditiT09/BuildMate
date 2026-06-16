@@ -545,6 +545,27 @@ export default function ProjectDetail() {
                           {opportunity.seats} seat{opportunity.seats !== 1 ? "s" : ""}
                         </p>
                       )}
+                      {opportunity.skills && opportunity.skills.length > 0 && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+                          {opportunity.skills.map((s) => (
+                            <span
+                              key={s.id}
+                              style={{
+                                background: `${C.brand}12`,
+                                color: C.brand,
+                                border: `1px solid ${C.brand}20`,
+                                borderRadius: 999,
+                                padding: "2px 8px",
+                                fontFamily: '"DM Sans", sans-serif',
+                                fontWeight: 700,
+                                fontSize: 11,
+                              }}
+                            >
+                              {s.skill.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <button
                       className="pd-btn-prime"
@@ -766,6 +787,27 @@ export default function ProjectDetail() {
                           {opportunity.seats != null && opportunity.status ? " · " : ""}
                           {opportunity.status}
                         </p>
+                      )}
+                      {opportunity.skills && opportunity.skills.length > 0 && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+                          {opportunity.skills.map((s) => (
+                            <span
+                              key={s.id}
+                              style={{
+                                background: `${C.brand}12`,
+                                color: C.brand,
+                                border: `1px solid ${C.brand}20`,
+                                borderRadius: 999,
+                                padding: "2px 8px",
+                                fontFamily: '"DM Sans", sans-serif',
+                                fontWeight: 700,
+                                fontSize: 11,
+                              }}
+                            >
+                              {s.skill.name}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
                     <button

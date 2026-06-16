@@ -32,3 +32,9 @@ class Skill(Base):
         back_populates="skill",
         cascade="all, delete-orphan"
     )
+
+    opportunities = relationship(
+        "OpportunitySkill",
+        back_populates="skill",
+        cascade="all, delete-orphan"
+    )

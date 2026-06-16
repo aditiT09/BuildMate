@@ -11,6 +11,7 @@ from app.models.project import Project
 from app.models.project_skill import ProjectSkill
 
 from app.models.opportunity import Opportunity
+from app.models.opportunity_skill import OpportunitySkill
 from app.models.application import Application
 
 from app.routes.users import router as users_router
@@ -22,6 +23,7 @@ from app.routes import matching
 from app.routes import skill
 from app.routes import user_skill
 from app.routes import project_skill
+from app.routes import opportunity_skill
 from app.routes import recommendation
 from app.routes import analytics
 from app.routes import ranking
@@ -70,6 +72,9 @@ app.include_router(
 )
 app.include_router(
     project_skill.router
+)
+app.include_router(
+    opportunity_skill.router
 )
 app.include_router(
     user_skill.router

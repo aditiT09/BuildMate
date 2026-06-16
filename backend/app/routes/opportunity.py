@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 
 from app.models.opportunity import Opportunity
+from app.models.opportunity_skill import OpportunitySkill
 from app.models.project import Project
 from app.models.user import User
 
@@ -63,10 +64,18 @@ def create_opportunity(
     )
 
     db.add(new_opportunity)
-
     db.commit()
-
     db.refresh(new_opportunity)
+
+    if opportunity.required_skills:
+        for skill_id in opportunity.required_skills:
+            opp_skill = OpportunitySkill(
+                opportunity_id=new_opportunity.id,
+                skill_id=skill_id
+            )
+            db.add(opp_skill)
+        db.commit()
+        db.refresh(new_opportunity)
 
     return new_opportunity
     
@@ -177,8 +186,20 @@ def update_opportunity(
     opportunity.seats = updated.seats
     opportunity.status = updated.status
 
-    db.commit()
+    # Update skills
+    db.query(OpportunitySkill).filter(
+        OpportunitySkill.opportunity_id == opportunity_id
+    ).delete()
 
+    if updated.required_skills:
+        for skill_id in updated.required_skills:
+            opp_skill = OpportunitySkill(
+                opportunity_id=opportunity_id,
+                skill_id=skill_id
+            )
+            db.add(opp_skill)
+
+    db.commit()
     db.refresh(opportunity)
 
     return opportunity

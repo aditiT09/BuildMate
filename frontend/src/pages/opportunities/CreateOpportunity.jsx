@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
 import { createOpportunity } from "../../api/opportunities";
+import { getSkills, createSkill } from "../../api/userSkills";
 
 const C = {
   brand:   "#E35336",
@@ -74,19 +75,150 @@ const STYLES = `
   .co-status-card.on { border-color: ${C.brand}; background: white; box-shadow: 0 0 0 4px ${C.brand}1A; }
   .co-submit:hover { background: ${C.brandDk}; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(227,83,54,0.28); }
   .co-submit:disabled { opacity: .6; cursor: wait; transform: none; }
+  .co-skill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: ${C.dark};
+    color: ${C.orange};
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all .12s ease;
+  }
+  .co-skill-tag button {
+    background: none;
+    border: none;
+    color: ${C.orange};
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 2px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .co-skill-tag button:hover {
+    color: white;
+  }
+  .co-suggest-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1.5px solid ${C.border};
+    border-radius: 14px;
+    margin-top: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  .co-suggest-item {
+    padding: 10px 16px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    color: ${C.dark};
+    cursor: pointer;
+    transition: all .1s ease;
+  }
+  .co-suggest-item:hover {
+    background: ${C.bg};
+    color: ${C.brand};
+  }
+  .co-suggest-create {
+    padding: 10px 16px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: ${C.brand};
+    cursor: pointer;
+    background: ${C.bg};
+    border-top: 1.5px solid ${C.border};
+    transition: all .1s ease;
+  }
+  .co-suggest-create:hover {
+    background: ${C.brand};
+    color: white;
+  }
 `;
 
 export default function CreateOpportunity() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [allSkills, setAllSkills] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [skillQ, setSkillQ] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadSkills();
+  }, []);
+
+  const loadSkills = async () => {
+    try {
+      const list = await getSkills();
+      setAllSkills(list);
+    } catch (error) {
+      console.error("Failed to load skills list:", error);
+    }
+  };
+
+  const handleSelectSkill = (skill) => {
+    if (!selectedSkills.find((s) => s.id === skill.id)) {
+      setSelectedSkills([...selectedSkills, skill]);
+    }
+    setSkillQ("");
+  };
+
+  const handleRemoveSkill = (skillId) => {
+    setSelectedSkills(selectedSkills.filter((s) => s.id !== skillId));
+  };
+
+  const handleCreateNewSkill = async () => {
+    const trimmed = skillQ.trim();
+    if (!trimmed) return;
+    
+    const match = allSkills.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
+    if (match) {
+      handleSelectSkill(match);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const newSkill = await createSkill(trimmed);
+      if (newSkill && newSkill.id) {
+        setAllSkills([...allSkills, newSkill]);
+        setSelectedSkills([...selectedSkills, newSkill]);
+      } else {
+        const skList = await getSkills();
+        setAllSkills(skList);
+        const existing = skList.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
+        if (existing) {
+          setSelectedSkills([...selectedSkills, existing]);
+        }
+      }
+      setSkillQ("");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to create skill");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const [form, setForm] = useState({
     role: "",
     seats: 1,
     status: "open",
   });
-
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -111,6 +243,7 @@ export default function CreateOpportunity() {
       await createOpportunity({
         ...form,
         project_id: Number(id),
+        required_skills: selectedSkills.map(s => s.id),
       });
 
       alert("Opportunity created!");
@@ -252,7 +385,7 @@ export default function CreateOpportunity() {
               </div>
 
               {/* Status */}
-              <div>
+              <div style={{ marginBottom: 22 }}>
                 <label style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
@@ -297,6 +430,75 @@ export default function CreateOpportunity() {
                       </p>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Skills Required */}
+              <div>
+                <label style={{
+                  display: "block", marginBottom: 8,
+                  fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
+                }}>
+                  required tech stack 🛠️
+                </label>
+
+                {/* selected skills */}
+                {selectedSkills.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                    {selectedSkills.map((skill) => (
+                      <span key={skill.id} className="co-skill-tag">
+                        {skill.name}
+                        <button type="button" onClick={() => handleRemoveSkill(skill.id)}>
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    placeholder="search or type required skill..."
+                    value={skillQ}
+                    onChange={(e) => setSkillQ(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (skillQ.trim()) {
+                          handleCreateNewSkill();
+                        }
+                      }
+                    }}
+                    className="co-input"
+                  />
+                  {skillQ.trim().length > 0 && (
+                    <div className="co-suggest-box">
+                      {allSkills
+                        .filter(
+                          (s) =>
+                            s.name.toLowerCase().includes(skillQ.toLowerCase()) &&
+                            !selectedSkills.some((sel) => sel.id === s.id)
+                        )
+                        .slice(0, 5)
+                        .map((skill) => (
+                          <div
+                            key={skill.id}
+                            className="co-suggest-item"
+                            onClick={() => handleSelectSkill(skill)}
+                          >
+                            {skill.name}
+                          </div>
+                        ))}
+                      {!allSkills.some(
+                        (s) => s.name.toLowerCase() === skillQ.toLowerCase().trim()
+                      ) && (
+                        <div className="co-suggest-create" onClick={handleCreateNewSkill}>
+                          + Create new skill "{skillQ.trim()}"
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
