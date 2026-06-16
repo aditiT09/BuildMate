@@ -7,6 +7,8 @@ import {
   getProjectById,
   updateProject,
 } from "../../api/projects";
+import { getSkills, createSkill } from "../../api/userSkills";
+import { addProjectSkill, getProjectSkills, removeProjectSkill } from "../../api/projectSkills";
 
 const C = {
   brand:   "#E35336",
@@ -64,6 +66,76 @@ const STYLES = `
   .cp-chip.on { background: ${C.dark}; color: ${C.orange}; border-color: ${C.dark}; }
   .cp-submit:hover { background: ${C.brandDk}; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(227,83,54,0.28); }
   .cp-submit:disabled { opacity: .6; cursor: wait; transform: none; }
+  .cp-skill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: ${C.dark};
+    color: ${C.orange};
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all .12s ease;
+  }
+  .cp-skill-tag button {
+    background: none;
+    border: none;
+    color: ${C.orange};
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 2px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cp-skill-tag button:hover {
+    color: white;
+  }
+  .cp-suggest-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1.5px solid ${C.border};
+    border-radius: 14px;
+    margin-top: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  .cp-suggest-item {
+    padding: 10px 16px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    color: ${C.dark};
+    cursor: pointer;
+    transition: all .1s ease;
+  }
+  .cp-suggest-item:hover {
+    background: ${C.bg};
+    color: ${C.brand};
+  }
+  .cp-suggest-create {
+    padding: 10px 16px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: ${C.brand};
+    cursor: pointer;
+    background: ${C.bg};
+    border-top: 1.5px solid ${C.border};
+    transition: all .1s ease;
+  }
+  .cp-suggest-create:hover {
+    background: ${C.brand};
+    color: white;
+  }
 `;
 
 export default function CreateProject() {
@@ -80,12 +152,29 @@ export default function CreateProject() {
   const [loading, setLoading] = useState(false);
   const [loadingProject, setLoadingProject] = useState(!!id);
 
+  const [allSkills, setAllSkills] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [initialSkills, setInitialSkills] = useState([]);
+  const [skillQ, setSkillQ] = useState("");
+
   useEffect(() => {
+    loadSkills();
     if (id) {
       loadProject();
+    } else {
+      setLoadingProject(false);
     }
     // eslint-disable-next-line
   }, [id]);
+
+  const loadSkills = async () => {
+    try {
+      const list = await getSkills();
+      setAllSkills(list);
+    } catch (error) {
+      console.error("Failed to load skills list:", error);
+    }
+  };
 
   const loadProject = async () => {
     try {
@@ -96,11 +185,58 @@ export default function CreateProject() {
         timeline: project.timeline,
         project_type: project.project_type,
       });
+      const currentSkills = await getProjectSkills(id);
+      setSelectedSkills(currentSkills);
+      setInitialSkills(currentSkills);
     } catch (error) {
       console.error(error);
       alert(error?.response?.data?.detail || "Failed to load project.");
     } finally {
       setLoadingProject(false);
+    }
+  };
+
+  const handleSelectSkill = (skill) => {
+    if (!selectedSkills.find((s) => s.id === skill.id)) {
+      setSelectedSkills([...selectedSkills, skill]);
+    }
+    setSkillQ("");
+  };
+
+  const handleRemoveSkill = (skillId) => {
+    setSelectedSkills(selectedSkills.filter((s) => s.id !== skillId));
+  };
+
+  const handleCreateNewSkill = async () => {
+    const trimmed = skillQ.trim();
+    if (!trimmed) return;
+    
+    const match = allSkills.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
+    if (match) {
+      handleSelectSkill(match);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const newSkill = await createSkill(trimmed);
+      if (newSkill && newSkill.id) {
+        setAllSkills([...allSkills, newSkill]);
+        setSelectedSkills([...selectedSkills, newSkill]);
+      } else {
+        const skList = await getSkills();
+        setAllSkills(skList);
+        const existing = skList.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
+        if (existing) {
+          setSelectedSkills([...selectedSkills, existing]);
+        }
+      }
+      setSkillQ("");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to create skill");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,9 +252,26 @@ export default function CreateProject() {
       let project;
       if (id) {
         project = await updateProject(id, form);
+        
+        const initialIds = initialSkills.map(s => s.id);
+        const selectedIds = selectedSkills.map(s => s.id);
+        
+        const toAdd = selectedSkills.filter(s => !initialIds.includes(s.id));
+        const toRemove = initialSkills.filter(s => !selectedIds.includes(s.id));
+        
+        await Promise.all([
+          ...toAdd.map(s => addProjectSkill(id, s.id)),
+          ...toRemove.map(s => removeProjectSkill(id, s.id))
+        ]);
+        
         alert("Project updated successfully!");
       } else {
         project = await createProject(form);
+        
+        await Promise.all(
+          selectedSkills.map(s => addProjectSkill(project.id, s.id))
+        );
+        
         alert("Project created successfully!");
       }
 
@@ -276,7 +429,7 @@ export default function CreateProject() {
               </div>
 
               {/* Project Type */}
-              <div>
+              <div style={{ marginBottom: 22 }}>
                 <label style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
@@ -307,6 +460,75 @@ export default function CreateProject() {
                   className="cp-input"
                   required
                 />
+              </div>
+
+              {/* Skills Required */}
+              <div>
+                <label style={{
+                  display: "block", marginBottom: 8,
+                  fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
+                }}>
+                  skills required 🎯
+                </label>
+
+                {/* selected skills */}
+                {selectedSkills.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                    {selectedSkills.map((skill) => (
+                      <span key={skill.id} className="cp-skill-tag">
+                        {skill.name}
+                        <button type="button" onClick={() => handleRemoveSkill(skill.id)}>
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    placeholder="search or type a skill..."
+                    value={skillQ}
+                    onChange={(e) => setSkillQ(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (skillQ.trim()) {
+                          handleCreateNewSkill();
+                        }
+                      }
+                    }}
+                    className="cp-input"
+                  />
+                  {skillQ.trim().length > 0 && (
+                    <div className="cp-suggest-box">
+                      {allSkills
+                        .filter(
+                          (s) =>
+                            s.name.toLowerCase().includes(skillQ.toLowerCase()) &&
+                            !selectedSkills.some((sel) => sel.id === s.id)
+                        )
+                        .slice(0, 5)
+                        .map((skill) => (
+                          <div
+                            key={skill.id}
+                            className="cp-suggest-item"
+                            onClick={() => handleSelectSkill(skill)}
+                          >
+                            {skill.name}
+                          </div>
+                        ))}
+                      {!allSkills.some(
+                        (s) => s.name.toLowerCase() === skillQ.toLowerCase().trim()
+                      ) && (
+                        <div className="cp-suggest-create" onClick={handleCreateNewSkill}>
+                          + Create new skill "{skillQ.trim()}"
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

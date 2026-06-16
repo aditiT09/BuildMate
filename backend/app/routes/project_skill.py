@@ -109,3 +109,53 @@ def get_project_skills_by_project(
         }
         for item in skills
     ]
+
+@router.delete("/{project_id}/skills/{skill_id}")
+def remove_project_skill(
+    project_id: int,
+    skill_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    project = (
+        db.query(Project)
+        .filter(Project.id == project_id)
+        .first()
+    )
+
+    if not project:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found"
+        )
+
+    if project.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
+        )
+
+    project_skill = (
+        db.query(ProjectSkill)
+        .filter(
+            ProjectSkill.project_id == project_id,
+            ProjectSkill.skill_id == skill_id
+        )
+        .first()
+    )
+
+    if not project_skill:
+        raise HTTPException(
+            status_code=404,
+            detail="Project skill association not found"
+        )
+
+    db.delete(project_skill)
+    db.commit()
+
+    try:
+        redis_client.flushall()
+    except Exception:
+        pass
+
+    return {"message": "Project skill removed"}

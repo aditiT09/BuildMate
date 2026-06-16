@@ -27,3 +27,11 @@ export const removeSkill = async (skillId) => {
 
   return response.data;
 };
+
+export const createSkill = async (name) => {
+  const response = await api.post(
+    `/skills/?name=${encodeURIComponent(name)}`
+  );
+
+  return response.data;
+};
