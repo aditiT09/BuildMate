@@ -12,14 +12,14 @@ def create_user():
             "name": "Test User",
             "email": email,
             "bio": "test",
-            "password": "password123"
+            "password": "Password123"
         }
     )
 
     return response.json()
 
 
-def login_user(email, password="password123"):
+def login_user(email, password="Password123"):
     response = client.post(
         "/auth/login",
         data={

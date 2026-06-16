@@ -761,78 +761,105 @@ export default function ProjectDetail() {
               }}>
                 📬 who's knocking
               </h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {opportunities.map((opportunity) => (
                   <div
                     key={opportunity.id}
                     style={{
                       background: C.surface, border: `1.5px solid ${C.border}`,
-                      borderRadius: 16, padding: "16px 20px",
-                      display: "flex", justifyContent: "space-between", alignItems: "center",
-                      flexWrap: "wrap", gap: 10,
+                      borderRadius: 16, padding: "20px 22px",
+                      display: "flex", flexDirection: "column", gap: 14,
                     }}
                   >
-                    <div>
-                      <p style={{
-                        fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 16,
-                        color: C.dark, margin: 0,
-                      }}>
-                        {opportunity.role}
-                      </p>
-                      {(opportunity.seats != null || opportunity.status) && (
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+                      <div>
                         <p style={{
-                          fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: C.muted, margin: "2px 0 0",
+                          fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 16,
+                          color: C.dark, margin: 0,
                         }}>
-                          {opportunity.seats != null ? `${opportunity.seats} seat${opportunity.seats !== 1 ? "s" : ""}` : ""}
-                          {opportunity.seats != null && opportunity.status ? " · " : ""}
-                          {opportunity.status}
+                          {opportunity.role}
                         </p>
-                      )}
-                      {opportunity.skills && opportunity.skills.length > 0 && (
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
-                          {opportunity.skills.map((s) => (
-                            <span
-                              key={s.id}
-                              style={{
-                                background: `${C.brand}12`,
-                                color: C.brand,
-                                border: `1px solid ${C.brand}20`,
-                                borderRadius: 999,
-                                padding: "2px 8px",
-                                fontFamily: '"DM Sans", sans-serif',
-                                fontWeight: 700,
-                                fontSize: 11,
-                              }}
-                            >
-                              {s.skill.name}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                        {(opportunity.seats != null || opportunity.status) && (
+                          <p style={{
+                            fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: C.muted, margin: "2px 0 0",
+                          }}>
+                            {opportunity.seats != null ? `${opportunity.seats} seat${opportunity.seats !== 1 ? "s" : ""}` : ""}
+                            {opportunity.seats != null && opportunity.status ? " · " : ""}
+                            {opportunity.status}
+                          </p>
+                        )}
+                        {opportunity.skills && opportunity.skills.length > 0 && (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+                            {opportunity.skills.map((s) => (
+                              <span
+                                key={s.id}
+                                style={{
+                                  background: `${C.brand}12`,
+                                  color: C.brand,
+                                  border: `1px solid ${C.brand}20`,
+                                  borderRadius: 999,
+                                  padding: "2px 8px",
+                                  fontFamily: '"DM Sans", sans-serif',
+                                  fontWeight: 700,
+                                  fontSize: 11,
+                                }}
+                              >
+                                {s.skill.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          onClick={() => navigate(`/opportunities/${opportunity.id}/edit`)}
+                          style={{
+                            background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
+                            borderRadius: 999, padding: "8px 18px",
+                            fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                            cursor: "pointer", transition: "all .15s ease",
+                          }}
+                        >
+                          ✏️ edit
+                        </button>
+                        <button
+                          onClick={() => navigate(`/opportunities/${opportunity.id}/applicants`)}
+                          style={{
+                            background: C.dark, color: C.orange, border: "none",
+                            borderRadius: 999, padding: "9px 18px",
+                            fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                            cursor: "pointer",
+                          }}
+                        >
+                          view applicants
+                        </button>
+                      </div>
                     </div>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button
-                        onClick={() => navigate(`/opportunities/${opportunity.id}/edit`)}
-                        style={{
-                          background: "transparent", color: C.dark2, border: `1.5px solid ${C.border}`,
-                          borderRadius: 999, padding: "8px 18px",
-                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
-                          cursor: "pointer", transition: "all .15s ease",
-                        }}
-                      >
-                        ✏️ edit
-                      </button>
-                      <button
-                        onClick={() => navigate(`/opportunities/${opportunity.id}/applicants`)}
-                        style={{
-                          background: C.dark, color: C.orange, border: "none",
-                          borderRadius: 999, padding: "9px 18px",
-                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
-                          cursor: "pointer",
-                        }}
-                      >
-                        view applicants
-                      </button>
+
+                    {/* Invite Banner */}
+                    <div
+                      onClick={() => navigate(`/opportunities/${opportunity.id}/invite`)}
+                      style={{
+                        background: `${C.orange}14`,
+                        border: `1.5px dashed ${C.orange}60`,
+                        borderRadius: 14,
+                        padding: "12px 16px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        fontFamily: '"DM Sans", sans-serif',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: C.dark2,
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span>💡</span> You can also invite builders to apply for this role
+                      </span>
+                      <span style={{ color: C.brand }}>invite builders →</span>
                     </div>
                   </div>
                 ))}

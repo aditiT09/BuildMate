@@ -15,3 +15,11 @@ export const getSkillGap = async (projectId, userId) => {
 
   return response.data;
 };
+
+export const getOpportunityMatches = async (opportunityId) => {
+  const response = await api.get(
+    `/matching/opportunities/${opportunityId}/matches`
+  );
+
+  return response.data;
+};

@@ -58,4 +58,10 @@ class User(Base):
         "Application",
         back_populates="user",
     )
+
+    invitations = relationship(
+        "Invitation",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
  

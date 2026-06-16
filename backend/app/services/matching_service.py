@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.project import Project
 from app.models.user import User
 from app.models.skill import Skill
+from app.models.opportunity import Opportunity
 
 from app.utils.redis_client import redis_client
 
@@ -162,5 +163,119 @@ def get_project_matches(
         )
     except Exception as e:
         print("Redis Write Error:", e)
+
+    return matches
+
+
+def get_opportunity_matches(
+    opportunity_id: int,
+    db: Session
+):
+    opportunity = (
+        db.query(Opportunity)
+        .filter(Opportunity.id == opportunity_id)
+        .first()
+    )
+
+    if not opportunity:
+        raise HTTPException(
+            status_code=404,
+            detail="Opportunity not found"
+        )
+
+    opportunity_skill_ids = {
+        skill.skill_id
+        for skill in opportunity.skills
+    }
+
+    if not opportunity_skill_ids:
+        opportunity_skill_ids = {
+            skill.skill_id
+            for skill in opportunity.project.skills
+        }
+
+    skill_map = {
+        skill.id: skill.name
+        for skill in db.query(Skill).all()
+    }
+
+    users = db.query(User).all()
+
+    matches = []
+
+    for user in users:
+        if user.id == opportunity.project.owner_id:
+            continue
+
+        user_skill_ids = {
+            skill.skill_id
+            for skill in user.skills
+        }
+
+        common_ids = (
+            opportunity_skill_ids &
+            user_skill_ids
+        )
+
+        missing_ids = (
+            opportunity_skill_ids -
+            user_skill_ids
+        )
+
+        matching_skills = [
+            skill_map[sid]
+            for sid in common_ids
+            if sid in skill_map
+        ]
+
+        missing_skills = [
+            skill_map[sid]
+            for sid in missing_ids
+            if sid in skill_map
+        ]
+
+        common_skills = len(common_ids)
+        total_opportunity_skills = len(opportunity_skill_ids)
+
+        if total_opportunity_skills == 0:
+            skill_match = 0
+        else:
+            skill_match = round(
+                (common_skills / total_opportunity_skills) * 100,
+                2
+            )
+
+        if total_opportunity_skills > 0 and skill_match < 40.0:
+            continue
+
+        activity_score = user.activity_score or 0
+        reliability_score = user.reliability_score or 0
+
+        overall_score = round(
+            (
+                skill_match * 0.7
+                + activity_score * 0.2
+                + reliability_score * 0.1
+            ),
+            2
+        )
+
+        matches.append({
+            "user_id": user.id,
+            "name": user.name,
+            "bio": user.bio,
+            "overall_score": overall_score,
+            "skill_match": skill_match,
+            "activity_score": activity_score,
+            "reliability_score": reliability_score,
+            "matching_skills": matching_skills,
+            "missing_skills": missing_skills,
+            "user_skills": [skill_map[sid] for sid in user_skill_ids if sid in skill_map]
+        })
+
+    matches.sort(
+        key=lambda x: x["overall_score"],
+        reverse=True
+    )
 
     return matches

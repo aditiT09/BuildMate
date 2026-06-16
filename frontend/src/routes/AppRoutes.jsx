@@ -16,6 +16,7 @@ import MatchResults from "../pages/matching/MatchResults";
 import MyApplications from "../pages/applications/MyApplications";
 import CreateProject from "../pages/projects/CreateProject";
 import CreateOpportunity from "../pages/opportunities/CreateOpportunity";
+import InviteBuilders from "../pages/opportunities/InviteBuilders";
 import OpportunityApplicants
 from "../pages/applications/OpportunityApplicants";
 import MyProjects from "../pages/projects/MyProjects";
@@ -68,6 +69,14 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <CreateOpportunity />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/opportunities/:opportunityId/invite"
+  element={
+    <ProtectedRoute>
+      <InviteBuilders />
     </ProtectedRoute>
   }
 />

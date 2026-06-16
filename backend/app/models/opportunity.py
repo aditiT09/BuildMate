@@ -53,3 +53,9 @@ class Opportunity(Base):
         back_populates="opportunity",
         cascade="all, delete-orphan"
     )
+
+    invitations = relationship(
+        "Invitation",
+        back_populates="opportunity",
+        cascade="all, delete-orphan"
+    )

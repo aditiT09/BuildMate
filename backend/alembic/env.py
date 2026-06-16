@@ -14,6 +14,7 @@ from app.models.project_skill import ProjectSkill
 from app.models.opportunity import Opportunity
 from app.models.opportunity_skill import OpportunitySkill
 from app.models.application import Application
+from app.models.invitation import Invitation
 from app.config import settings
 from app.models.profile import Profile
 from app.models.project_resource import ProjectResource

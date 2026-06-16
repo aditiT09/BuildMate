@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getMyApplications } from "../../api/applications";
+import { getReceivedInvitations, respondToInvitation } from "../../api/invitations";
 import Layout from "../../components/layout/Layout";
 
 const C = {
@@ -44,6 +45,7 @@ export default function MyApplications() {
   const navigate = useNavigate();
 
   const [applications, setApplications] = useState([]);
+  const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -53,12 +55,29 @@ export default function MyApplications() {
 
   const fetchApplications = async () => {
     try {
-      const data = await getMyApplications();
-      setApplications(data);
+      const [appData, inviteData] = await Promise.all([
+        getMyApplications(),
+        getReceivedInvitations(),
+      ]);
+      setApplications(appData);
+      setInvitations(inviteData);
     } catch (err) {
       console.error(err);
       setError("couldn't load your applications");
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRespond = async (invitationId, status) => {
+    try {
+      setLoading(true);
+      await respondToInvitation(invitationId, status);
+      alert(`Invitation ${status}!`);
+      await fetchApplications();
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.detail || "Failed to respond to invitation.");
       setLoading(false);
     }
   };
@@ -144,6 +163,71 @@ export default function MyApplications() {
               every role you've applied for, and where it stands. fingers crossed 🤞
             </p>
           </div>
+
+          {/* PENDING INVITATIONS */}
+          {invitations.filter(inv => inv.status === "pending").length > 0 && (
+            <div className="ma-fade" style={{ marginBottom: 36 }}>
+              <h2 style={{
+                fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
+                color: C.dark, marginBottom: 16, display: "flex", alignItems: "center", gap: 8
+              }}>
+                📬 Collaboration Invites ({invitations.filter(inv => inv.status === "pending").length})
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {invitations.filter(inv => inv.status === "pending").map((invite) => (
+                  <div
+                    key={invite.id}
+                    style={{
+                      background: C.surface, border: `2px solid ${C.orange}`,
+                      borderRadius: 20, padding: "20px 24px",
+                      boxShadow: `4px 4px 0px ${C.orange}`,
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      flexWrap: "wrap", gap: 12
+                    }}
+                  >
+                    <div>
+                      <h3 style={{
+                        fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 18,
+                        color: C.dark, margin: "0 0 4px"
+                      }}>
+                        {invite.opportunity?.project?.title}
+                      </h3>
+                      <p style={{
+                        fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: C.muted, margin: 0
+                      }}>
+                        invited you to join as <span style={{ color: C.dark2, fontWeight: 700 }}>{invite.opportunity?.role}</span>
+                      </p>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        onClick={() => handleRespond(invite.id, "accepted")}
+                        style={{
+                          background: C.green, color: "white", border: "none",
+                          borderRadius: 999, padding: "8px 18px",
+                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                          cursor: "pointer", transition: "all .15s ease",
+                        }}
+                      >
+                        ✓ Accept
+                      </button>
+                      <button
+                        onClick={() => handleRespond(invite.id, "rejected")}
+                        style={{
+                          background: "transparent", color: C.brand, border: `1.5px solid ${C.brand}40`,
+                          borderRadius: 999, padding: "8px 18px",
+                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                          cursor: "pointer", transition: "all .15s ease",
+                        }}
+                      >
+                        Decline
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {applications.length === 0 ? (
             <div className="ma-fade" style={{

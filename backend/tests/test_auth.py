@@ -8,7 +8,7 @@ def test_login_success():
     user_data = {
         "name": "Test User",
         "email": unique_email,
-        "password": "password123",
+        "password": "Password123",
         "bio": "test bio"
     }
 
@@ -23,7 +23,7 @@ def test_login_success():
         "/auth/login",
         data={
             "username": unique_email,
-            "password": "password123"
+            "password": "Password123"
         }
     )
 
@@ -40,7 +40,7 @@ def test_login_invalid_password():
     user_data = {
         "name": "Test User",
         "email": unique_email,
-        "password": "password123",
+        "password": "Password123",
         "bio": "test bio"
     }
 
@@ -70,7 +70,7 @@ def test_create_user():
         json={
             "name": "Test User",
             "email": unique_email,
-            "password": "password123",
+            "password": "Password123",
             "bio": "test bio"
         }
     )
@@ -88,7 +88,7 @@ def test_duplicate_email():
     user_data = {
         "name": "Test User",
         "email": unique_email,
-        "password": "password123",
+        "password": "Password123",
         "bio": "test bio"
     }
 
@@ -104,5 +104,5 @@ def test_duplicate_email():
         json=user_data
     )
 
-    assert second_response.status_code == 400
+    assert second_response.status_code == 409
     assert second_response.json()["detail"] == "Email already registered"
