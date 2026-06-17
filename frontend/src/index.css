@@ -52,3 +52,15 @@ body::before {
   /* Bottom explainer row */
   #mission > div:last-child { grid-template-columns: 1fr !important; }
 }
+
+/* ── Keyboard Focus Indicators ── */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[role="radio"]:focus-visible {
+  outline: 3px solid #E35336;
+  outline-offset: 3px;
+}

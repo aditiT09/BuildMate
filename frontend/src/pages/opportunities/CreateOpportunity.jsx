@@ -71,6 +71,7 @@ const STYLES = `
     padding: 14px 16px; cursor: pointer; transition: all .15s ease;
     background: ${C.bg};
     display: flex; align-items: center; gap: 10px;
+    text-align: left; font-family: inherit;
   }
   .co-status-card.on { border-color: ${C.brand}; background: white; box-shadow: 0 0 0 4px ${C.brand}1A; }
   .co-submit:hover { background: ${C.brandDk}; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(227,83,54,0.28); }
@@ -421,7 +422,8 @@ export default function CreateOpportunity() {
                   taking applications? 📥
                 </label>
                 <div style={{ display: "flex", gap: 12 }}>
-                  <div
+                  <button
+                    type="button"
                     className={`co-status-card ${form.status === "open" ? "on" : ""}`}
                     onClick={() => setForm({ ...form, status: "open" })}
                   >
@@ -438,9 +440,10 @@ export default function CreateOpportunity() {
                         people can apply now
                       </p>
                     </div>
-                  </div>
+                  </button>
 
-                  <div
+                  <button
+                    type="button"
                     className={`co-status-card ${form.status === "closed" ? "on" : ""}`}
                     onClick={() => setForm({ ...form, status: "closed" })}
                   >
@@ -457,7 +460,7 @@ export default function CreateOpportunity() {
                         not accepting rn
                       </p>
                     </div>
-                  </div>
+                  </button>
                 </div>
               </div>
 

@@ -365,20 +365,28 @@ export default function Dashboard() {
               find your squad and let's cook fr fr 🍳
             </p>
             {/* GitHub streak callout */}
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              marginTop: 16, padding: "8px 18px",
-              background: "linear-gradient(135deg, #2B1B12 0%, #4A372D 100%)",
-              borderRadius: 9999, cursor: "pointer",
-              animation: "gradFlow 4s ease infinite",
-              backgroundSize: "200% 200%",
-            }} onClick={() => navigate("/discover")}>
+            <button
+              type="button"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                marginTop: 16, padding: "8px 18px",
+                background: "linear-gradient(135deg, #2B1B12 0%, #4A372D 100%)",
+                borderRadius: 9999, cursor: "pointer",
+                animation: "gradFlow 4s ease infinite",
+                backgroundSize: "200% 200%",
+                border: "none",
+                outline: "none",
+                fontFamily: "inherit",
+                textAlign: "left",
+              }}
+              onClick={() => navigate("/discover")}
+            >
               <span style={{ fontSize: 16 }}>⚡</span>
               <span style={{ color: "#F4A460", fontSize: 13, fontWeight: 600, letterSpacing: "0.03em" }}>
                 Stay consistent — keep your GitHub streak alive
               </span>
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>→</span>
-            </div>
+            </button>
           </div>
 
           {/* Score rings */}
