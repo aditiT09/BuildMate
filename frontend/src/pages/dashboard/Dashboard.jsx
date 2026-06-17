@@ -4,6 +4,7 @@ import { getMyProjects } from "../../api/projects";
 import { getMyApplications } from "../../api/applications";
 import { getOverview } from "../../api/analytics";
 import { getMyProfile } from "../../api/profile";
+import { getCurrentUser } from "../../api/users";
 import { useAuth } from "../../context/AuthContext";
 
 // ── Palette ────────────────────────────────────────────
@@ -57,19 +58,37 @@ function Skeleton({ w = "100%", h = 20, r = 8 }) {
 }
 
 // ── Animated counter ────────────────────────────────────
-function AnimCount({ target, duration = 1200 }) {
+function AnimCount({ target, duration = 1000 }) {
   const [val, setVal] = useState(0);
+
   useEffect(() => {
-    if (!target) return;
+    if (target === undefined || target === null) return;
+    
     let start = null;
+    const startVal = val;
+    const diff = target - startVal;
+
+    if (diff === 0) {
+      setVal(target);
+      return;
+    }
+
+    let animId;
     const step = (ts) => {
       if (!start) start = ts;
       const progress = Math.min((ts - start) / duration, 1);
-      setVal(Math.floor(progress * target));
-      if (progress < 1) requestAnimationFrame(step);
+      setVal(Math.floor(startVal + progress * diff));
+      if (progress < 1) {
+        animId = requestAnimationFrame(step);
+      }
     };
-    requestAnimationFrame(step);
+    animId = requestAnimationFrame(step);
+
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+    };
   }, [target]);
+
   return <>{val}</>;
 }
 
@@ -231,6 +250,7 @@ export default function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [overview,     setOverview]     = useState(null);
   const [profile,      setProfile]      = useState(null);
+  const [currentUser,  setCurrentUser]  = useState(null);
   const [loading,      setLoading]      = useState(true);
   const [greeting,     setGreeting]     = useState("Hey");
 
@@ -244,16 +264,18 @@ export default function Dashboard() {
 
   const loadDashboard = async () => {
     try {
-      const [pd, ad, od, prd] = await Promise.all([
+      const [pd, ad, od, prd, curUser] = await Promise.all([
         getMyProjects(),
         getMyApplications(),
         getOverview(),
         getMyProfile().catch(() => null),
+        getCurrentUser().catch(() => null),
       ]);
       setProjects(pd);
       setApplications(ad);
       setOverview(od);
       setProfile(prd);
+      setCurrentUser(curUser);
     } catch (err) {
       console.error(err);
     } finally {
@@ -278,6 +300,51 @@ export default function Dashboard() {
 
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "32px 28px" }}>
 
+        {/* ══ HEADER BAR ════════════════════════════════ */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 28,
+          animation: "slideUp 0.6s ease both",
+        }}>
+          <span style={{
+            fontFamily: '"Syne", sans-serif',
+            fontSize: 24,
+            fontWeight: 800,
+            color: C.dark,
+            letterSpacing: "-0.01em",
+            textTransform: "lowercase",
+          }}>
+            buildmate
+          </span>
+
+          <Link to="/profile" style={{ textDecoration: "none" }}>
+            <div style={{
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: C.brand,
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: '"Syne", sans-serif',
+              fontWeight: 800,
+              fontSize: 13,
+              border: `2px solid ${C.dark}`,
+              boxShadow: `3px 3px 0px ${C.dark}`,
+              cursor: "pointer",
+              transition: "transform 0.15s, box-shadow 0.15s",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translate(-2px, -2px)"; e.currentTarget.style.boxShadow = `5px 5px 0px ${C.dark}` }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = `3px 3px 0px ${C.dark}` }}
+            >
+              {displayName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+            </div>
+          </Link>
+        </div>
+
         {/* ══ HERO HEADER ══════════════════════════════ */}
         <div style={{
           display: "grid",
@@ -286,9 +353,6 @@ export default function Dashboard() {
           animation: "slideUp 0.6s ease both",
         }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: C.brand, marginBottom: 10, fontFamily: '"DM Sans", sans-serif' }}>
-              ✦ BuildMate HQ
-            </p>
             <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontWeight: 700, lineHeight: 0.9, color: C.dark }}>
               <span style={{ fontSize: "clamp(40px, 5vw, 72px)", display: "block" }}>
                 {greeting},
@@ -298,7 +362,7 @@ export default function Dashboard() {
               </span>
             </h1>
             <p style={{ marginTop: 14, fontSize: 17, color: C.dark2, fontStyle: "italic", fontFamily: '"Cormorant Garamond", serif' }}>
-              your next teammate is one swipe away 🚀
+              find your squad and let's cook fr fr 🍳
             </p>
             {/* GitHub streak callout */}
             <div style={{
@@ -328,8 +392,8 @@ export default function Dashboard() {
               Your scores
             </p>
             <div style={{ display: "flex", gap: 20 }}>
-              <ScoreRing score={user?.activity_score    ?? 50} label="Activity"    color={C.brand}  />
-              <ScoreRing score={user?.reliability_score ?? 50} label="Reliability" color={C.orange} />
+              <ScoreRing score={currentUser?.activity_score    ?? user?.activity_score    ?? 50} label="Activity"    color={C.brand}  />
+              <ScoreRing score={currentUser?.reliability_score ?? user?.reliability_score ?? 50} label="Reliability" color={C.orange} />
             </div>
             <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", lineHeight: 1.5, maxWidth: 160, fontFamily: '"DM Sans", sans-serif' }}>
               Ship more projects to level up your scores 🔥
@@ -344,7 +408,7 @@ export default function Dashboard() {
           gap: 16, marginBottom: 28,
         }}>
           {loading ? (
-            Array(5).fill(0).map((_, i) => (
+            Array(3).fill(0).map((_, i) => (
               <div key={i} style={{ borderRadius: 20, padding: 24, background: C.surface, border: `1px solid ${C.border}`, minHeight: 160 }}>
                 <Skeleton h={12} w="60%" r={6} />
                 <div style={{ marginTop: 16 }}><Skeleton h={48} w="40%" r={8} /></div>
@@ -355,43 +419,60 @@ export default function Dashboard() {
             <>
               <StatCard color={C.brand}   icon="📁" title="My Projects"    value={projects.length}                    sub="you're building"      delay={0}   link="/my-projects" />
               <StatCard color={C.orange}  icon="📬" title="Applications"   value={applications.length}                sub="sent by you"          delay={0.05} link="/applications" />
-              <StatCard color="#7C5CBF"   icon="✅" title="Accepted"       value={acceptedApps}                       sub={`${successRate}% success rate`} delay={0.1}  />
-              <StatCard color="#D48A2D"   icon="⏳" title="Pending"        value={pendingApps}                        sub="awaiting response"    delay={0.15} link="/applications" />
-              <StatCard color="#2E7D32"   icon="🌍" title="Live Projects"  value={overview?.total_projects ?? 0}      sub="on the platform"      delay={0.2}  link="/discover" />
+              <StatCard color="#2E7D32"   icon="🌍" title="Live Projects"  value={overview?.total_projects ?? 0}      sub="on the platform"      delay={0.1}  link="/discover" />
             </>
           )}
-        </div>
-
-        {/* ══ SECOND ROW — Platform stats ══════════════ */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-          gap: 14, marginBottom: 32,
-        }}>
-          {[
-            { icon: "👥", label: "Builders", value: overview?.total_users ?? 0 },
-            { icon: "🎯", label: "Openings",  value: overview?.total_opportunities ?? 0 },
-            { icon: "📨", label: "Total Applications", value: overview?.total_applications ?? 0 },
-            { icon: "🤝", label: "Accepted globally", value: overview?.accepted_applications ?? 0 },
-          ].map((s, i) => (
-            <MiniStat key={s.label} {...s} delay={i * 0.05} loading={loading} />
-          ))}
         </div>
 
         {/* ══ MAIN GRID ════════════════════════════════ */}
         <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 20, marginBottom: 20 }}>
 
-          {/* Activity streak */}
+          {/* Top skills / Trending Skills */}
           <div className="dash-card" style={{
-            background: C.surface, borderRadius: 24, padding: 28,
-            border: `1px solid ${C.border}`,
+            background: C.dark, borderRadius: 24, padding: 28,
             animation: "slideUp 0.6s ease 0.2s both", opacity: 0,
           }}>
-            <SectionLabel>📊 Activity Streak</SectionLabel>
-            {loading
-              ? <Skeleton h={100} r={12} />
-              : <StreakGrid applications={applications} />
-            }
+            <SectionLabel light>🛠️ Trending Skills</SectionLabel>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 18, fontStyle: "italic" }}>
+              what everyone's learning rn
+            </p>
+            {loading ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[1,2,3,4,5].map(i => <Skeleton key={i} h={32} r={8} />)}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {(overview?.top_skills || []).map((skill, i) => (
+                  <div key={skill} style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    animation: `slideUp 0.4s ease ${0.2 + i * 0.06}s both`, opacity: 0,
+                  }}>
+                    <span style={{ color: C.orange, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 14, width: 20 }}>
+                      {i + 1}.
+                    </span>
+                    <div style={{
+                      flex: 1, height: 32, borderRadius: 8,
+                      background: "rgba(255,255,255,0.06)",
+                      display: "flex", alignItems: "center",
+                      paddingLeft: 12, overflow: "hidden", position: "relative",
+                    }}>
+                      <div style={{
+                        position: "absolute", left: 0, top: 0, bottom: 0,
+                        width: `${100 - i * 15}%`,
+                        background: `linear-gradient(90deg, rgba(227,83,54,0.25), transparent)`,
+                        transition: "width 1s ease",
+                      }} />
+                      <span style={{ position: "relative", color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: 500 }}>
+                        {skill}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {(!overview?.top_skills || overview.top_skills.length === 0) && (
+                  <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontStyle: "italic" }}>No skill data yet — add yours in profile!</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Application breakdown */}
@@ -534,7 +615,7 @@ export default function Dashboard() {
                     }}>📄</div>
                     <div>
                       <p style={{ fontWeight: 600, fontSize: 14, color: C.dark }}>
-                        {app.opportunity?.title || `Opportunity #${app.opportunity_id}`}
+                        {app.opportunity?.role || "Collaborator"}
                       </p>
                       <p style={{ fontSize: 12, color: C.muted }}>
                         {app.opportunity?.project?.title || "BuildMate Project"}
@@ -553,145 +634,164 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ══ BOTTOM ROW — Quick actions + top skills ══ */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
-
-          {/* Quick actions */}
-          <div className="dash-card" style={{
-            background: C.surface, borderRadius: 24, padding: 28,
-            border: `1px solid ${C.border}`,
-            animation: "slideUp 0.6s ease 0.4s both", opacity: 0,
-          }}>
-            <SectionLabel>⚡ Quick Actions</SectionLabel>
-            <p style={{ fontSize: 13, color: C.muted, marginBottom: 20, fontStyle: "italic" }}>
-              "a ship in harbour is safe, but that's not what ships are for"
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { icon: "🔍", label: "Discover Projects",    sub: "Swipe on what matches your vibe",   href: "/discover",       color: C.brand  },
-                { icon: "📁", label: "Create a Project",     sub: "Drop your idea, find your team",     href: "/create-project", color: "#7C5CBF" },
-                { icon: "📋", label: "My Applications",      sub: "Track where you stand",              href: "/applications",   color: C.orange },
-                { icon: "🏗️", label: "My Projects",          sub: "See what you've built",              href: "/my-projects",    color: "#2E7D32" },
-                { icon: "👤", label: "Edit Profile",         sub: "Make your CV slappp",                href: "/profile",        color: "#D48A2D" },
-              ].map((a, i) => (
-                <Link key={a.label} to={a.href} style={{ textDecoration: "none" }}>
-                  <div style={{
-                    display: "flex", alignItems: "center", gap: 12,
-                    padding: "12px 14px", borderRadius: 12,
-                    border: `1px solid ${C.border}`, background: C.cream,
-                    cursor: "pointer",
-                    transition: "all 0.18s ease",
-                    animation: `slideUp 0.4s ease ${0.4 + i * 0.05}s both`,
-                    opacity: 0,
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = a.color; e.currentTarget.style.background = `${a.color}10`; e.currentTarget.style.transform = "translateX(4px)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.cream; e.currentTarget.style.transform = "translateX(0)"; }}
-                  >
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: `${a.color}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                      {a.icon}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontWeight: 600, fontSize: 14, color: C.dark }}>{a.label}</p>
-                      <p style={{ fontSize: 11, color: C.muted }}>{a.sub}</p>
-                    </div>
-                    <span style={{ color: C.muted, fontSize: 14 }}>→</span>
-                  </div>
-                </Link>
-              ))}
+        {/* ══ BOTTOM GRID ══════════════════════════════ */}
+        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: 20, marginBottom: 20 }}>
+          
+          {/* Left Column: Badges & Profile Completeness */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            {/* Badges Earned Card */}
+            <div className="dash-card" style={{
+              background: C.surface, borderRadius: 24, padding: 28,
+              border: `1px solid ${C.border}`,
+              animation: "slideUp 0.6s ease 0.4s both", opacity: 0,
+            }}>
+              <SectionLabel>🏅 Badges Earned</SectionLabel>
+              <div style={{ textAlign: "center", padding: "16px 0" }}>
+                <span style={{ fontSize: 40, filter: "grayscale(100%)", opacity: 0.4 }}>🏆</span>
+                <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, marginTop: 12 }}>
+                  zero badges? the audacity.
+                </p>
+                <p style={{ fontSize: 12, color: C.muted, fontFamily: '"DM Sans", sans-serif', marginTop: 6, fontStyle: "italic" }}>
+                  stop yapping and start shipping to get decorated fr fr 🎖️
+                </p>
+              </div>
             </div>
+
+            {/* Profile Completeness Card */}
+            <ProfileCompleteness profile={profile} user={user} />
           </div>
 
-          {/* Top skills + platform health */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-            {/* Top skills */}
+          {/* Right Column: BuildMate Stats & About Section */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            {/* BuildMate Stats Card */}
             <div className="dash-card" style={{
-              background: C.dark, borderRadius: 24, padding: 28, flex: 1,
+              background: C.dark, borderRadius: 24, padding: 28, color: "white",
               animation: "slideUp 0.6s ease 0.45s both", opacity: 0,
             }}>
-              <SectionLabel light>🛠️ Trending Skills</SectionLabel>
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 18, fontStyle: "italic" }}>
-                what everyone's learning rn
-              </p>
-              {loading ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {[1,2,3,4,5].map(i => <Skeleton key={i} h={32} r={8} />)}
+              <SectionLabel light>📊 BuildMate Stats</SectionLabel>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 10 }}>
+                <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <span style={{ fontSize: 24 }}>🚀</span>
+                  <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.brand, margin: "6px 0 2px" }}>
+                    <AnimCount target={overview?.total_projects ?? 0} />
+                  </h4>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Projects</p>
                 </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {(overview?.top_skills || []).map((skill, i) => (
-                    <div key={skill} style={{
-                      display: "flex", alignItems: "center", gap: 10,
-                      animation: `slideUp 0.4s ease ${0.45 + i * 0.06}s both`, opacity: 0,
-                    }}>
-                      <span style={{ color: C.orange, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 14, width: 20 }}>
-                        {i + 1}.
-                      </span>
-                      <div style={{
-                        flex: 1, height: 32, borderRadius: 8,
-                        background: "rgba(255,255,255,0.06)",
-                        display: "flex", alignItems: "center",
-                        paddingLeft: 12, overflow: "hidden", position: "relative",
-                      }}>
-                        <div style={{
-                          position: "absolute", left: 0, top: 0, bottom: 0,
-                          width: `${100 - i * 15}%`,
-                          background: `linear-gradient(90deg, rgba(227,83,54,0.25), transparent)`,
-                          transition: "width 1s ease",
-                        }} />
-                        <span style={{ position: "relative", color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: 500 }}>
-                          {skill}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  {(!overview?.top_skills || overview.top_skills.length === 0) && (
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontStyle: "italic" }}>No skill data yet — add yours in profile!</p>
-                  )}
+                <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <span style={{ fontSize: 24 }}>👥</span>
+                  <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.orange, margin: "6px 0 2px" }}>
+                    <AnimCount target={overview?.total_users ?? 0} />
+                  </h4>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Builders</p>
                 </div>
-              )}
-            </div>
-
-            {/* GitHub streak reminder card */}
-            <div className="dash-card" style={{
-              background: "linear-gradient(135deg, #E35336 0%, #B8391F 100%)",
-              borderRadius: 24, padding: 24,
-              animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
-            }}>
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
-                <span style={{ fontSize: 36 }}>⚡</span>
-                <div>
-                  <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 18, color: "white", lineHeight: 1.2, marginBottom: 8 }}>
-                    Every project = a GitHub commit
-                  </h3>
-                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", lineHeight: 1.6 }}>
-                    BuildMate helps you maintain your GitHub streak — every contribution here is real, shippable work. No more green-desert repos. 🌿
-                  </p>
-                  <Link to="/discover" style={{ textDecoration: "none" }}>
-                    <button style={{
-                      marginTop: 14, background: "rgba(255,255,255,0.18)",
-                      border: "1.5px solid rgba(255,255,255,0.3)",
-                      color: "white", borderRadius: 9999,
-                      padding: "8px 20px", fontSize: 12,
-                      fontWeight: 700, cursor: "pointer",
-                      fontFamily: '"DM Sans", sans-serif',
-                      letterSpacing: "0.06em", textTransform: "uppercase",
-                      transition: "all 0.2s",
-                    }}
-                      onMouseEnter={e => e.target.style.background = "rgba(255,255,255,0.3)"}
-                      onMouseLeave={e => e.target.style.background = "rgba(255,255,255,0.18)"}
-                    >
-                      Find a project now →
-                    </button>
-                  </Link>
+                <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <span style={{ fontSize: 24 }}>🎯</span>
+                  <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: "#7C5CBF", margin: "6px 0 2px" }}>
+                    <AnimCount target={overview?.total_opportunities ?? 0} />
+                  </h4>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Openings</p>
                 </div>
               </div>
+            </div>
+
+            {/* About Section */}
+            <div className="dash-card" style={{
+              background: C.surface, borderRadius: 24, padding: 28,
+              border: `1px solid ${C.border}`,
+              animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
+            }}>
+              <SectionLabel>💡 About BuildMate</SectionLabel>
+              <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 18, color: C.dark, marginBottom: 10 }}>
+                Killing the squad-finding struggle.
+              </h3>
+              <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif' }}>
+                BuildMate was cooked up to stop developers and designers from building in silos. We connect you with builders based on real tech-stack synergy, helping you match, team up, and ship actual projects instead of yapping on resumes. Fr fr, let's ship together. 🚀
+              </p>
             </div>
           </div>
         </div>
 
-        {/* ══ PROFILE COMPLETENESS ═════════════════════ */}
-        <ProfileCompleteness profile={profile} user={user} />
+        {/* ══ AUTHOR FOOTER SIGNATURE ══════════════════ */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: 40,
+          paddingTop: 24,
+          borderTop: `1px solid ${C.border}`,
+          animation: "slideUp 0.6s ease 0.55s both",
+          opacity: 0,
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+            background: C.surface,
+            border: `2px solid ${C.dark}`,
+            boxShadow: `4px 4px 0px ${C.dark}`,
+            borderRadius: 20,
+            padding: "16px 24px",
+          }}>
+            <img
+              src="/aditi_profile.png"
+              alt="Aditi Tiwari"
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                border: `2px solid ${C.dark}`,
+                objectFit: "cover",
+              }}
+            />
+            <div>
+              <p style={{
+                fontFamily: '"Syne", sans-serif',
+                fontWeight: 800,
+                fontSize: 14,
+                color: C.dark,
+                margin: 0,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}>
+                build by aditi tiwari
+              </p>
+              <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+                <a
+                  href="https://linkedin.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: C.brand,
+                    textDecoration: "none",
+                    fontFamily: '"DM Sans", sans-serif',
+                  }}
+                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                  onMouseLeave={e => e.target.style.textDecoration = "none"}
+                >
+                  🔗 LinkedIn
+                </a>
+                <a
+                  href="https://instagram.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: C.brand,
+                    textDecoration: "none",
+                    fontFamily: '"DM Sans", sans-serif',
+                  }}
+                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                  onMouseLeave={e => e.target.style.textDecoration = "none"}
+                >
+                  📸 Instagram
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
