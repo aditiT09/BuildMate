@@ -101,7 +101,7 @@ export default function Hero() {
         animation: 'fadeUp 0.8s ease 0.5s forwards',
         opacity: 0,
       }}>
-        <Link to="/signup">
+        <Link to="/register">
           <HoverBtn
             base={{ background: C.terra500, color: C.sand200, border: 'none' }}
             hover={{ background: C.terra800, transform: 'translateY(-2px)', boxShadow: '0 12px 32px rgba(196,98,45,0.35)' }}
