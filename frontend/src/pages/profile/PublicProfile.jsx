@@ -11,7 +11,7 @@ const C = {
   surface:  "#FDFBF7",
   dark:     "#2B1B12",
   dark2:    "#4A372D",
-  muted:    "#8C776A",
+  muted:    "#6E5A4E",
   border:   "#E9DDD0",
   sand:     "#F5EDE0",
   sandDk:   "#EDD5B8",

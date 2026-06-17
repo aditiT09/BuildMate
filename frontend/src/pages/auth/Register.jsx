@@ -81,7 +81,7 @@ const PasswordHint = ({ password }) => {
           display: "flex",
           alignItems: "center",
           gap: "4px",
-          color: met ? "#16a34a" : "#A89080",
+          color: met ? "#16a34a" : "#756255",
           fontWeight: met ? 600 : 400,
           transition: "color 0.2s",
         }}>
@@ -103,7 +103,7 @@ function Register() {
     textPrimary: "#2B1B12",
     muted: "#6B5A50",
     border: "#D2B48C",
-    placeholder: "#A89080",
+    placeholder: "#756255",
     bg: "#FFF8F0",
   };
 

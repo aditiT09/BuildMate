@@ -16,7 +16,7 @@ const C = {
   surface:  "#FDFBF7",
   dark:     "#2B1B12",
   dark2:    "#4A372D",
-  muted:    "#8C776A",
+  muted:    "#6E5A4E",
   border:   "#E9DDD0",
   sand:     "#F5EDE0",
   sandDark: "#EDD5B8",
@@ -396,14 +396,14 @@ export default function Dashboard() {
             gap: 16, minWidth: 220,
             animation: "slideLeft 0.6s ease 0.1s both", opacity: 0,
           }}>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: '"DM Sans", sans-serif' }}>
+            <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: '"DM Sans", sans-serif' }}>
               Your scores
             </p>
             <div style={{ display: "flex", gap: 20 }}>
               <ScoreRing score={currentUser?.activity_score    ?? user?.activity_score    ?? 50} label="Activity"    color={C.brand}  />
               <ScoreRing score={currentUser?.reliability_score ?? user?.reliability_score ?? 50} label="Reliability" color={C.orange} />
             </div>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", lineHeight: 1.5, maxWidth: 160, fontFamily: '"DM Sans", sans-serif' }}>
+            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, textAlign: "center", lineHeight: 1.5, maxWidth: 160, fontFamily: '"DM Sans", sans-serif' }}>
               Ship more projects to level up your scores 🔥
             </p>
           </div>

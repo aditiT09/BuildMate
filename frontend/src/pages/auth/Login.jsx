@@ -9,7 +9,7 @@ const colors = {
   secondary: "#F4A460",
   textPrimary: "#2B1B12",
   textSecondary: "#4A372D",
-  muted: "#6B7280",
+  muted: "#555E6C",
   border: "#D2B48C",
   background: "#FFF8F0",
   success: "#22C55E",
@@ -463,7 +463,7 @@ function Login() {
           </div>
 
           {/* Bottom note */}
-          <p className="text-center text-xs mt-5" style={{ color: "#A89890" }}>
+          <p className="text-center text-xs mt-5" style={{ color: "#6F5D53" }}>
             By signing in you agree to our{" "}
             <Link to="/terms" style={{ color: colors.muted }}>Terms</Link>
             {" "}and{" "}

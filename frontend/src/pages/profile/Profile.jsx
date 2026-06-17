@@ -10,7 +10,7 @@ import Layout from "../../components/layout/Layout";
 const C = {
   brand:"#E35336",brandDk:"#B8391F",orange:"#F4A460",
   bg:"#FFF8F0",surface:"#FDFBF7",dark:"#2B1B12",
-  dark2:"#4A372D",muted:"#8C776A",border:"#E9DDD0",
+  dark2:"#4A372D",muted:"#6E5A4E",border:"#E9DDD0",
   sand:"#F5EDE0",sandDk:"#EDD5B8",cream:"#FBF5EE",
   success:"#2E7D32",warn:"#D48A2D",
 };
@@ -37,7 +37,7 @@ const STYLES = `
 
   .pi{width:100%;padding:11px 16px;border:1.5px solid #E9DDD0;border-radius:12px;background:#FFF8F0;font-size:14px;color:#2B1B12;font-family:"DM Sans",sans-serif;transition:border-color .2s,box-shadow .2s;box-sizing:border-box;}
   .pi:focus{outline:none;border-color:#E35336;box-shadow:0 0 0 3px rgba(227,83,54,0.12);}
-  .pi::placeholder{color:#8C776A;opacity:.7;}
+  .pi::placeholder{color:#6E5A4E;opacity:.9;}
   .lc:hover{border-color:#E35336 !important;background:#FEE8E3 !important;}
   .skill-tag:hover .sx{opacity:1 !important;}
   .addbtn:hover{background:#FEE8E3 !important;border-color:#E35336 !important;color:#E35336 !important;}
