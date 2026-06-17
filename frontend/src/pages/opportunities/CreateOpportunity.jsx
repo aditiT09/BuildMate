@@ -353,7 +353,7 @@ export default function CreateOpportunity() {
 
               {/* Role */}
               <div style={{ marginBottom: 22 }}>
-                <label style={{
+                <label htmlFor="role" style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
@@ -375,6 +375,7 @@ export default function CreateOpportunity() {
                 </div>
 
                 <input
+                  id="role"
                   type="text"
                   name="role"
                   placeholder="...or type your own role"
@@ -462,7 +463,7 @@ export default function CreateOpportunity() {
 
               {/* Skills Required */}
               <div>
-                <label style={{
+                <label htmlFor="skills_search" style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
@@ -485,6 +486,7 @@ export default function CreateOpportunity() {
 
                 <div style={{ position: "relative" }}>
                   <input
+                    id="skills_search"
                     type="text"
                     placeholder="search required skill..."
                     value={skillQ}

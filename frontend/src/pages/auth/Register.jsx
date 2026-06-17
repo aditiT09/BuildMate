@@ -33,9 +33,9 @@ const IconEye = ({ color, closed }) => (
   </svg>
 );
 
-const FieldRow = ({ label, icon, children, labelStyle }) => (
+const FieldRow = ({ label, icon, children, labelStyle, id }) => (
   <div>
-    <label style={labelStyle}>{label}</label>
+    <label htmlFor={id} style={labelStyle}>{label}</label>
     <div style={{ position: "relative" }}>
       <span style={{
         position: "absolute",
@@ -292,8 +292,9 @@ function Register() {
 
             {/* ── Full Name ── */}
             <div>
-              <label style={labelStyle}>Full Name</label>
+              <label htmlFor="name" style={labelStyle}>Full Name</label>
               <input
+                id="name"
                 type="text"
                 name="name"
                 placeholder="Jane Doe"
@@ -314,8 +315,9 @@ function Register() {
             </div>
 
             {/* ── Email ── */}
-            <FieldRow label="Email Address" labelStyle={labelStyle} icon={<IconMail color={colors.placeholder} />}>
+            <FieldRow id="email" label="Email Address" labelStyle={labelStyle} icon={<IconMail color={colors.placeholder} />}>
               <input
+                id="email"
                 type="email"
                 name="email"
                 placeholder="you@example.com"
@@ -327,9 +329,10 @@ function Register() {
             </FieldRow>
 
             {/* ── Password ── */}
-            <FieldRow label="Password" labelStyle={labelStyle} icon={<IconLock color={colors.placeholder} />}>
+            <FieldRow id="password" label="Password" labelStyle={labelStyle} icon={<IconLock color={colors.placeholder} />}>
               <div style={{ position: "relative" }}>
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Min. 8 characters"

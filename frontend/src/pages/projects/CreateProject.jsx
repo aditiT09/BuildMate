@@ -342,13 +342,14 @@ export default function CreateProject() {
 
               {/* Title */}
               <div style={{ marginBottom: 22 }}>
-                <label style={{
+                <label htmlFor="title" style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
                   what's it called? 🏷️
                 </label>
                 <input
+                  id="title"
                   type="text"
                   name="title"
                   placeholder="e.g. campus carpool app"
@@ -361,13 +362,14 @@ export default function CreateProject() {
 
               {/* Description */}
               <div style={{ marginBottom: 22 }}>
-                <label style={{
+                <label htmlFor="description" style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
                   what's the pitch? 💬
                 </label>
                 <textarea
+                  id="description"
                   name="description"
                   placeholder="what are you building, why does it matter, and what kind of help are you after?"
                   value={form.description}
@@ -380,13 +382,14 @@ export default function CreateProject() {
 
               {/* Timeline */}
               <div style={{ marginBottom: 22 }}>
-                <label style={{
+                <label htmlFor="timeline" style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
                   how long's the grind? ⏳
                 </label>
                 <input
+                  id="timeline"
                   type="text"
                   name="timeline"
                   placeholder="e.g. 6-8 weeks"
@@ -399,7 +402,7 @@ export default function CreateProject() {
 
               {/* Project Type */}
               <div style={{ marginBottom: 22 }}>
-                <label style={{
+                <label htmlFor="project_type" style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
@@ -421,6 +424,7 @@ export default function CreateProject() {
                 </div>
 
                 <input
+                  id="project_type"
                   type="text"
                   name="project_type"
                   placeholder="...or type your own"
@@ -433,7 +437,7 @@ export default function CreateProject() {
 
               {/* Skills Required */}
               <div>
-                <label style={{
+                <label htmlFor="skills_search" style={{
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
@@ -456,6 +460,7 @@ export default function CreateProject() {
 
                 <div style={{ position: "relative" }}>
                   <input
+                    id="skills_search"
                     type="text"
                     placeholder="search required skill..."
                     value={skillQ}

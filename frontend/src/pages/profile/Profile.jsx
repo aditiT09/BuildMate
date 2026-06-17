@@ -137,9 +137,9 @@ function STitle({children,action}){
   );
 }
 
-function FLabel({children,req}){
+function FLabel({children,req,htmlFor}){
   return(
-    <label style={{display:"block",fontSize:11,fontWeight:700,letterSpacing:".13em",textTransform:"uppercase",color:C.muted,fontFamily:'"DM Sans",sans-serif',marginBottom:6}}>
+    <label htmlFor={htmlFor} style={{display:"block",fontSize:11,fontWeight:700,letterSpacing:".13em",textTransform:"uppercase",color:C.muted,fontFamily:'"DM Sans",sans-serif',marginBottom:6}}>
       {children}{req&&<span style={{color:C.brand}}> *</span>}
     </label>
   );
@@ -482,8 +482,8 @@ export default function Profile(){
                   <div style={{display:"flex",gap:14,alignItems:"flex-start",marginBottom:22,padding:16,background:C.cream,borderRadius:16,border:`1px solid ${C.border}`}}>
                     <AvatarDisplay src={form.avatar} name={form.full_name||displayName} size={68}/>
                     <div style={{flex:1}}>
-                      <FLabel>Avatar URL</FLabel>
-                      <input className="pi" value={form.avatar} onChange={e=>setForm(f=>({...f,avatar:e.target.value}))} placeholder="https://example.com/photo.jpg"/>
+                      <FLabel htmlFor="avatar">Avatar URL</FLabel>
+                      <input id="avatar" className="pi" value={form.avatar} onChange={e=>setForm(f=>({...f,avatar:e.target.value}))} placeholder="https://example.com/photo.jpg"/>
                       <p style={{fontSize:11,color:C.muted,marginTop:5,fontFamily:'"DM Sans",sans-serif'}}>Paste an image URL — GitHub avatar, Gravatar, etc.</p>
                     </div>
                   </div>
@@ -498,8 +498,8 @@ export default function Profile(){
                       {key:"portfolio",label:"Portfolio",ph:"yoursite.dev"},
                     ].map(({key,label,ph,req})=>(
                       <div key={key}>
-                        <FLabel req={req}>{label}</FLabel>
-                        <input className="pi" value={form[key]} onChange={e=>setForm(f=>({...f,[key]:e.target.value}))} placeholder={ph}/>
+                        <FLabel htmlFor={key} req={req}>{label}</FLabel>
+                        <input id={key} className="pi" value={form[key]} onChange={e=>setForm(f=>({...f,[key]:e.target.value}))} placeholder={ph}/>
                       </div>
                     ))}
                   </div>
@@ -516,8 +516,8 @@ export default function Profile(){
                   </div>
 
                   <div style={{marginBottom:22}}>
-                    <FLabel>Bio</FLabel>
-                    <textarea className="pi" value={form.bio} onChange={e=>setForm(f=>({...f,bio:e.target.value}))} placeholder="I'm a developer who loves building things that actually ship…" rows={4} style={{resize:"vertical",lineHeight:1.65}}/>
+                    <FLabel htmlFor="bio">Bio</FLabel>
+                    <textarea id="bio" className="pi" value={form.bio} onChange={e=>setForm(f=>({...f,bio:e.target.value}))} placeholder="I'm a developer who loves building things that actually ship…" rows={4} style={{resize:"vertical",lineHeight:1.65}}/>
                     <p style={{fontSize:11,color:C.muted,marginTop:5,fontFamily:'"DM Sans",sans-serif'}}>{form.bio.length}/500 characters</p>
                   </div>
 

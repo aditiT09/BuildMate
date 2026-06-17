@@ -248,6 +248,7 @@ function Login() {
               {/* Email */}
               <div>
                 <label
+                  htmlFor="email"
                   className="block text-xs font-medium mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
@@ -264,6 +265,7 @@ function Login() {
                     </svg>
                   </span>
                   <input
+                    id="email"
                     type="email"
                     placeholder="you@university.edu"
                     value={email}
@@ -294,6 +296,7 @@ function Login() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label
+                    htmlFor="password"
                     className="block text-xs font-medium"
                     style={{ color: colors.textSecondary }}
                   >
@@ -318,6 +321,7 @@ function Login() {
                     </svg>
                   </span>
                   <input
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
