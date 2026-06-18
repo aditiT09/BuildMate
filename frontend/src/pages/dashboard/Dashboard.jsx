@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getMyProjects } from "../../api/projects";
 import { getMyApplications } from "../../api/applications";
 import { getOverview } from "../../api/analytics";
-import { getMyProfile } from "../../api/profile";
+import { getMyProfile, getAuthorProfile } from "../../api/profile";
 import { getCurrentUser } from "../../api/users";
 import { useAuth } from "../../context/AuthContext";
 
@@ -141,11 +141,47 @@ const STYLES = `
   @keyframes dotBlink  { 0%,100%{opacity:1} 50%{opacity:0.2} }
   @keyframes streakPop { 0%{transform:scale(0.8);opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
   @keyframes gradFlow  { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  @keyframes arrowFlow  { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
 
   .dash-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
   .dash-card:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(43,27,18,0.06); }
   .streak-cell { transition: all 0.15s ease; }
   .streak-cell:hover { transform: scale(1.3); }
+
+  .about-flow {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 28px;
+    margin-top: 28px;
+    width: 100%;
+  }
+  .about-step {
+    width: 48%;
+    background: #FFF8F0;
+    border: 1.5px solid #E9DDD0;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 4px 4px 0px #2B1B12;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+  }
+  .about-step:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 6px 6px 0px #E35336;
+  }
+  .about-step-1 { align-self: flex-start; }
+  .about-step-2 { align-self: flex-end; }
+  .about-step-3 { align-self: flex-start; }
+
+  @media (max-width: 991px) {
+    .about-step {
+      width: 100% !important;
+      align-self: center !important;
+    }
+  }
 `;
 
 // ── Skeleton loader ──────────────────────────────────────
@@ -163,17 +199,25 @@ function Skeleton({ w = "100%", h = 20, r = 8 }) {
 // ── Animated counter ────────────────────────────────────
 function AnimCount({ target, duration = 1200 }) {
   const [val, setVal] = useState(0);
+  const prevTargetRef = useRef(0);
+
   useEffect(() => {
-    if (!target) return;
+    const startVal = prevTargetRef.current;
+    prevTargetRef.current = target;
+    
     let start = null;
+    const diff = target - startVal;
+
     const step = (ts) => {
       if (!start) start = ts;
       const progress = Math.min((ts - start) / duration, 1);
-      setVal(Math.floor(progress * target));
+      setVal(Math.floor(startVal + progress * diff));
       if (progress < 1) requestAnimationFrame(step);
     };
+    
     requestAnimationFrame(step);
-  }, [target]);
+  }, [target, duration]);
+
   return <>{val}</>;
 }
 
@@ -339,6 +383,7 @@ export default function Dashboard() {
   const [overview,     setOverview]     = useState(null);
   const [profile,      setProfile]      = useState(null);
   const [currentUser,  setCurrentUser]  = useState(null);
+  const [authorProfile, setAuthorProfile] = useState(null);
   const [loading,      setLoading]      = useState(true);
   const [greeting,     setGreeting]     = useState("Hey");
 
@@ -348,22 +393,35 @@ export default function Dashboard() {
     else if (h < 17) setGreeting("Good afternoon");
     else setGreeting("Good evening");
     loadDashboard();
+
+    const interval = setInterval(async () => {
+      try {
+        const od = await getOverview();
+        setOverview(od);
+      } catch (err) {
+        console.error("Error polling overview stats:", err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const loadDashboard = async () => {
     try {
-      const [pd, ad, od, prd, curUser] = await Promise.all([
+      const [pd, ad, od, prd, curUser, authProf] = await Promise.all([
         getMyProjects(),
         getMyApplications(),
         getOverview(),
         getMyProfile().catch(() => null),
         getCurrentUser().catch(() => null),
+        getAuthorProfile().catch(() => null),
       ]);
       setProjects(pd);
       setApplications(ad);
       setOverview(od);
       setProfile(prd);
       setCurrentUser(curUser);
+      setAuthorProfile(authProf);
     } catch (err) {
       console.error(err);
     } finally {
@@ -373,6 +431,7 @@ export default function Dashboard() {
 
   const displayName = profile?.full_name || user?.name || "Builder";
   const firstName   = displayName.split(" ")[0];
+  const isAditi     = user?.email === "adititiwari09@gmail.com";
 
   const pendingApps  = applications.filter(a => a.status === "pending").length;
   const acceptedApps = applications.filter(a => a.status === "accepted").length;
@@ -646,6 +705,8 @@ export default function Dashboard() {
           background: C.surface, borderRadius: 24, padding: 36,
           border: `1px solid ${C.border}`, marginBottom: 28,
           animation: "slideUp 0.6s ease 0.3s both", opacity: 0,
+          width: "100%",
+          boxSizing: "border-box",
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <SectionLabel icon={<FolderIcon color={C.brand} size={18} />}>My Projects</SectionLabel>
@@ -678,6 +739,8 @@ export default function Dashboard() {
           background: C.surface, borderRadius: 24, padding: 36,
           border: `1px solid ${C.border}`, marginBottom: 28,
           animation: "slideUp 0.6s ease 0.35s both", opacity: 0,
+          width: "100%",
+          boxSizing: "border-box",
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <SectionLabel icon={<MailIcon color={C.brand} size={18} />}>Recent Applications</SectionLabel>
@@ -743,22 +806,24 @@ export default function Dashboard() {
         <div className="dash-card" style={{
           background: C.surface, borderRadius: 24, padding: 36,
           border: `1px solid ${C.border}`, marginBottom: 28,
-          minHeight: 250,
+          minHeight: 400,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
           animation: "slideUp 0.6s ease 0.4s both", opacity: 0,
+          width: "100%",
+          boxSizing: "border-box",
         }}>
           <SectionLabel icon={<AwardIcon color={C.brand} size={18} />}>Badges Earned</SectionLabel>
           <div style={{ textAlign: "center", padding: "16px 0", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             <div style={{ display: "inline-flex", opacity: 0.35, marginBottom: 12 }}>
               <AwardIcon color={C.dark} size={48} />
             </div>
-            <p style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 16, color: C.dark, margin: 0 }}>
-              zero badges? the audacity.
-            </p>
-            <p style={{ fontSize: 12, color: C.muted, fontFamily: '"DM Sans", sans-serif', marginTop: 6, fontStyle: "italic", margin: "6px 0 0" }}>
-              lock in and start shipping to get decorated.
+            <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 18, color: C.dark, marginBottom: 8, marginTop: 0 }}>
+              No badges yet.
+            </h3>
+            <p style={{ fontSize: 14, color: C.muted, fontFamily: '"DM Sans", sans-serif', margin: "0 auto", maxWidth: 320, lineHeight: 1.5 }}>
+              Your builder arc is just getting started. Ship something cool.
             </p>
           </div>
         </div>
@@ -767,40 +832,42 @@ export default function Dashboard() {
 
         {/* ══ BUILDMATE STATS (WHOLE / FULL WIDTH) ══════ */}
         <div className="dash-card" style={{
-          background: C.dark, borderRadius: 24, padding: 36, color: "white",
+          background: C.surface, borderRadius: 24, padding: 36, color: C.dark,
+          border: `1px solid ${C.border}`,
           animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
           width: "100%",
           boxSizing: "border-box",
           marginBottom: 28,
+          
         }}>
-          <SectionLabel light icon={<GlobeIcon color={C.brand} size={18} />}>BuildMate Stats</SectionLabel>
+          <SectionLabel icon={<GlobeIcon color={C.brand} size={18} />}>BuildMate Stats</SectionLabel>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 10 }}>
-            <div style={{ textAlign: "center", padding: "16px 24px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div style={{ textAlign: "center", padding: "16px 24px", background: C.cream, borderRadius: 16, border: `1px solid ${C.border}` }}>
               <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
                 <RocketIcon color={C.brand} size={24} />
               </div>
               <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.brand, margin: "6px 0 2px" }}>
                 <AnimCount target={overview?.total_projects ?? 0} />
               </h4>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Projects</p>
+              <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Projects</p>
             </div>
-            <div style={{ textAlign: "center", padding: "16px 24px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div style={{ textAlign: "center", padding: "16px 24px", background: C.cream, borderRadius: 16, border: `1px solid ${C.border}` }}>
               <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
                 <UsersIcon color={C.orange} size={24} />
               </div>
               <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.orange, margin: "6px 0 2px" }}>
                 <AnimCount target={overview?.total_users ?? 0} />
               </h4>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Builders</p>
+              <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Builders</p>
             </div>
-            <div style={{ textAlign: "center", padding: "16px 24px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div style={{ textAlign: "center", padding: "16px 24px", background: C.cream, borderRadius: 16, border: `1px solid ${C.border}` }}>
               <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
                 <TargetIcon color="#7C5CBF" size={24} />
               </div>
               <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: "#7C5CBF", margin: "6px 0 2px" }}>
                 <AnimCount target={overview?.total_opportunities ?? 0} />
               </h4>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Openings</p>
+              <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Openings</p>
             </div>
           </div>
         </div>
@@ -814,84 +881,214 @@ export default function Dashboard() {
           boxSizing: "border-box",
         }}>
           <SectionLabel icon={<InfoIcon color={C.brand} size={18} />}>About BuildMate</SectionLabel>
-          <h3 style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 18, color: C.dark, marginBottom: 10 }}>
-            Killing the squad-finding struggle.
-          </h3>
-          <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif' }}>
-            BuildMate was cooked up to stop developers and designers from building in silos. We connect you with builders based on real tech-stack synergy, helping you match, team up, and ship actual projects instead of yapping on resumes. Let's ship together.
-          </p>
+          
+          <div className="about-flow">
+            {/* Step 1 */}
+            <div className="about-step about-step-1">
+              <h4 style={{ fontFamily: '"Flaviotte", "Geist", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                01. The Spark
+              </h4>
+              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif', margin: 0 }}>
+                BuildMate was born from a simple idea: great projects need great teammates. Too many students have ideas but struggle to find people who share their skills, passion, and drive.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="about-step about-step-2">
+              <h4 style={{ fontFamily: '"Flaviotte", "Geist", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                02. The Mission
+              </h4>
+              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif', margin: 0 }}>
+                We make collaboration easier by helping builders discover projects, connect with talented peers, and create teams that actually ship. No awkward networking, no endless searching—just the right people for the right project.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="about-step about-step-3">
+              <h4 style={{ fontFamily: '"Flaviotte", "Geist", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                03. The Vision
+              </h4>
+              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif', margin: 0 }}>
+                At BuildMate, we believe the next big idea starts with one connection. Build together, learn together, and turn ambitious ideas into real achievements.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* ══ AUTHOR FOOTER SIGNATURE ══════ */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          background: "transparent",
+        <div className="dash-card" style={{
+          background: C.surface,
           border: `1px solid ${C.border}`,
-          borderRadius: 20,
-          padding: "20px 24px",
+          borderRadius: 24,
+          padding: 36,
           animation: "slideUp 0.6s ease 0.6s both",
           opacity: 0,
           width: "100%",
           boxSizing: "border-box",
+          marginBottom: 28,
         }}>
-          <img
-            src="/aditi_profile.png"
-            alt="Aditi Tiwari"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: "50%",
-              border: `1px solid ${C.border}`,
-              objectFit: "cover",
-            }}
-          />
-          <div>
-            <p style={{
-              fontFamily: '"Syne", sans-serif',
-              fontWeight: 800,
-              fontSize: 13,
-              color: C.dark,
-              margin: 0,
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-            }}>
-              built by aditi tiwari
-            </p>
-            <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
-              <a
-                href="https://linkedin.com/"
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: C.brand,
-                  textDecoration: "none",
-                  fontFamily: '"DM Sans", sans-serif',
-                }}
-                onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                onMouseLeave={e => e.target.style.textDecoration = "none"}
-              >
-                LinkedIn ↗
-              </a>
-              <a
-                href="https://instagram.com/"
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: C.brand,
-                  textDecoration: "none",
-                  fontFamily: '"DM Sans", sans-serif',
-                }}
-                onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                onMouseLeave={e => e.target.style.textDecoration = "none"}
-              >
-                Instagram ↗
-              </a>
+          <SectionLabel icon={<UserIcon color={C.brand} size={18} />}>Built by Aditi Tiwari</SectionLabel>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 28, marginTop: 12 }}>
+            {/* Left Column */}
+            <div style={{ flex: 1 }}>
+              <p style={{
+                fontSize: 22,
+                color: C.dark,
+                lineHeight: 1.5,
+                fontFamily: '"Cormorant Garamond", Georgia, serif',
+                margin: "0 0 20px 0",
+                fontWeight: 600,
+              }}>
+                To every builder out there<br />
+                —thanks for being part of BuildMate.<br />
+                We can't wait to see what you'll create<br />
+                together.
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.muted, fontFamily: '"DM Sans", sans-serif' }}>
+                  Connect with us:
+                </span>
+                <a
+                  href="https://linkedin.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: C.brand,
+                    textDecoration: "none",
+                    fontFamily: '"DM Sans", sans-serif',
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                  onMouseLeave={e => e.target.style.textDecoration = "none"}
+                >
+                  LinkedIn ↗
+                </a>
+                <span style={{ color: C.border }}>|</span>
+                <a
+                  href="https://instagram.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: C.brand,
+                    textDecoration: "none",
+                    fontFamily: '"DM Sans", sans-serif',
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                  onMouseLeave={e => e.target.style.textDecoration = "none"}
+                >
+                  Instagram ↗
+                </a>
+                <span style={{ color: C.border }}>|</span>
+                <a
+                  href="mailto:adititiwari09@gmail.com"
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: C.brand,
+                    textDecoration: "none",
+                    fontFamily: '"DM Sans", sans-serif',
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                  onMouseLeave={e => e.target.style.textDecoration = "none"}
+                >
+                  adititiwari09@gmail.com
+                </a>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div style={{ flexShrink: 0 }}>
+              {authorProfile?.avatar ? (
+                isAditi ? (
+                  <Link to="/profile" style={{ textDecoration: "none" }}>
+                    <img
+                      src={authorProfile.avatar}
+                      alt="Aditi Tiwari"
+                      style={{
+                        width: 90,
+                        height: 120,
+                        borderRadius: 12,
+                        border: `2px solid ${C.brand}`,
+                        objectFit: "cover",
+                        transition: "transform 0.2s",
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
+                      onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                    />
+                  </Link>
+                ) : (
+                  <img
+                    src={authorProfile.avatar}
+                    alt="Aditi Tiwari"
+                    style={{
+                      width: 90,
+                      height: 120,
+                      borderRadius: 12,
+                      border: `2px solid ${C.brand}`,
+                      objectFit: "cover",
+                    }}
+                  />
+                )
+              ) : (
+                isAditi ? (
+                  <Link to="/profile" style={{ textDecoration: "none" }}>
+                    <div style={{
+                      width: 90,
+                      height: 120,
+                      borderRadius: 12,
+                      border: `2px dashed ${C.brand}`,
+                      background: C.sand,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                    }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = C.sandDark;
+                        e.currentTarget.style.transform = "scale(1.05)";
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = C.sand;
+                        e.currentTarget.style.transform = "scale(1)";
+                      }}
+                    >
+                      <span style={{ fontSize: 24, color: C.brand, fontWeight: 700, lineHeight: 1 }}>+</span>
+                      <span style={{ fontSize: 10, color: C.brand, fontWeight: 700, marginTop: 4, fontFamily: '"DM Sans", sans-serif', textTransform: "uppercase" }}>Photo</span>
+                    </div>
+                  </Link>
+                ) : (
+                  <div style={{
+                    width: 90,
+                    height: 120,
+                    borderRadius: 12,
+                    background: `linear-gradient(135deg, ${C.brand}, ${C.brandDark})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: '"Syne", sans-serif',
+                    fontWeight: 800,
+                    fontSize: 28,
+                    color: "white",
+                    border: `2px solid ${C.sandDark}`,
+                  }}>
+                    AT
+                  </div>
+                )
+              )}
             </div>
           </div>
         </div>

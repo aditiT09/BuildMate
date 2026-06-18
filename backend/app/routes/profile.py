@@ -39,6 +39,27 @@ def get_my_profile(
     return profile
 
 
+# Get author profile (Aditi Tiwari)
+@router.get("/author/profile")
+def get_author_profile(
+    db: Session = Depends(get_db),
+):
+    profile = (
+        db.query(Profile)
+        .join(User, Profile.user_id == User.id)
+        .filter(User.email == "adititiwari09@gmail.com")
+        .first()
+    )
+    if not profile:
+        return {
+            "id": 0,
+            "user_id": 0,
+            "full_name": "Aditi Tiwari",
+            "avatar": None
+        }
+    return profile
+
+
 # Public profile
 @router.get("/{user_id}", response_model=ProfileOut)
 def get_profile(

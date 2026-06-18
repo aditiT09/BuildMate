@@ -21,3 +21,8 @@ export const getProfile = async (userId) => {
 
   return response.data;
 };
+
+export const getAuthorProfile = async () => {
+  const response = await api.get("/profile/author/profile");
+  return response.data;
+};
