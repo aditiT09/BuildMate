@@ -17,8 +17,14 @@ def test_project_matching_and_skill_gap():
     candidate_headers = auth_headers(candidate_token)
 
     # 3. Create skills
-    skill_python = client.post("/skills/?name=Python").json()
-    skill_react = client.post("/skills/?name=React").json()
+    skill_python = client.post(
+        "/skills/?name=Python",
+        headers=owner_headers,
+    ).json()
+    skill_react = client.post(
+        "/skills/?name=React",
+        headers=owner_headers,
+    ).json()
 
     # 4. Create project
     project = client.post(

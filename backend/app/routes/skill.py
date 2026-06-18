@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 
 from app.models.skill import Skill
+from app.models.user import User
+from app.utils.security import get_current_user
 from fastapi import Query
 
 router = APIRouter(
@@ -18,7 +20,9 @@ def create_skill(
 
     name: str,
 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+
+    current_user: User = Depends(get_current_user)
 
 ):
 
