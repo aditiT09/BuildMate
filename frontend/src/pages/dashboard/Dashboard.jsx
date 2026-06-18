@@ -523,16 +523,16 @@ export default function Dashboard() {
             background: C.dark, borderRadius: 24, padding: 36,
             animation: "slideUp 0.6s ease 0.2s both", opacity: 0,
           }}>
-            <SectionLabel light icon={<TrendingIcon color={C.orange} size={18} />}>Trending Skills</SectionLabel>
+            <SectionLabel light icon={<TrendingIcon color={C.orange} size={18} />} fontSize={18}>Trending Skills</SectionLabel>
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 18, fontStyle: "italic" }}>
               top skills currently in demand
             </p>
             {loading ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {[1,2,3,4,5].map(i => <Skeleton key={i} h={32} r={8} />)}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {[1,2,3,4,5].map(i => <Skeleton key={i} h={42} r={10} />)}
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {(overview?.top_skills || []).map((skill, i) => {
                   const isObj = typeof skill === "object" && skill !== null;
                   const name = isObj ? skill.name : skill;
@@ -544,15 +544,15 @@ export default function Dashboard() {
                       display: "flex", alignItems: "center", gap: 10,
                       animation: `slideUp 0.4s ease ${0.2 + i * 0.06}s both`, opacity: 0,
                     }}>
-                      <span style={{ color: C.orange, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 14, width: 20 }}>
+                      <span style={{ color: C.orange, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 16, width: 24 }}>
                         {i + 1}.
                       </span>
                       <div style={{
-                        flex: 1, height: 32, borderRadius: 8,
+                        flex: 1, height: 42, borderRadius: 10,
                         background: "rgba(255,255,255,0.06)",
                         display: "flex", alignItems: "center",
                         justifyContent: "space-between",
-                        paddingLeft: 12, paddingRight: 12, overflow: "hidden", position: "relative",
+                        paddingLeft: 16, paddingRight: 16, overflow: "hidden", position: "relative",
                       }}>
                         <div style={{
                           position: "absolute", left: 0, top: 0, bottom: 0,
@@ -560,11 +560,11 @@ export default function Dashboard() {
                           background: `linear-gradient(90deg, rgba(227,83,54,0.25), transparent)`,
                           transition: "width 1s ease",
                         }} />
-                        <span style={{ position: "relative", color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: 500 }}>
+                        <span style={{ position: "relative", color: "rgba(255,255,255,0.9)", fontSize: 15, fontWeight: 600 }}>
                           {name}
                         </span>
                         {isObj && (
-                          <span style={{ position: "relative", color: C.orange, fontSize: 12, fontWeight: 700, fontFamily: '"Syne", sans-serif' }}>
+                          <span style={{ position: "relative", color: C.orange, fontSize: 13, fontWeight: 700, fontFamily: '"Syne", sans-serif' }}>
                             {count} {count === 1 ? "builder" : "builders"}
                           </span>
                         )}
@@ -584,7 +584,7 @@ export default function Dashboard() {
             background: C.dark, borderRadius: 24, padding: 36, color: "white",
             animation: "slideUp 0.6s ease 0.25s both", opacity: 0,
           }}>
-            <SectionLabel light icon={<MailIcon color={C.orange} size={18} />}>Application Breakdown</SectionLabel>
+            <SectionLabel light icon={<MailIcon color={C.orange} size={18} />} fontSize={18}>Application Breakdown</SectionLabel>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20, fontStyle: "italic" }}>
               "no shot I'm going 0/3 this week" — you, probably
             </p>
@@ -694,8 +694,8 @@ export default function Dashboard() {
             <EmptyState
               icon={<MailIcon color={C.muted} size={48} />}
               headline="zero applications? the audacity"
-              sub="Swipe on projects, apply to openings — build that portfolio, not regrets"
-              cta="Start swiping"
+              sub="Explore projects, apply to openings — build that portfolio, not regrets"
+              cta="Start exploring"
               href="/discover"
             />
           ) : (
@@ -739,164 +739,162 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ══ BOTTOM GRID ══════════════════════════════ */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: 28, marginBottom: 28 }}>
-          
-          {/* Left Column: Badges & Profile Completeness */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-            {/* Badges Earned Card */}
-            <div className="dash-card" style={{
-              background: C.surface, borderRadius: 24, padding: 36,
-              border: `1px solid ${C.border}`,
-              animation: "slideUp 0.6s ease 0.4s both", opacity: 0,
-            }}>
-              <SectionLabel icon={<AwardIcon color={C.brand} size={18} />}>Badges Earned</SectionLabel>
-              <div style={{ textAlign: "center", padding: "16px 0" }}>
-                <div style={{ display: "inline-flex", opacity: 0.35, marginBottom: 12 }}>
-                  <AwardIcon color={C.dark} size={48} />
-                </div>
-                <p style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 16, color: C.dark }}>
-                  zero badges? the audacity.
-                </p>
-                <p style={{ fontSize: 12, color: C.muted, fontFamily: '"DM Sans", sans-serif', marginTop: 6, fontStyle: "italic" }}>
-                  lock in and start shipping to get decorated.
-                </p>
-              </div>
+        {/* ══ BADGES EARNED (WHOLE / FULL WIDTH) ══════ */}
+        <div className="dash-card" style={{
+          background: C.surface, borderRadius: 24, padding: 36,
+          border: `1px solid ${C.border}`, marginBottom: 28,
+          minHeight: 250,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          animation: "slideUp 0.6s ease 0.4s both", opacity: 0,
+        }}>
+          <SectionLabel icon={<AwardIcon color={C.brand} size={18} />}>Badges Earned</SectionLabel>
+          <div style={{ textAlign: "center", padding: "16px 0", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ display: "inline-flex", opacity: 0.35, marginBottom: 12 }}>
+              <AwardIcon color={C.dark} size={48} />
             </div>
-
-            {/* Profile Completeness Card */}
-            <ProfileCompleteness profile={profile} user={user} />
+            <p style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 16, color: C.dark, margin: 0 }}>
+              zero badges? the audacity.
+            </p>
+            <p style={{ fontSize: 12, color: C.muted, fontFamily: '"DM Sans", sans-serif', marginTop: 6, fontStyle: "italic", margin: "6px 0 0" }}>
+              lock in and start shipping to get decorated.
+            </p>
           </div>
+        </div>
+        {/* Profile Completeness Card (WHOLE / FULL WIDTH) */}
+        <ProfileCompleteness profile={profile} user={user} />
 
-          {/* Right Column: BuildMate Stats & About Section */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-            {/* BuildMate Stats Card */}
-            <div className="dash-card" style={{
-              background: C.dark, borderRadius: 24, padding: 36, color: "white",
-              animation: "slideUp 0.6s ease 0.45s both", opacity: 0,
-            }}>
-              <SectionLabel light icon={<GlobeIcon color={C.brand} size={18} />}>BuildMate Stats</SectionLabel>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 10 }}>
-                <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
-                    <RocketIcon color={C.brand} size={24} />
-                  </div>
-                  <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.brand, margin: "6px 0 2px" }}>
-                    <AnimCount target={overview?.total_projects ?? 0} />
-                  </h4>
-                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Projects</p>
-                </div>
-                <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
-                    <UsersIcon color={C.orange} size={24} />
-                  </div>
-                  <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.orange, margin: "6px 0 2px" }}>
-                    <AnimCount target={overview?.total_users ?? 0} />
-                  </h4>
-                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Builders</p>
-                </div>
-                <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
-                    <TargetIcon color="#7C5CBF" size={24} />
-                  </div>
-                  <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: "#7C5CBF", margin: "6px 0 2px" }}>
-                    <AnimCount target={overview?.total_opportunities ?? 0} />
-                  </h4>
-                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Openings</p>
-                </div>
+        {/* ══ BUILDMATE STATS (WHOLE / FULL WIDTH) ══════ */}
+        <div className="dash-card" style={{
+          background: C.dark, borderRadius: 24, padding: 36, color: "white",
+          animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
+          width: "100%",
+          boxSizing: "border-box",
+          marginBottom: 28,
+        }}>
+          <SectionLabel light icon={<GlobeIcon color={C.brand} size={18} />}>BuildMate Stats</SectionLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 10 }}>
+            <div style={{ textAlign: "center", padding: "16px 24px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
+                <RocketIcon color={C.brand} size={24} />
               </div>
+              <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.brand, margin: "6px 0 2px" }}>
+                <AnimCount target={overview?.total_projects ?? 0} />
+              </h4>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Projects</p>
             </div>
-
-            {/* About Section */}
-            <div className="dash-card" style={{
-              background: C.surface, borderRadius: 24, padding: 36,
-              border: `1px solid ${C.border}`,
-              animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
-            }}>
-              <SectionLabel icon={<InfoIcon color={C.brand} size={18} />}>About BuildMate</SectionLabel>
-              <h3 style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 18, color: C.dark, marginBottom: 10 }}>
-                Killing the squad-finding struggle.
-              </h3>
-              <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif' }}>
-                BuildMate was cooked up to stop developers and designers from building in silos. We connect you with builders based on real tech-stack synergy, helping you match, team up, and ship actual projects instead of yapping on resumes. Let's ship together.
-              </p>
-            </div>
-
-            {/* ══ AUTHOR FOOTER SIGNATURE (RELOCATED) ══════ */}
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              background: "transparent",
-              border: `1px solid ${C.border}`,
-              borderRadius: 20,
-              padding: "20px 24px",
-              animation: "slideUp 0.6s ease 0.55s both",
-              opacity: 0,
-            }}>
-              <img
-                src="/aditi_profile.png"
-                alt="Aditi Tiwari"
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: "50%",
-                  border: `1px solid ${C.border}`,
-                  objectFit: "cover",
-                }}
-              />
-              <div>
-                <p style={{
-                  fontFamily: '"Syne", sans-serif',
-                  fontWeight: 800,
-                  fontSize: 13,
-                  color: C.dark,
-                  margin: 0,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}>
-                  built by aditi tiwari
-                </p>
-                <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
-                  <a
-                    href="https://linkedin.com/"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: C.brand,
-                      textDecoration: "none",
-                      fontFamily: '"DM Sans", sans-serif',
-                    }}
-                    onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                    onMouseLeave={e => e.target.style.textDecoration = "none"}
-                  >
-                    LinkedIn ↗
-                  </a>
-                  <a
-                    href="https://instagram.com/"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: C.brand,
-                      textDecoration: "none",
-                      fontFamily: '"DM Sans", sans-serif',
-                    }}
-                    onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                    onMouseLeave={e => e.target.style.textDecoration = "none"}
-                  >
-                    Instagram ↗
-                  </a>
-                </div>
+            <div style={{ textAlign: "center", padding: "16px 24px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
+                <UsersIcon color={C.orange} size={24} />
               </div>
+              <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.orange, margin: "6px 0 2px" }}>
+                <AnimCount target={overview?.total_users ?? 0} />
+              </h4>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Builders</p>
             </div>
-
+            <div style={{ textAlign: "center", padding: "16px 24px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
+                <TargetIcon color="#7C5CBF" size={24} />
+              </div>
+              <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: "#7C5CBF", margin: "6px 0 2px" }}>
+                <AnimCount target={overview?.total_opportunities ?? 0} />
+              </h4>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Openings</p>
+            </div>
           </div>
         </div>
 
+        {/* ══ ABOUT BUILDMATE (WHOLE / FULL WIDTH / BELOW STATS) ══════ */}
+        <div className="dash-card" style={{
+          background: C.surface, borderRadius: 24, padding: 36,
+          border: `1px solid ${C.border}`, marginBottom: 28,
+          animation: "slideUp 0.6s ease 0.55s both", opacity: 0,
+          width: "100%",
+          boxSizing: "border-box",
+        }}>
+          <SectionLabel icon={<InfoIcon color={C.brand} size={18} />}>About BuildMate</SectionLabel>
+          <h3 style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 18, color: C.dark, marginBottom: 10 }}>
+            Killing the squad-finding struggle.
+          </h3>
+          <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif' }}>
+            BuildMate was cooked up to stop developers and designers from building in silos. We connect you with builders based on real tech-stack synergy, helping you match, team up, and ship actual projects instead of yapping on resumes. Let's ship together.
+          </p>
+        </div>
+
+        {/* ══ AUTHOR FOOTER SIGNATURE ══════ */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          background: "transparent",
+          border: `1px solid ${C.border}`,
+          borderRadius: 20,
+          padding: "20px 24px",
+          animation: "slideUp 0.6s ease 0.6s both",
+          opacity: 0,
+          width: "100%",
+          boxSizing: "border-box",
+        }}>
+          <img
+            src="/aditi_profile.png"
+            alt="Aditi Tiwari"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              border: `1px solid ${C.border}`,
+              objectFit: "cover",
+            }}
+          />
+          <div>
+            <p style={{
+              fontFamily: '"Syne", sans-serif',
+              fontWeight: 800,
+              fontSize: 13,
+              color: C.dark,
+              margin: 0,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}>
+              built by aditi tiwari
+            </p>
+            <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+              <a
+                href="https://linkedin.com/"
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: C.brand,
+                  textDecoration: "none",
+                  fontFamily: '"DM Sans", sans-serif',
+                }}
+                onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                onMouseLeave={e => e.target.style.textDecoration = "none"}
+              >
+                LinkedIn ↗
+              </a>
+              <a
+                href="https://instagram.com/"
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: C.brand,
+                  textDecoration: "none",
+                  fontFamily: '"DM Sans", sans-serif',
+                }}
+                onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                onMouseLeave={e => e.target.style.textDecoration = "none"}
+              >
+                Instagram ↗
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -968,13 +966,13 @@ function MiniStat({ icon, label, value, delay, loading }) {
   );
 }
 
-function SectionLabel({ children, light, icon }) {
+function SectionLabel({ children, light, icon, fontSize = 18 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
       {icon && <span style={{ display: "inline-flex", alignItems: "center" }}>{icon}</span>}
       <p style={{
         fontFamily: '"Poppins", sans-serif', fontWeight: 700,
-        fontSize: 15, letterSpacing: "0.01em",
+        fontSize: fontSize, letterSpacing: "0.01em",
         color: light ? "rgba(255,255,255,0.85)" : C.dark,
         margin: 0,
       }}>{children}</p>
@@ -1096,8 +1094,10 @@ function ProfileCompleteness({ profile, user }) {
   return (
     <div className="dash-card" style={{
       background: C.surface, borderRadius: 24, padding: 36,
-      border: `1px solid ${C.border}`,
-      animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
+      border: `1px solid ${C.border}`, marginBottom: 28,
+      animation: "slideUp 0.6s ease 0.45s both", opacity: 0,
+      width: "100%",
+      boxSizing: "border-box",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <SectionLabel icon={<UserIcon color={C.brand} size={18} />}>Profile Completeness</SectionLabel>

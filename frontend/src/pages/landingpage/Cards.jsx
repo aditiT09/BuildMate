@@ -189,8 +189,8 @@ export default function Cards() {
           />
           <SmallCard
             icon="👥"
-            title={"SWIPE\nAPPLICANTS"}
-            desc="Tinder for teammates. Review profiles, check portfolios, and connect in one tap."
+            title={"EXPLORE\nAPPLICANTS"}
+            desc="Review candidate profiles, check portfolios, and connect with builders in one tap."
           />
         </div>
 
