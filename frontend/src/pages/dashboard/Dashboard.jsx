@@ -342,7 +342,7 @@ function ScoreRing({ score = 50, label, color, size = 88 }) {
         />
         <text x={size/2} y={size/2 + 5} textAnchor="middle" fill={C.dark}
               style={{ fontSize: 18, fontWeight: 700, transform: "rotate(90deg)", transformOrigin: `${size/2}px ${size/2}px`, fontFamily: '"Syne", sans-serif' }}>
-          {score}
+          <AnimCount target={score} />
         </text>
       </svg>
       <span style={{ fontSize: 11, fontWeight: 600, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: '"DM Sans", sans-serif' }}>{label}</span>
@@ -396,8 +396,12 @@ export default function Dashboard() {
 
     const interval = setInterval(async () => {
       try {
-        const od = await getOverview();
+        const [od, curUser] = await Promise.all([
+          getOverview(),
+          getCurrentUser().catch(() => null),
+        ]);
         setOverview(od);
+        if (curUser) setCurrentUser(curUser);
       } catch (err) {
         console.error("Error polling overview stats:", err);
       }

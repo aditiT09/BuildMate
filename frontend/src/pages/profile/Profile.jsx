@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getMyProfile, saveProfile } from "../../api/profile";
 import { getMySkills, getSkills, addSkill, removeSkill } from "../../api/userSkills";
 import { getMyProjects } from "../../api/projects";
 import { getMyApplications } from "../../api/applications";
+import { getCurrentUser } from "../../api/users";
 import { useAuth } from "../../context/AuthContext";
 import Layout from "../../components/layout/Layout";
 
@@ -114,6 +115,30 @@ function Toast({msg,type,onClose}){
   );
 }
 
+function AnimCount({ target, duration = 1200 }) {
+  const [val, setVal] = useState(0);
+  const prevTargetRef = useRef(0);
+
+  useEffect(() => {
+    const startVal = prevTargetRef.current;
+    prevTargetRef.current = target;
+    
+    let start = null;
+    const diff = target - startVal;
+
+    const step = (ts) => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      setVal(Math.floor(startVal + progress * diff));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    
+    requestAnimationFrame(step);
+  }, [target, duration]);
+
+  return <>{val}</>;
+}
+
 function ScoreRing({score=50,label,color,size=88}){
   const r=size/2-9,circ=2*Math.PI*r,pct=Math.min(score,100)/100;
   return(
@@ -125,7 +150,7 @@ function ScoreRing({score=50,label,color,size=88}){
           style={{transition:"stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1)"}}/>
         <text x={size/2} y={size/2+6} textAnchor="middle"
           style={{fontSize:19,fontWeight:800,fontFamily:'"Syne",sans-serif',transform:`rotate(90deg)`,transformOrigin:`${size/2}px ${size/2}px`,fill:C.dark}}>
-          {score}
+          <AnimCount target={score} />
         </text>
       </svg>
       <p style={{fontSize:10,fontWeight:700,letterSpacing:".12em",textTransform:"uppercase",color:C.muted,fontFamily:'"DM Sans",sans-serif'}}>{label}</p>
@@ -239,6 +264,7 @@ function Empty({icon,msg,cta,href,onClick}){
 export default function Profile(){
   const {user}=useAuth();
   const [profile,setProfile]=useState(null);
+  const [currentUser,setCurrentUser]=useState(null);
   const [skills,setSkills]=useState([]);
   const [allSkills,setAllSkills]=useState([]);
   const [projects,setProjects]=useState([]);
@@ -250,21 +276,38 @@ export default function Profile(){
   const [skillQ,setSkillQ]=useState("");
   const [form,setForm]=useState({full_name:"",bio:"",college:"",degree:"",github:"",linkedin:"",portfolio:"",avatar:"",availability:""});
 
-  useEffect(()=>{loadAll();},[]);
+  useEffect(()=>{
+    loadAll();
+
+    const interval = setInterval(async () => {
+      try {
+        const curUser = await getCurrentUser();
+        if (curUser) setCurrentUser(curUser);
+      } catch (err) {
+        console.error("Error polling user score data:", err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  },[]);
 
   const loadAll=async()=>{
     try{
       setLoading(true);
-      const [prof,mySk,allSk,projs,myApps]=await Promise.all([
+      const [prof,mySk,allSk,projs,myApps,curUser]=await Promise.all([
         getMyProfile().catch(()=>null),
         getMySkills().catch(()=>[]),
         getSkills().catch(()=>[]),
         getMyProjects().catch(()=>[]),
         getMyApplications().catch(()=>[]),
+        getCurrentUser().catch(()=>null),
       ]);
       if(prof){
         setProfile(prof);
         setForm({full_name:prof.full_name||"",bio:prof.bio||"",college:prof.college||"",degree:prof.degree||"",github:prof.github||"",linkedin:prof.linkedin||"",portfolio:prof.portfolio||"",avatar:prof.avatar||"",availability:prof.availability||""});
+      }
+      if(curUser){
+        setCurrentUser(curUser);
       }
       setSkills(mySk);setAllSkills(allSk);setProjects(projs);setApps(myApps);
     }catch(e){fire("Failed to load profile","error");}
@@ -384,8 +427,8 @@ export default function Profile(){
               <Card delay={0.15} style={{padding:"20px 24px"}}>
                 <p style={{fontSize:10,fontWeight:800,letterSpacing:".18em",textTransform:"uppercase",color:C.muted,fontFamily:'"DM Sans",sans-serif',marginBottom:16,textAlign:"center"}}>Your scores</p>
                 <div style={{display:"flex",justifyContent:"center",gap:20}}>
-                  <ScoreRing score={user?.activity_score??50}    label="Activity"    color={C.brand}  size={86}/>
-                  <ScoreRing score={user?.reliability_score??50} label="Reliability" color={C.orange} size={86}/>
+                  <ScoreRing score={currentUser?.activity_score ?? user?.activity_score ?? 50}    label="Activity"    color={C.brand}  size={86}/>
+                  <ScoreRing score={currentUser?.reliability_score ?? user?.reliability_score ?? 50} label="Reliability" color={C.orange} size={86}/>
                 </div>
                 <p style={{fontSize:11,color:C.muted,textAlign:"center",marginTop:12,fontFamily:'"DM Sans",sans-serif',fontStyle:"italic",lineHeight:1.5,display:"flex",alignItems:"center",justifyContent:"center",gap:5}}>
                   <Ic name="zap" size={11} color={C.muted}/> Ship more to level up
