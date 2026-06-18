@@ -27,6 +27,19 @@ const SKILL_COLORS = [
   {bg:"#F3E5F5",text:"#4A148C"},{bg:"#FFF8E1",text:"#F57F17"},
 ];
 
+const AVATAR_PRESETS = [
+  { gender: "female", name: "Sara", url: "https://i.pinimg.com/736x/32/d6/03/32d603476c874db687a7634a16bfac9d.jpg" },
+  { gender: "female", name: "Chloe", url: "https://i.pinimg.com/736x/72/a0/e1/72a0e1f4e0f7b4461911a7c56d4688e9.jpg" },
+  { gender: "female", name: "Daisy", url: "https://i.pinimg.com/736x/40/e9/73/40e973196c2fb215273de70b090f6f1d.jpg" },
+  { gender: "female", name: "Sophia", url: "https://i.pinimg.com/736x/f3/1e/84/f31e840ae73ab83a584b1fffad05ab80.jpg" },
+  { gender: "female", name: "Anya", url: "https://i.pinimg.com/736x/be/88/03/be8803ac9540504695bef0b0b7070615.jpg" },
+  { gender: "male", name: "Felix", url: "https://i.pinimg.com/736x/0b/97/6f/0b976f0a7aa1aa43870e1812eee5a55d.jpg" },
+  { gender: "male", name: "George", url: "https://i.pinimg.com/736x/1e/9e/f4/1e9ef4b31381110ef41554c36cd79c19.jpg" },
+  { gender: "male", name: "Jack", url: "https://i.pinimg.com/736x/17/e8/a5/17e8a5c483bf5e357b5351fcda2a8f07.jpg" },
+  { gender: "male", name: "Leo", url: "https://i.pinimg.com/736x/0e/da/3e/0eda3ebf94daa9d8c3e58ffbcf74ec25.jpg" },
+  { gender: "male", name: "Toby", url: "https://i.pinimg.com/736x/a9/0c/eb/a90cebea32fa68ba92e4733c54efe384.jpg" },
+];
+
 const STYLES = `
   @keyframes fadeUp  {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
   @keyframes shimmer {0%{background-position:-200% 0}100%{background-position:200% 0}}
@@ -479,12 +492,74 @@ export default function Profile(){
                 <Card delay={0.1}>
                   <STitle><Ic name="edit" size={16} color={C.brand}/> Edit Profile</STitle>
 
-                  <div style={{display:"flex",gap:14,alignItems:"flex-start",marginBottom:22,padding:16,background:C.cream,borderRadius:16,border:`1px solid ${C.border}`}}>
-                    <AvatarDisplay src={form.avatar} name={form.full_name||displayName} size={68}/>
-                    <div style={{flex:1}}>
-                      <FLabel htmlFor="avatar">Avatar URL</FLabel>
-                      <input id="avatar" className="pi" value={form.avatar} onChange={e=>setForm(f=>({...f,avatar:e.target.value}))} placeholder="https://example.com/photo.jpg"/>
-                      <p style={{fontSize:11,color:C.muted,marginTop:5,fontFamily:'"DM Sans",sans-serif'}}>Paste an image URL — GitHub avatar, Gravatar, etc.</p>
+                  <div style={{display:"flex",gap:16,alignItems:"flex-start",marginBottom:22,padding:20,background:C.cream,borderRadius:16,border:`1px solid ${C.border}`,flexDirection:"column"}}>
+                    <div style={{display:"flex",gap:16,alignItems:"center",width:"100%"}}>
+                      <AvatarDisplay src={form.avatar} name={form.full_name||displayName} size={68}/>
+                      <div style={{flex:1}}>
+                        <FLabel htmlFor="avatar">Avatar URL / Custom Photo</FLabel>
+                        <input id="avatar" className="pi" value={form.avatar} onChange={e=>setForm(f=>({...f,avatar:e.target.value}))} placeholder="https://example.com/photo.jpg"/>
+                        <p style={{fontSize:11,color:C.muted,marginTop:5,fontFamily:'"DM Sans",sans-serif',margin:"5px 0 0"}}>Paste an image URL — or pick a preset below</p>
+                      </div>
+                    </div>
+                    
+                    <div style={{width:"100%",borderTop:`1px solid ${C.border}`,paddingTop:16,marginTop:4}}>
+                      <FLabel>Choose an avatar preset</FLabel>
+                      
+                      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:8}}>
+                        {/* 5 Women preset */}
+                        <div style={{padding:"14px 18px",background:C.bg,borderRadius:12,border:`1.5px solid ${C.border}`}}>
+                          <p style={{fontSize:11,fontWeight:700,color:C.muted,fontFamily:'"DM Sans",sans-serif',textTransform:"uppercase",letterSpacing:"0.05em",margin:"0 0 10px 0"}}>Women</p>
+                          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                            {AVATAR_PRESETS.filter(p=>p.gender==="female").map(p=>(
+                              <img
+                                key={p.url}
+                                src={p.url}
+                                alt={p.name}
+                                onClick={()=>setForm(f=>({...f,avatar:p.url}))}
+                                style={{
+                                  width:38,
+                                  height:38,
+                                  borderRadius:"50%",
+                                  cursor:"pointer",
+                                  border:form.avatar===p.url?`2.5px solid ${C.brand}`:`1.5px solid ${C.border}`,
+                                  background:C.bg,
+                                  boxSizing:"border-box",
+                                  transition:"transform .15s ease",
+                                }}
+                                onMouseEnter={e=>e.currentTarget.style.transform="scale(1.1)"}
+                                onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* 5 Men preset */}
+                        <div style={{padding:"14px 18px",background:C.bg,borderRadius:12,border:`1.5px solid ${C.border}`}}>
+                          <p style={{fontSize:11,fontWeight:700,color:C.muted,fontFamily:'"DM Sans",sans-serif',textTransform:"uppercase",letterSpacing:"0.05em",margin:"0 0 10px 0"}}>Men</p>
+                          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                            {AVATAR_PRESETS.filter(p=>p.gender==="male").map(p=>(
+                              <img
+                                key={p.url}
+                                src={p.url}
+                                alt={p.name}
+                                onClick={()=>setForm(f=>({...f,avatar:p.url}))}
+                                style={{
+                                  width:38,
+                                  height:38,
+                                  borderRadius:"50%",
+                                  cursor:"pointer",
+                                  border:form.avatar===p.url?`2.5px solid ${C.brand}`:`1.5px solid ${C.border}`,
+                                  background:C.bg,
+                                  boxSizing:"border-box",
+                                  transition:"transform .15s ease",
+                                }}
+                                onMouseEnter={e=>e.currentTarget.style.transform="scale(1.1)"}
+                                onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

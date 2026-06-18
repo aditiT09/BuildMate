@@ -116,24 +116,6 @@ export default function DashboardNavbar() {
           {/* Right — create + avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }} className="dash-nav-links">
 
-            {/* Create project CTA */}
-            <Link to="/create-project" style={{ textDecoration: 'none' }}>
-              <button style={{
-                background: C.brand, color: 'white', border: 'none',
-                borderRadius: 9999, padding: '7px 16px',
-                fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                fontFamily: '"DM Sans", sans-serif',
-                letterSpacing: '0.04em',
-                transition: 'all 0.18s',
-                display: 'flex', alignItems: 'center', gap: 5,
-              }}
-                onMouseEnter={e => { e.currentTarget.style.background = C.brandDk; e.currentTarget.style.transform = 'translateY(-1px)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = C.brand; e.currentTarget.style.transform = 'translateY(0)' }}
-              >
-                <span>+</span> New Project
-              </button>
-            </Link>
-
             {/* Avatar dropdown */}
             <div style={{ position: 'relative' }} ref={dropRef}>
               <button
@@ -250,11 +232,8 @@ export default function DashboardNavbar() {
                 </div>
               </Link>
             ))}
-            <div style={{ display: 'flex', gap: 8, paddingTop: 8, borderTop: `1px solid ${C.border}`, marginTop: 4 }}>
-              <Link to="/create-project" style={{ flex: 1, textDecoration: 'none' }} onClick={() => setMobOpen(false)}>
-                <button style={{ width: '100%', background: C.brand, color: 'white', border: 'none', borderRadius: 9999, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans", sans-serif' }}>+ New Project</button>
-              </Link>
-              <button onClick={handleLogout} style={{ flex: 1, background: 'transparent', color: C.brand, border: `1.5px solid ${C.brand}`, borderRadius: 9999, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans", sans-serif' }}>Log out</button>
+            <div style={{ paddingTop: 8, borderTop: `1px solid ${C.border}`, marginTop: 4 }}>
+              <button onClick={handleLogout} style={{ width: '100%', background: 'transparent', color: C.brand, border: `1.5px solid ${C.brand}`, borderRadius: 9999, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: '"DM Sans", sans-serif' }}>Log out</button>
             </div>
           </div>
         )}
