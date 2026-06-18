@@ -70,6 +70,7 @@ def get_users(
     limit: int = Query(10, le=100),
     offset: int = 0,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     users = (
         db.query(User)
