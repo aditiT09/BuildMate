@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getMyProjects } from "../../api/projects";
 import { getMyApplications } from "../../api/applications";
@@ -16,7 +16,7 @@ const C = {
   surface:  "#FDFBF7",
   dark:     "#2B1B12",
   dark2:    "#4A372D",
-  muted:    "#6E5A4E",
+  muted:    "#8C776A",
   border:   "#E9DDD0",
   sand:     "#F5EDE0",
   sandDark: "#EDD5B8",
@@ -26,11 +26,114 @@ const C = {
   warn:     "#D48A2D",
 };
 
+// ── SVG Icons ───────────────────────────────────────────
+const FolderIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+const MailIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <polyline points="22,6 12,13 2,6" />
+  </svg>
+);
+
+const GlobeIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+  </svg>
+);
+
+const RocketIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <path d="M4.5 16.5c-1.5 1.26-2 3.3-2 3.3s2.04-.5 3.3-2L18.5 5.5a4.24 4.24 0 1 0-6-6L4.5 16.5z" />
+    <path d="M12 15l-3-3m5.5 8.5L12 18l-3-3-2.5 2.5a1 1 0 0 0-.2.3l-1.5 4a.5.5 0 0 0 .6.6l4-1.5a1 1 0 0 0 .3-.2l2.5-2.5z" />
+  </svg>
+);
+
+const AwardIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <circle cx="12" cy="8" r="7" />
+    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+  </svg>
+);
+
+const FlameIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
+);
+
+const LightningIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+
+const UserIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const InfoIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="16" x2="12" y2="12" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+  </svg>
+);
+
+const TrendingIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+    <polyline points="17 6 23 6 23 12" />
+  </svg>
+);
+
+const UsersIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const TargetIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
+);
+
+const ClockIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+const FileTextIcon = ({ color = "currentColor", size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <polyline points="10 9 9 9 8 9" />
+  </svg>
+);
+
 // ── Keyframes injected once ─────────────────────────────
 const STYLES = `
-  @keyframes countUp   { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
-  @keyframes slideLeft { from { opacity:0; transform:translateX(30px) } to { opacity:1; transform:translateX(0) } }
-  @keyframes slideUp   { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
+  @keyframes countUp   { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+  @keyframes slideLeft { from { opacity:0; transform:translateX(12px) } to { opacity:1; transform:translateX(0) } }
+  @keyframes slideUp   { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
   @keyframes shimmer   { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
   @keyframes pulse3    { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
   @keyframes spin360   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
@@ -40,7 +143,7 @@ const STYLES = `
   @keyframes gradFlow  { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
   .dash-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
-  .dash-card:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(43,27,18,0.1); }
+  .dash-card:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(43,27,18,0.06); }
   .streak-cell { transition: all 0.15s ease; }
   .streak-cell:hover { transform: scale(1.3); }
 `;
@@ -58,41 +161,24 @@ function Skeleton({ w = "100%", h = 20, r = 8 }) {
 }
 
 // ── Animated counter ────────────────────────────────────
-function AnimCount({ target, duration = 1000 }) {
+function AnimCount({ target, duration = 1200 }) {
   const [val, setVal] = useState(0);
-
   useEffect(() => {
-    if (target === undefined || target === null) return;
-    
+    if (!target) return;
     let start = null;
-    const startVal = val;
-    const diff = target - startVal;
-
-    if (diff === 0) {
-      setVal(target);
-      return;
-    }
-
-    let animId;
     const step = (ts) => {
       if (!start) start = ts;
       const progress = Math.min((ts - start) / duration, 1);
-      setVal(Math.floor(startVal + progress * diff));
-      if (progress < 1) {
-        animId = requestAnimationFrame(step);
-      }
+      setVal(Math.floor(progress * target));
+      if (progress < 1) requestAnimationFrame(step);
     };
-    animId = requestAnimationFrame(step);
-
-    return () => {
-      if (animId) cancelAnimationFrame(animId);
-    };
+    requestAnimationFrame(step);
   }, [target]);
-
   return <>{val}</>;
 }
 
 // ── GitHub-style streak grid ─────────────────────────────
+/* eslint-disable-next-line no-unused-vars */
 function StreakGrid({ applications = [] }) {
   // Build 52 weeks × 7 days based on actual application activity
   const today = new Date();
@@ -144,17 +230,17 @@ function StreakGrid({ applications = [] }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <span style={{ fontSize: 24 }}>🔥</span>
+        <FlameIcon color={C.brand} size={24} />
         <div>
-          <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22, color: C.dark, lineHeight: 1 }}>
+          <p style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 22, color: C.dark, lineHeight: 1 }}>
             {streak}-day streak
           </p>
           <p style={{ fontSize: 12, color: C.muted, fontFamily: '"DM Sans", sans-serif', marginTop: 2 }}>
-            Keep shipping — your GitHub streak thanks you 🙌
+            Keep shipping — your GitHub streak thanks you
           </p>
         </div>
         <div style={{ marginLeft: "auto", background: C.brand, color: "white", padding: "4px 14px", borderRadius: 9999, fontSize: 11, fontWeight: 700, fontFamily: '"DM Sans", sans-serif', letterSpacing: "0.08em", textTransform: "uppercase" }}>
-          On fire
+          Active
         </div>
       </div>
 
@@ -223,20 +309,22 @@ function ScoreRing({ score = 50, label, color, size = 88 }) {
 // ── Status badge ─────────────────────────────────────────
 function StatusBadge({ status }) {
   const map = {
-    pending:  { bg: "#FFF3CD", color: "#856404", icon: "⏳" },
-    accepted: { bg: "#D4EDDA", color: "#155724", icon: "✅" },
-    rejected: { bg: "#F8D7DA", color: "#721C24", icon: "❌" },
+    pending:  { bg: "#FFF8F0", color: "#D48A2D", dot: "#D48A2D" },
+    accepted: { bg: "#F3FAF5", color: "#2E7D32", dot: "#2E7D32" },
+    rejected: { bg: "#FFF5F5", color: "#B8391F", dot: "#B8391F" },
   };
   const s = map[status] || map.pending;
   return (
     <span style={{
       background: s.bg, color: s.color,
-      padding: "3px 10px", borderRadius: 9999,
+      padding: "4px 10px", borderRadius: 9999,
       fontSize: 11, fontWeight: 600,
       fontFamily: '"DM Sans", sans-serif',
-      display: "inline-flex", alignItems: "center", gap: 4,
+      display: "inline-flex", alignItems: "center", gap: 6,
+      border: `1px solid ${s.dot}20`,
     }}>
-      {s.icon} {status}
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.dot }} />
+      {status}
     </span>
   );
 }
@@ -289,56 +377,54 @@ export default function Dashboard() {
   const pendingApps  = applications.filter(a => a.status === "pending").length;
   const acceptedApps = applications.filter(a => a.status === "accepted").length;
   const rejectedApps = applications.filter(a => a.status === "rejected").length;
-  const successRate  = applications.length
-    ? Math.round((acceptedApps / applications.length) * 100)
-    : 0;
+
 
   // ── Layout ───────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, paddingTop: 80, fontFamily: '"DM Sans", sans-serif' }}>
+    <div style={{ minHeight: "100vh", background: C.bg, paddingTop: 24, fontFamily: '"DM Sans", sans-serif' }}>
       <style>{STYLES}</style>
 
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "32px 28px" }}>
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "16px 28px 32px 28px" }}>
 
         {/* ══ HEADER BAR ════════════════════════════════ */}
         <div style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 28,
+          marginBottom: 32,
           animation: "slideUp 0.6s ease both",
         }}>
           <span style={{
-            fontFamily: '"Syne", sans-serif',
-            fontSize: 24,
+            fontFamily: '"Eczar", serif',
+            fontSize: 28,
             fontWeight: 800,
-            color: C.dark,
+            color: C.brand,
             letterSpacing: "-0.01em",
-            textTransform: "lowercase",
+            textTransform: "none",
           }}>
-            buildmate
+            BuildMate
           </span>
 
           <Link to="/profile" style={{ textDecoration: "none" }}>
             <div style={{
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
+              width: 38,
+              height: 38,
+              borderRadius: 10,
               background: C.brand,
               color: "white",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontFamily: '"Syne", sans-serif',
+              fontFamily: '"Eczar", serif',
               fontWeight: 800,
-              fontSize: 13,
-              border: `2px solid ${C.dark}`,
-              boxShadow: `3px 3px 0px ${C.dark}`,
+              fontSize: 14,
+              border: `2px solid #FFF8F0`,
+              boxShadow: `0 4px 12px rgba(227, 83, 54, 0.25)`,
               cursor: "pointer",
-              transition: "transform 0.15s, box-shadow 0.15s",
+              transition: "transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translate(-2px, -2px)"; e.currentTarget.style.boxShadow = `5px 5px 0px ${C.dark}` }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = `3px 3px 0px ${C.dark}` }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.08)" }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)" }}
             >
               {displayName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
             </div>
@@ -349,7 +435,7 @@ export default function Dashboard() {
         <div style={{
           display: "grid",
           gridTemplateColumns: "1fr auto",
-          gap: 24, marginBottom: 32,
+          gap: 28, marginBottom: 36,
           animation: "slideUp 0.6s ease both",
         }}>
           <div>
@@ -362,49 +448,41 @@ export default function Dashboard() {
               </span>
             </h1>
             <p style={{ marginTop: 14, fontSize: 17, color: C.dark2, fontStyle: "italic", fontFamily: '"Cormorant Garamond", serif' }}>
-              find your squad and let's cook fr fr 🍳
+              find your squad and let's cook
             </p>
             {/* GitHub streak callout */}
-            <button
-              type="button"
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                marginTop: 16, padding: "8px 18px",
-                background: "linear-gradient(135deg, #2B1B12 0%, #4A372D 100%)",
-                borderRadius: 9999, cursor: "pointer",
-                animation: "gradFlow 4s ease infinite",
-                backgroundSize: "200% 200%",
-                border: "none",
-                outline: "none",
-                fontFamily: "inherit",
-                textAlign: "left",
-              }}
-              onClick={() => navigate("/discover")}
-            >
-              <span style={{ fontSize: 16 }}>⚡</span>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              marginTop: 16, padding: "8px 18px",
+              background: "linear-gradient(135deg, #2B1B12 0%, #4A372D 100%)",
+              borderRadius: 9999, cursor: "pointer",
+              animation: "gradFlow 4s ease infinite",
+              backgroundSize: "200% 200%",
+            }} onClick={() => navigate("/discover")}>
+              <LightningIcon color={C.orange} size={16} />
               <span style={{ color: "#F4A460", fontSize: 13, fontWeight: 600, letterSpacing: "0.03em" }}>
                 Stay consistent — keep your GitHub streak alive
               </span>
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>→</span>
-            </button>
+            </div>
           </div>
 
           {/* Score rings */}
           <div style={{
-            background: C.dark, borderRadius: 24, padding: "24px 28px",
+            background: C.dark, borderRadius: 24, padding: "28px 32px",
             display: "flex", flexDirection: "column", alignItems: "center",
             gap: 16, minWidth: 220,
             animation: "slideLeft 0.6s ease 0.1s both", opacity: 0,
           }}>
-            <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: '"DM Sans", sans-serif' }}>
+            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: '"DM Sans", sans-serif' }}>
               Your scores
             </p>
             <div style={{ display: "flex", gap: 20 }}>
               <ScoreRing score={currentUser?.activity_score    ?? user?.activity_score    ?? 50} label="Activity"    color={C.brand}  />
               <ScoreRing score={currentUser?.reliability_score ?? user?.reliability_score ?? 50} label="Reliability" color={C.orange} />
             </div>
-            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, textAlign: "center", lineHeight: 1.5, maxWidth: 160, fontFamily: '"DM Sans", sans-serif' }}>
-              Ship more projects to level up your scores 🔥
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", lineHeight: 1.5, maxWidth: 160, fontFamily: '"DM Sans", sans-serif' }}>
+              Ship more projects to level up your scores.
             </p>
           </div>
         </div>
@@ -413,11 +491,16 @@ export default function Dashboard() {
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: 16, marginBottom: 28,
+          gap: 28, marginBottom: 36,
         }}>
           {loading ? (
             Array(3).fill(0).map((_, i) => (
-              <div key={i} style={{ borderRadius: 20, padding: 24, background: C.surface, border: `1px solid ${C.border}`, minHeight: 160 }}>
+              <div key={i} style={{
+                borderRadius: 20, padding: "28px 28px",
+                background: C.surface, border: `1px solid ${C.border}`,
+                minHeight: 210, display: "flex", flexDirection: "column",
+                justifyContent: "space-between"
+              }}>
                 <Skeleton h={12} w="60%" r={6} />
                 <div style={{ marginTop: 16 }}><Skeleton h={48} w="40%" r={8} /></div>
                 <div style={{ marginTop: 10 }}><Skeleton h={10} w="80%" r={6} /></div>
@@ -425,24 +508,24 @@ export default function Dashboard() {
             ))
           ) : (
             <>
-              <StatCard color={C.brand}   icon="📁" title="My Projects"    value={projects.length}                    sub="you're building"      delay={0}   link="/my-projects" />
-              <StatCard color={C.orange}  icon="📬" title="Applications"   value={applications.length}                sub="sent by you"          delay={0.05} link="/applications" />
-              <StatCard color="#2E7D32"   icon="🌍" title="Live Projects"  value={overview?.total_projects ?? 0}      sub="on the platform"      delay={0.1}  link="/discover" />
+              <StatCard color={C.brand}   icon={<FolderIcon color={C.brand} size={24} />} title="My Projects"    value={projects.length}                    sub="you're building"      delay={0}   link="/my-projects" />
+              <StatCard color={C.orange}  icon={<MailIcon color={C.orange} size={24} />} title="Applications"   value={applications.length}                sub="sent by you"          delay={0.05} link="/applications" />
+              <StatCard color="#2E7D32"   icon={<GlobeIcon color="#2E7D32" size={24} />} title="Live Projects"  value={overview?.total_projects ?? 0}      sub="on the platform"      delay={0.1}  link="/discover" />
             </>
           )}
         </div>
 
         {/* ══ MAIN GRID ════════════════════════════════ */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 20, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 28, marginBottom: 28 }}>
 
           {/* Top skills / Trending Skills */}
           <div className="dash-card" style={{
-            background: C.dark, borderRadius: 24, padding: 28,
+            background: C.dark, borderRadius: 24, padding: 36,
             animation: "slideUp 0.6s ease 0.2s both", opacity: 0,
           }}>
-            <SectionLabel light>🛠️ Trending Skills</SectionLabel>
+            <SectionLabel light icon={<TrendingIcon color={C.orange} size={18} />}>Trending Skills</SectionLabel>
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 18, fontStyle: "italic" }}>
-              what everyone's learning rn
+              top skills currently in demand
             </p>
             {loading ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -450,32 +533,45 @@ export default function Dashboard() {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {(overview?.top_skills || []).map((skill, i) => (
-                  <div key={skill} style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    animation: `slideUp 0.4s ease ${0.2 + i * 0.06}s both`, opacity: 0,
-                  }}>
-                    <span style={{ color: C.orange, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 14, width: 20 }}>
-                      {i + 1}.
-                    </span>
-                    <div style={{
-                      flex: 1, height: 32, borderRadius: 8,
-                      background: "rgba(255,255,255,0.06)",
-                      display: "flex", alignItems: "center",
-                      paddingLeft: 12, overflow: "hidden", position: "relative",
+                {(overview?.top_skills || []).map((skill, i) => {
+                  const isObj = typeof skill === "object" && skill !== null;
+                  const name = isObj ? skill.name : skill;
+                  const count = isObj ? skill.count : 0;
+                  const maxCount = typeof overview?.top_skills?.[0] === "object" ? (overview?.top_skills?.[0]?.count || 1) : 1;
+                  const pct = isObj ? (count / maxCount * 100) : (100 - i * 15);
+                  return (
+                    <div key={name} style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      animation: `slideUp 0.4s ease ${0.2 + i * 0.06}s both`, opacity: 0,
                     }}>
-                      <div style={{
-                        position: "absolute", left: 0, top: 0, bottom: 0,
-                        width: `${100 - i * 15}%`,
-                        background: `linear-gradient(90deg, rgba(227,83,54,0.25), transparent)`,
-                        transition: "width 1s ease",
-                      }} />
-                      <span style={{ position: "relative", color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: 500 }}>
-                        {skill}
+                      <span style={{ color: C.orange, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 14, width: 20 }}>
+                        {i + 1}.
                       </span>
+                      <div style={{
+                        flex: 1, height: 32, borderRadius: 8,
+                        background: "rgba(255,255,255,0.06)",
+                        display: "flex", alignItems: "center",
+                        justifyContent: "space-between",
+                        paddingLeft: 12, paddingRight: 12, overflow: "hidden", position: "relative",
+                      }}>
+                        <div style={{
+                          position: "absolute", left: 0, top: 0, bottom: 0,
+                          width: `${Math.max(15, pct)}%`,
+                          background: `linear-gradient(90deg, rgba(227,83,54,0.25), transparent)`,
+                          transition: "width 1s ease",
+                        }} />
+                        <span style={{ position: "relative", color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: 500 }}>
+                          {name}
+                        </span>
+                        {isObj && (
+                          <span style={{ position: "relative", color: C.orange, fontSize: 12, fontWeight: 700, fontFamily: '"Syne", sans-serif' }}>
+                            {count} {count === 1 ? "builder" : "builders"}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {(!overview?.top_skills || overview.top_skills.length === 0) && (
                   <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontStyle: "italic" }}>No skill data yet — add yours in profile!</p>
                 )}
@@ -485,10 +581,10 @@ export default function Dashboard() {
 
           {/* Application breakdown */}
           <div className="dash-card" style={{
-            background: C.dark, borderRadius: 24, padding: 28, color: "white",
+            background: C.dark, borderRadius: 24, padding: 36, color: "white",
             animation: "slideUp 0.6s ease 0.25s both", opacity: 0,
           }}>
-            <SectionLabel light>📬 Application Breakdown</SectionLabel>
+            <SectionLabel light icon={<MailIcon color={C.orange} size={18} />}>Application Breakdown</SectionLabel>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20, fontStyle: "italic" }}>
               "no shot I'm going 0/3 this week" — you, probably
             </p>
@@ -547,12 +643,12 @@ export default function Dashboard() {
 
         {/* ══ MY PROJECTS ══════════════════════════════ */}
         <div className="dash-card" style={{
-          background: C.surface, borderRadius: 24, padding: 28,
-          border: `1px solid ${C.border}`, marginBottom: 20,
+          background: C.surface, borderRadius: 24, padding: 36,
+          border: `1px solid ${C.border}`, marginBottom: 28,
           animation: "slideUp 0.6s ease 0.3s both", opacity: 0,
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <SectionLabel>🚀 My Projects</SectionLabel>
+            <SectionLabel icon={<FolderIcon color={C.brand} size={18} />}>My Projects</SectionLabel>
             <Link to="/create-project" style={{ textDecoration: "none" }}>
               <ActionBtn>+ New Project</ActionBtn>
             </Link>
@@ -560,11 +656,11 @@ export default function Dashboard() {
 
           {loading ? (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
-              {[1,2,3].map(i => <Skeleton key={i} h={120} r={14} />)}
+              {[1,2,3].map(i => <Skeleton key={i} h={200} r={14} />)}
             </div>
           ) : projects.length === 0 ? (
             <EmptyState
-              emoji="📭"
+              icon={<FolderIcon color={C.muted} size={48} />}
               headline="no projects? bestie, let's fix that"
               sub="Start building — every project is a GitHub commit waiting to happen"
               cta="Create your first project"
@@ -579,12 +675,12 @@ export default function Dashboard() {
 
         {/* ══ RECENT APPLICATIONS ══════════════════════ */}
         <div className="dash-card" style={{
-          background: C.surface, borderRadius: 24, padding: 28,
-          border: `1px solid ${C.border}`, marginBottom: 20,
+          background: C.surface, borderRadius: 24, padding: 36,
+          border: `1px solid ${C.border}`, marginBottom: 28,
           animation: "slideUp 0.6s ease 0.35s both", opacity: 0,
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <SectionLabel>📬 Recent Applications</SectionLabel>
+            <SectionLabel icon={<MailIcon color={C.brand} size={18} />}>Recent Applications</SectionLabel>
             <Link to="/discover" style={{ textDecoration: "none" }}>
               <ActionBtn secondary>Discover more →</ActionBtn>
             </Link>
@@ -596,7 +692,7 @@ export default function Dashboard() {
             </div>
           ) : applications.length === 0 ? (
             <EmptyState
-              emoji="✉️"
+              icon={<MailIcon color={C.muted} size={48} />}
               headline="zero applications? the audacity"
               sub="Swipe on projects, apply to openings — build that portfolio, not regrets"
               cta="Start swiping"
@@ -617,10 +713,11 @@ export default function Dashboard() {
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10,
-                      background: C.sandDark,
+                      background: C.sand,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 16,
-                    }}>📄</div>
+                    }}>
+                      <FileTextIcon color={C.dark} size={18} />
+                    </div>
                     <div>
                       <p style={{ fontWeight: 600, fontSize: 14, color: C.dark }}>
                         {app.opportunity?.role || "Collaborator"}
@@ -643,24 +740,26 @@ export default function Dashboard() {
         </div>
 
         {/* ══ BOTTOM GRID ══════════════════════════════ */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: 20, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: 28, marginBottom: 28 }}>
           
           {/* Left Column: Badges & Profile Completeness */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
             {/* Badges Earned Card */}
             <div className="dash-card" style={{
-              background: C.surface, borderRadius: 24, padding: 28,
+              background: C.surface, borderRadius: 24, padding: 36,
               border: `1px solid ${C.border}`,
               animation: "slideUp 0.6s ease 0.4s both", opacity: 0,
             }}>
-              <SectionLabel>🏅 Badges Earned</SectionLabel>
+              <SectionLabel icon={<AwardIcon color={C.brand} size={18} />}>Badges Earned</SectionLabel>
               <div style={{ textAlign: "center", padding: "16px 0" }}>
-                <span style={{ fontSize: 40, filter: "grayscale(100%)", opacity: 0.4 }}>🏆</span>
-                <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, marginTop: 12 }}>
+                <div style={{ display: "inline-flex", opacity: 0.35, marginBottom: 12 }}>
+                  <AwardIcon color={C.dark} size={48} />
+                </div>
+                <p style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 16, color: C.dark }}>
                   zero badges? the audacity.
                 </p>
                 <p style={{ fontSize: 12, color: C.muted, fontFamily: '"DM Sans", sans-serif', marginTop: 6, fontStyle: "italic" }}>
-                  stop yapping and start shipping to get decorated fr fr 🎖️
+                  lock in and start shipping to get decorated.
                 </p>
               </div>
             </div>
@@ -670,30 +769,36 @@ export default function Dashboard() {
           </div>
 
           {/* Right Column: BuildMate Stats & About Section */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
             {/* BuildMate Stats Card */}
             <div className="dash-card" style={{
-              background: C.dark, borderRadius: 24, padding: 28, color: "white",
+              background: C.dark, borderRadius: 24, padding: 36, color: "white",
               animation: "slideUp 0.6s ease 0.45s both", opacity: 0,
             }}>
-              <SectionLabel light>📊 BuildMate Stats</SectionLabel>
+              <SectionLabel light icon={<GlobeIcon color={C.brand} size={18} />}>BuildMate Stats</SectionLabel>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 10 }}>
                 <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <span style={{ fontSize: 24 }}>🚀</span>
+                  <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
+                    <RocketIcon color={C.brand} size={24} />
+                  </div>
                   <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.brand, margin: "6px 0 2px" }}>
                     <AnimCount target={overview?.total_projects ?? 0} />
                   </h4>
                   <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Projects</p>
                 </div>
                 <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <span style={{ fontSize: 24 }}>👥</span>
+                  <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
+                    <UsersIcon color={C.orange} size={24} />
+                  </div>
                   <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.orange, margin: "6px 0 2px" }}>
                     <AnimCount target={overview?.total_users ?? 0} />
                   </h4>
                   <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 700 }}>Builders</p>
                 </div>
                 <div style={{ textAlign: "center", padding: "12px", background: "rgba(255,255,255,0.06)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <span style={{ fontSize: 24 }}>🎯</span>
+                  <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
+                    <TargetIcon color="#7C5CBF" size={24} />
+                  </div>
                   <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: "#7C5CBF", margin: "6px 0 2px" }}>
                     <AnimCount target={overview?.total_opportunities ?? 0} />
                   </h4>
@@ -704,100 +809,91 @@ export default function Dashboard() {
 
             {/* About Section */}
             <div className="dash-card" style={{
-              background: C.surface, borderRadius: 24, padding: 28,
+              background: C.surface, borderRadius: 24, padding: 36,
               border: `1px solid ${C.border}`,
               animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
             }}>
-              <SectionLabel>💡 About BuildMate</SectionLabel>
-              <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 18, color: C.dark, marginBottom: 10 }}>
+              <SectionLabel icon={<InfoIcon color={C.brand} size={18} />}>About BuildMate</SectionLabel>
+              <h3 style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 18, color: C.dark, marginBottom: 10 }}>
                 Killing the squad-finding struggle.
               </h3>
               <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif' }}>
-                BuildMate was cooked up to stop developers and designers from building in silos. We connect you with builders based on real tech-stack synergy, helping you match, team up, and ship actual projects instead of yapping on resumes. Fr fr, let's ship together. 🚀
+                BuildMate was cooked up to stop developers and designers from building in silos. We connect you with builders based on real tech-stack synergy, helping you match, team up, and ship actual projects instead of yapping on resumes. Let's ship together.
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* ══ AUTHOR FOOTER SIGNATURE ══════════════════ */}
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: 40,
-          paddingTop: 24,
-          borderTop: `1px solid ${C.border}`,
-          animation: "slideUp 0.6s ease 0.55s both",
-          opacity: 0,
-        }}>
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            background: C.surface,
-            border: `2px solid ${C.dark}`,
-            boxShadow: `4px 4px 0px ${C.dark}`,
-            borderRadius: 20,
-            padding: "16px 24px",
-          }}>
-            <img
-              src="/aditi_profile.png"
-              alt="Aditi Tiwari"
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: "50%",
-                border: `2px solid ${C.dark}`,
-                objectFit: "cover",
-              }}
-            />
-            <div>
-              <p style={{
-                fontFamily: '"Syne", sans-serif',
-                fontWeight: 800,
-                fontSize: 14,
-                color: C.dark,
-                margin: 0,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              }}>
-                build by aditi tiwari
-              </p>
-              <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
-                <a
-                  href="https://linkedin.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: C.brand,
-                    textDecoration: "none",
-                    fontFamily: '"DM Sans", sans-serif',
-                  }}
-                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                  onMouseLeave={e => e.target.style.textDecoration = "none"}
-                >
-                  🔗 LinkedIn
-                </a>
-                <a
-                  href="https://instagram.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: C.brand,
-                    textDecoration: "none",
-                    fontFamily: '"DM Sans", sans-serif',
-                  }}
-                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                  onMouseLeave={e => e.target.style.textDecoration = "none"}
-                >
-                  📸 Instagram
-                </a>
+            {/* ══ AUTHOR FOOTER SIGNATURE (RELOCATED) ══════ */}
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              background: "transparent",
+              border: `1px solid ${C.border}`,
+              borderRadius: 20,
+              padding: "20px 24px",
+              animation: "slideUp 0.6s ease 0.55s both",
+              opacity: 0,
+            }}>
+              <img
+                src="/aditi_profile.png"
+                alt="Aditi Tiwari"
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  border: `1px solid ${C.border}`,
+                  objectFit: "cover",
+                }}
+              />
+              <div>
+                <p style={{
+                  fontFamily: '"Syne", sans-serif',
+                  fontWeight: 800,
+                  fontSize: 13,
+                  color: C.dark,
+                  margin: 0,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}>
+                  built by aditi tiwari
+                </p>
+                <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+                  <a
+                    href="https://linkedin.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: C.brand,
+                      textDecoration: "none",
+                      fontFamily: '"DM Sans", sans-serif',
+                    }}
+                    onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                    onMouseLeave={e => e.target.style.textDecoration = "none"}
+                  >
+                    LinkedIn ↗
+                  </a>
+                  <a
+                    href="https://instagram.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: C.brand,
+                      textDecoration: "none",
+                      fontFamily: '"DM Sans", sans-serif',
+                    }}
+                    onMouseEnter={e => e.target.style.textDecoration = "underline"}
+                    onMouseLeave={e => e.target.style.textDecoration = "none"}
+                  >
+                    Instagram ↗
+                  </a>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
 
@@ -811,9 +907,12 @@ export default function Dashboard() {
 function StatCard({ color, icon, title, value, sub, delay, link }) {
   const inner = (
     <div className="dash-card" style={{
-      background: C.surface, borderRadius: 20, padding: "22px 24px",
+      background: C.surface, borderRadius: 20, padding: "28px 28px",
       border: `1px solid ${C.border}`,
-      position: "relative", overflow: "hidden", minHeight: 150,
+      position: "relative", overflow: "hidden", minHeight: 210,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
       animation: `slideUp 0.5s ease ${delay}s both`, opacity: 0,
       cursor: link ? "pointer" : "default",
     }}>
@@ -825,7 +924,7 @@ function StatCard({ color, icon, title, value, sub, delay, link }) {
         transition: "transform 0.3s ease",
       }} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-        <span style={{ fontSize: 24 }}>{icon}</span>
+        <span style={{ display: "inline-flex", alignItems: "center" }}>{icon}</span>
         <span style={{
           fontSize: 10, fontWeight: 700, letterSpacing: "0.15em",
           textTransform: "uppercase", color: color,
@@ -848,6 +947,7 @@ function StatCard({ color, icon, title, value, sub, delay, link }) {
   return link ? <Link to={link} style={{ textDecoration: "none" }}>{inner}</Link> : inner;
 }
 
+/* eslint-disable-next-line no-unused-vars */
 function MiniStat({ icon, label, value, delay, loading }) {
   return (
     <div style={{
@@ -856,7 +956,7 @@ function MiniStat({ icon, label, value, delay, loading }) {
       display: "flex", alignItems: "center", gap: 12,
       animation: `slideUp 0.4s ease ${delay}s both`, opacity: 0,
     }}>
-      <span style={{ fontSize: 22 }}>{icon}</span>
+      <span style={{ display: "inline-flex", alignItems: "center" }}>{icon}</span>
       <div>
         {loading
           ? <Skeleton h={24} w={40} r={4} />
@@ -868,13 +968,15 @@ function MiniStat({ icon, label, value, delay, loading }) {
   );
 }
 
-function SectionLabel({ children, light }) {
+function SectionLabel({ children, light, icon }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+      {icon && <span style={{ display: "inline-flex", alignItems: "center" }}>{icon}</span>}
       <p style={{
-        fontFamily: '"Syne", sans-serif', fontWeight: 700,
+        fontFamily: '"Poppins", sans-serif', fontWeight: 700,
         fontSize: 15, letterSpacing: "0.01em",
         color: light ? "rgba(255,255,255,0.85)" : C.dark,
+        margin: 0,
       }}>{children}</p>
       <div style={{ flex: 1, height: 1, background: light ? "rgba(255,255,255,0.1)" : C.border }} />
     </div>
@@ -911,7 +1013,12 @@ function ProjectCard({ project, delay }) {
         style={{
           background: h ? C.sandDark : C.cream,
           border: `1.5px solid ${h ? C.brand : C.border}`,
-          borderRadius: 16, padding: "18px 20px",
+          borderRadius: 16,
+          padding: "28px 28px",
+          minHeight: 260,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
           cursor: "pointer",
           transition: "all 0.2s ease",
           transform: h ? "translateY(-2px)" : "translateY(0)",
@@ -919,26 +1026,28 @@ function ProjectCard({ project, delay }) {
           animation: `slideUp 0.4s ease ${delay}s both`, opacity: 0,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-          <span style={{ fontSize: 22 }}>🏗️</span>
-          {project.project_type && (
-            <span style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
-              textTransform: "uppercase", color: C.brand,
-              background: `${C.brand}15`, padding: "3px 10px", borderRadius: 9999,
-              fontFamily: '"DM Sans", sans-serif',
-            }}>{project.project_type}</span>
-          )}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+            <FolderIcon color={C.brand} size={22} />
+            {project.project_type && (
+              <span style={{
+                fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
+                textTransform: "uppercase", color: C.brand,
+                background: `${C.brand}15`, padding: "3px 10px", borderRadius: 9999,
+                fontFamily: '"DM Sans", sans-serif',
+              }}>{project.project_type}</span>
+            )}
+          </div>
+          <h4 style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 16, color: C.dark, marginBottom: 8, lineHeight: 1.3 }}>
+            {project.title}
+          </h4>
+          <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            {project.description}
+          </p>
         </div>
-        <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 16, color: C.dark, marginBottom: 6, lineHeight: 1.3 }}>
-          {project.title}
-        </h4>
-        <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-          {project.description}
-        </p>
         {project.timeline && (
-          <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ fontSize: 11 }}>⏱</span>
+          <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 6 }}>
+            <ClockIcon color={C.muted} size={11} />
             <span style={{ fontSize: 11, color: C.muted }}>{project.timeline}</span>
           </div>
         )}
@@ -947,10 +1056,10 @@ function ProjectCard({ project, delay }) {
   );
 }
 
-function EmptyState({ emoji, headline, sub, cta, href }) {
+function EmptyState({ icon, headline, sub, cta, href }) {
   return (
     <div style={{ textAlign: "center", padding: "32px 20px" }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>{emoji}</div>
+      {icon && <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 12 }}>{icon}</div>}
       <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 18, color: C.dark, marginBottom: 8 }}>
         {headline}
       </h3>
@@ -986,12 +1095,12 @@ function ProfileCompleteness({ profile, user }) {
 
   return (
     <div className="dash-card" style={{
-      background: C.surface, borderRadius: 24, padding: 28,
+      background: C.surface, borderRadius: 24, padding: 36,
       border: `1px solid ${C.border}`,
       animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <SectionLabel>👤 Profile Completeness</SectionLabel>
+        <SectionLabel icon={<UserIcon color={C.brand} size={18} />}>Profile Completeness</SectionLabel>
         <Link to="/profile" style={{ textDecoration: "none" }}>
           <ActionBtn secondary>Complete profile →</ActionBtn>
         </Link>
@@ -1017,14 +1126,20 @@ function ProfileCompleteness({ profile, user }) {
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {fields.map(f => (
           <div key={f.label} style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "5px 12px", borderRadius: 9999,
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "6px 14px", borderRadius: 9999,
             background: f.done ? "#D4EDDA" : C.cream,
             border: `1px solid ${f.done ? "#C3E6CB" : C.border}`,
             fontSize: 12, fontWeight: 500,
             color: f.done ? "#155724" : C.muted,
           }}>
-            <span>{f.done ? "✓" : "○"}</span>
+            <span style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: f.done ? "#2E7D32" : C.accent1,
+              display: "inline-block"
+            }} />
             {f.label}
           </div>
         ))}
@@ -1032,7 +1147,7 @@ function ProfileCompleteness({ profile, user }) {
 
       {pct < 100 && (
         <p style={{ marginTop: 14, fontSize: 13, color: C.muted, fontStyle: "italic" }}>
-          💡 A complete profile gets {Math.round((100 - pct) / 10 * 3)}x more visibility in matching — don't sleep on it
+          A complete profile gets {Math.round((100 - pct) / 10 * 3)}x more visibility in matching — don't sleep on it
         </p>
       )}
     </div>

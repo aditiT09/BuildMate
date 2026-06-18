@@ -102,11 +102,11 @@ def get_overview(
         .count(),
 
         "top_skills": [
-
-            skill.name
-
+            {
+                "name": skill.name,
+                "count": skill.count
+            }
             for skill in top_skills
-
         ]
 
     }
