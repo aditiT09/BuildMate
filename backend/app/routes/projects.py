@@ -50,14 +50,17 @@ def create_project(
 
 @router.get("/projects")
 def get_projects(
+    owner_id: int = Query(None),
     limit: int = Query(10, le=100),
     offset: int = 0,
     db: Session = Depends(get_db)
 ):
+    query = db.query(Project)
+    if owner_id is not None:
+        query = query.filter(Project.owner_id == owner_id)
 
     projects = (
-        db.query(Project)
-        .offset(offset)
+        query.offset(offset)
         .limit(limit)
         .all()
     )

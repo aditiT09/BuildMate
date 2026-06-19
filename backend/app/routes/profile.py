@@ -11,6 +11,7 @@ from app.schemas.profile import (
 )
 
 from app.utils.security import get_current_user
+from app.utils.scoring import recalculate_user_scores
 
 router = APIRouter()
 
@@ -35,6 +36,8 @@ def get_my_profile(
         db.add(profile)
         db.commit()
         db.refresh(profile)
+    else:
+        recalculate_user_scores(current_user, db)
 
     return profile
 
@@ -77,6 +80,9 @@ def get_profile(
             status_code=404,
             detail="Profile not found"
         )
+
+    if profile.user:
+        recalculate_user_scores(profile.user, db)
 
     return profile
 

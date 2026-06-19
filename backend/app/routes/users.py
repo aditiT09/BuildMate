@@ -11,6 +11,7 @@ from app.utils.security import (
     hash_password,
     get_current_user,
 )
+from app.utils.scoring import recalculate_user_scores
 
 from app.schemas.user import (
     UserCreate,
@@ -107,5 +108,7 @@ def update_me(
 )
 def get_me(
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
+    recalculate_user_scores(current_user, db)
     return current_user

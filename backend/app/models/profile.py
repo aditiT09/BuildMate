@@ -30,3 +30,11 @@ class Profile(Base):
     availability = Column(String, nullable=True)
 
     user = relationship("User")
+
+    @property
+    def activity_score(self):
+        return self.user.activity_score if self.user else 50
+
+    @property
+    def reliability_score(self):
+        return self.user.reliability_score if self.user else 50

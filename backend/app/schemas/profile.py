@@ -17,6 +17,8 @@ class ProfileCreate(BaseModel):
 class ProfileOut(ProfileCreate):
     id: int
     user_id: int
+    activity_score: int
+    reliability_score: int
 
     class Config:
         from_attributes = True
