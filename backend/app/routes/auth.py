@@ -1,6 +1,4 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -15,6 +13,7 @@ from app.utils.security import (
     verify_password,
     create_access_token
 )
+from app.utils.rate_limiter import check_auth_rate_limit
 
 
 router = APIRouter(
@@ -28,12 +27,16 @@ router = APIRouter(
     response_model=TokenResponse
 )
 def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
     # Normalise email — trim whitespace and lowercase
     # so "  User@Example.com " matches stored "user@example.com"
     email = form_data.username.strip().lower()
+
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    check_auth_rate_limit(client_ip, email)
 
     user = (
         db.query(User)

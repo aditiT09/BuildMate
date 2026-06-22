@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str = "secret"
 
-    REDIS_URL: str
+    REDIS_URL: str = "redis://localhost:6379/0"
     TEST_DATABASE_URL: str | None = None
 
     class Config:

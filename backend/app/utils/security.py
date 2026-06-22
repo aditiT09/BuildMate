@@ -13,17 +13,13 @@ from fastapi.security import OAuth2PasswordBearer
 
 from sqlalchemy.orm import Session
 
-from dotenv import load_dotenv
-
-import os
-
 from app.database import get_db
 from app.models.user import User
+from app.config import settings
 import secrets
-load_dotenv()
 
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = settings.SECRET_KEY
 
 ALGORITHM = "HS256"
 
@@ -91,8 +87,6 @@ def get_current_user(
         detail="Invalid token"
     )
 
-    print("TOKEN:", token)
-
     try:
         payload = jwt.decode(
             token,
@@ -100,17 +94,12 @@ def get_current_user(
             algorithms=[ALGORITHM]
         )
 
-        print("PAYLOAD:", payload)
-
         email = payload.get("sub")
-
-        print("EMAIL:", email)
 
         if email is None:
             raise credentials_exception
 
-    except JWTError as e:
-        print("JWT ERROR:", e)
+    except JWTError:
         raise credentials_exception
 
     user = (
@@ -118,8 +107,6 @@ def get_current_user(
         .filter(User.email == email)
         .first()
     )
-
-    print("USER:", user)
 
     if user is None:
         raise credentials_exception

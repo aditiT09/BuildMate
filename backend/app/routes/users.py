@@ -1,5 +1,5 @@
 
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Request
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -12,6 +12,7 @@ from app.utils.security import (
     get_current_user,
 )
 from app.utils.scoring import recalculate_user_scores
+from app.utils.rate_limiter import check_auth_rate_limit
 
 from app.schemas.user import (
     UserCreate,
@@ -29,8 +30,12 @@ router = APIRouter()
 )
 def create_user(
     user: UserCreate,
+    request: Request,
     db: Session = Depends(get_db),
 ):
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    check_auth_rate_limit(client_ip)
+
     try:
         # UserCreate schema already validates and normalizes
         new_user = User(
