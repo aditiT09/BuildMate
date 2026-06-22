@@ -17,30 +17,25 @@ router = APIRouter(
 
 @router.post("/")
 def create_skill(
-
     name: str,
-
     db: Session = Depends(get_db),
-
     current_user: User = Depends(get_current_user)
-
 ):
-
+    normalized_name = name.strip().title()
     existing = db.query(
         Skill
     ).filter(
-        Skill.name == name
+        Skill.name == normalized_name
     ).first()
 
     if existing:
-
         return {
             "message":
             "Skill already exists"
         }
 
     skill = Skill(
-        name=name
+        name=normalized_name
     )
 
     db.add(skill)
@@ -60,12 +55,9 @@ def create_skill(
 
 @router.get("/skills")
 def get_skills(
-
-    limit: int = Query(100, le=1000),
-    offset: int = 0,
-
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db)
-
 ):
 
     skills = db.query(Skill)\

@@ -56,8 +56,8 @@ def create_project_link(
     new_resource = ProjectResource(
         project_id=project_id,
         title=resource.title,
-        resource_type=resource.resource_type,
-        url=resource.url,
+        resource_type=resource.resource_type.value,
+        url=str(resource.url),
     )
 
     db.add(new_resource)

@@ -31,21 +31,22 @@ def add_skill(
     )
 
 ):
+    # Validate skill exists
+    target_skill = db.query(Skill).filter(Skill.id == skill.skill_id).first()
+    if not target_skill:
+        raise HTTPException(
+            status_code=404,
+            detail="Skill not found"
+        )
+
     existing = (
-
-    db.query(UserSkill)
-
-    .filter(
-
-        UserSkill.user_id == current_user.id,
-
-        UserSkill.skill_id == skill.skill_id
-
+        db.query(UserSkill)
+        .filter(
+            UserSkill.user_id == current_user.id,
+            UserSkill.skill_id == skill.skill_id
+        )
+        .first()
     )
-
-    .first()
-
-)
 
     if existing:
 

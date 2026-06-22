@@ -8,6 +8,7 @@ from app.database import get_db
 
 from app.models.opportunity import Opportunity
 from app.models.opportunity_skill import OpportunitySkill
+from app.models.skill import Skill
 
 from app.schemas.opportunity_skill import OpportunitySkillCreate
 
@@ -27,6 +28,14 @@ def add_opportunity_skill(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
+
+    # Validate skill exists
+    skill = db.query(Skill).filter(Skill.id == data.skill_id).first()
+    if not skill:
+        raise HTTPException(
+            status_code=404,
+            detail="Skill not found"
+        )
 
     opportunity = (
         db.query(Opportunity)

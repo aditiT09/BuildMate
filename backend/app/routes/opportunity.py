@@ -35,6 +35,16 @@ def create_opportunity(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    # Validate required skills exist
+    if opportunity.required_skills:
+        from app.models.skill import Skill
+        for skill_id in opportunity.required_skills:
+            skill_exists = db.query(Skill).filter(Skill.id == skill_id).first()
+            if not skill_exists:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Skill with ID {skill_id} not found"
+                )
 
     project = (
         db.query(Project)
@@ -86,8 +96,8 @@ def create_opportunity(
     response_model=list[OpportunityResponse]
 )
 def get_opportunities(
-    limit: int = Query(10, le=100),
-    offset: int = 0,
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db)
 ):
 

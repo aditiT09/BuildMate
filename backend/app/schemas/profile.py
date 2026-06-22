@@ -1,17 +1,45 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl, Field
 
 
 class ProfileCreate(BaseModel):
-    full_name: str | None = None
-    bio: str | None = None
-    college: str | None = None
-    degree: str | None = None
-    skills: str | None = None
-    github: str | None = None
-    linkedin: str | None = None
-    portfolio: str | None = None
-    avatar: str | None = None
-    availability: str | None = None
+    full_name: str | None = Field(
+        default=None,
+        max_length=100
+    )
+
+    bio: str | None = Field(
+        default=None,
+        max_length=500
+    )
+
+    college: str | None = Field(
+        default=None,
+        max_length=100
+    )
+
+    degree: str | None = Field(
+        default=None,
+        max_length=100
+    )
+
+    skills: str | None = Field(
+        default=None,
+        max_length=500
+    )
+
+    github: HttpUrl | None = None
+    linkedin: HttpUrl | None = None
+    portfolio: HttpUrl | None = None
+
+    avatar: str | None = Field(
+        default=None,
+        max_length=500
+    )
+
+    availability: str | None = Field(
+        default=None,
+        max_length=100
+    )
 
 
 class ProfileOut(ProfileCreate):

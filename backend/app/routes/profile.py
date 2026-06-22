@@ -106,9 +106,9 @@ def save_profile(
         profile.college = profile_data.college
         profile.degree = profile_data.degree
         profile.skills = profile_data.skills
-        profile.github = profile_data.github
-        profile.linkedin = profile_data.linkedin
-        profile.portfolio = profile_data.portfolio
+        profile.github = str(profile_data.github) if profile_data.github else None
+        profile.linkedin = str(profile_data.linkedin) if profile_data.linkedin else None
+        profile.portfolio = str(profile_data.portfolio) if profile_data.portfolio else None
         profile.avatar = profile_data.avatar
         profile.availability = profile_data.availability
 
@@ -120,9 +120,9 @@ def save_profile(
             college=profile_data.college,
             degree=profile_data.degree,
             skills=profile_data.skills,
-            github=profile_data.github,
-            linkedin=profile_data.linkedin,
-            portfolio=profile_data.portfolio,
+            github=str(profile_data.github) if profile_data.github else None,
+            linkedin=str(profile_data.linkedin) if profile_data.linkedin else None,
+            portfolio=str(profile_data.portfolio) if profile_data.portfolio else None,
             avatar=profile_data.avatar,
             availability=profile_data.availability,
         )

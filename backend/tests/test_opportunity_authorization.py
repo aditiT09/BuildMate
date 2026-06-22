@@ -14,7 +14,7 @@ def test_cross_project_opportunity_reassignment_blocked():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },
@@ -40,7 +40,7 @@ def test_cross_project_opportunity_reassignment_blocked():
         "/projects",
         json={
             "title": "Project B",
-            "description": "Test",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "3 months",
             "project_type": "Mobile"
         },

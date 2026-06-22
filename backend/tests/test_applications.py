@@ -18,7 +18,7 @@ def test_apply():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },
@@ -69,7 +69,7 @@ def test_duplicate_application():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },
@@ -119,7 +119,7 @@ def test_accept_application():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },
@@ -164,7 +164,7 @@ def test_reject_application():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },
@@ -209,7 +209,7 @@ def test_non_owner_cannot_accept():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },
@@ -257,7 +257,7 @@ def test_seat_limit():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },
@@ -316,7 +316,7 @@ def test_cannot_accept_twice():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test Project",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },
@@ -372,7 +372,7 @@ def test_closed_opportunity():
         "/projects",
         json={
             "title": "Project A",
-            "description": "Test Project",
+            "description": "Test Project Long Description with 20+ characters",
             "timeline": "2 months",
             "project_type": "Web"
         },

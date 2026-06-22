@@ -8,6 +8,7 @@ from app.database import get_db
 
 from app.models.project import Project
 from app.models.project_skill import ProjectSkill
+from app.models.skill import Skill
 
 from app.schemas.project_skill import ProjectSkillCreate
 
@@ -27,6 +28,14 @@ def add_project_skill(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
+
+    # Validate skill exists
+    skill = db.query(Skill).filter(Skill.id == data.skill_id).first()
+    if not skill:
+        raise HTTPException(
+            status_code=404,
+            detail="Skill not found"
+        )
 
     project = (
         db.query(Project)
