@@ -181,6 +181,26 @@ def update_opportunity(
             detail="Not authorized"
         )
 
+    # Validate ownership of the target project if changing it
+    if updated.project_id != opportunity.project_id:
+        target_project = (
+            db.query(Project)
+            .filter(
+                Project.id == updated.project_id
+            )
+            .first()
+        )
+        if not target_project:
+            raise HTTPException(
+                status_code=404,
+                detail="Target project not found"
+            )
+        if target_project.owner_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized"
+            )
+
     opportunity.role = updated.role
     opportunity.project_id = updated.project_id
     opportunity.seats = updated.seats
