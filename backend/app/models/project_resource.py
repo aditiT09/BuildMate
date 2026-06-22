@@ -19,7 +19,7 @@ class ProjectResource(Base):
 
     project_id = Column(
         Integer,
-        ForeignKey("projects.id"),
+        ForeignKey("projects.id", ondelete="CASCADE"),
         nullable=False
     )
 

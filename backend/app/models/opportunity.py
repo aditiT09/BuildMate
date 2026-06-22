@@ -2,6 +2,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
+from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -9,6 +10,17 @@ from app.database import Base
 
 class Opportunity(Base):
     __tablename__ = "opportunities"
+
+    __table_args__ = (
+        CheckConstraint(
+            "seats > 0",
+            name="check_opportunity_seats"
+        ),
+        CheckConstraint(
+            "status IN ('open', 'closed')",
+            name="check_opportunity_status"
+        ),
+    )
 
     id = Column(
         Integer,
@@ -23,7 +35,7 @@ class Opportunity(Base):
 
     project_id = Column(
         Integer,
-        ForeignKey("projects.id"),
+        ForeignKey("projects.id", ondelete="CASCADE"),
         nullable=False
     )
 

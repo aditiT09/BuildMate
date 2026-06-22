@@ -26,13 +26,13 @@ class UserSkill(Base):
 
     user_id = Column(
         Integer,
-        ForeignKey("users.id"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False
     )
 
     skill_id = Column(
         Integer,
-        ForeignKey("skills.id"),
+        ForeignKey("skills.id", ondelete="CASCADE"),
         nullable=False
     )
 

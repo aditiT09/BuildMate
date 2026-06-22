@@ -3,6 +3,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint
+from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -17,6 +18,10 @@ class Application(Base):
             "opportunity_id",
             name="uq_application"
         ),
+        CheckConstraint(
+            "status IN ('pending', 'accepted', 'rejected')",
+            name="check_application_status"
+        ),
     )
 
     id = Column(
@@ -27,13 +32,13 @@ class Application(Base):
 
     user_id = Column(
         Integer,
-        ForeignKey("users.id"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False
     )
 
     opportunity_id = Column(
         Integer,
-        ForeignKey("opportunities.id"),
+        ForeignKey("opportunities.id", ondelete="CASCADE"),
         nullable=False
     )
 

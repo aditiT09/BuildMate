@@ -3,6 +3,7 @@ from fastapi import Depends
 from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
 
@@ -101,7 +102,14 @@ def create_invitation(
     )
 
     db.add(invitation)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="User already invited"
+        )
     db.refresh(invitation)
 
     return invitation
@@ -160,6 +168,27 @@ def respond_to_invitation(
             detail="Not authorized to respond to this invitation"
         )
 
+    # 1. Lock the Opportunity row first
+    opportunity = (
+        db.query(Opportunity)
+        .filter(Opportunity.id == invitation.opportunity_id)
+        .with_for_update()
+        .first()
+    )
+    if not opportunity:
+        raise HTTPException(
+            status_code=404,
+            detail="Opportunity not found"
+        )
+
+    # 2. Reload/lock the Invitation within the opportunity lock
+    invitation = (
+        db.query(Invitation)
+        .filter(Invitation.id == invitation_id)
+        .with_for_update()
+        .first()
+    )
+
     if invitation.status != "pending":
         raise HTTPException(
             status_code=400,
@@ -173,11 +202,7 @@ def respond_to_invitation(
             detail="Invalid response status"
         )
 
-    invitation.status = status_lower
-
     if status_lower == "accepted":
-        opportunity = invitation.opportunity
-        
         # Check seats remaining
         accepted_count = (
             db.query(Application)
@@ -189,8 +214,7 @@ def respond_to_invitation(
         )
 
         if accepted_count >= opportunity.seats:
-            invitation.status = "pending"  # revert
-            db.commit()
+            db.rollback()
             raise HTTPException(
                 status_code=400,
                 detail="No seats remaining for this role"
@@ -205,12 +229,13 @@ def respond_to_invitation(
         db.add(application)
 
         # Update reliability score
-        current_user.reliability_score = (current_user.reliability_score or 0) + 5
+        current_user.reliability_score = min(100, (current_user.reliability_score or 0) + 5)
 
         # Close opportunity if filled
         if accepted_count + 1 >= opportunity.seats:
             opportunity.status = "closed"
 
+    invitation.status = status_lower
     db.commit()
     db.refresh(invitation)
 

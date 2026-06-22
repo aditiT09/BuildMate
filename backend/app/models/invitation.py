@@ -3,6 +3,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint
+from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -16,6 +17,10 @@ class Invitation(Base):
             "user_id",
             "opportunity_id",
             name="uq_invitation"
+        ),
+        CheckConstraint(
+            "status IN ('pending', 'accepted', 'rejected')",
+            name="check_invitation_status"
         ),
     )
 

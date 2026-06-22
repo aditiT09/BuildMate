@@ -3,6 +3,7 @@ from fastapi import Depends
 from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
 
@@ -77,14 +78,17 @@ def create_application(
     )
 
     db.add(new_application)
-
-    db.commit()
+    current_user.activity_score = min(100, (current_user.activity_score or 50) + 2)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="Already applied"
+        )
 
     db.refresh(new_application)
-
-    current_user.activity_score += 2
-
-    db.commit()
 
     return new_application
 
@@ -182,19 +186,37 @@ def accept_application(
             detail="Application not found"
         )
 
-    if application.status != "pending":
-        raise HTTPException(
-            status_code=400,
-            detail="Application already processed"
-        )
-
+    # 1. Lock the Opportunity row first
     opportunity = (
         db.query(Opportunity)
         .filter(
             Opportunity.id == application.opportunity_id
         )
+        .with_for_update()
         .first()
     )
+
+    if not opportunity:
+        raise HTTPException(
+            status_code=404,
+            detail="Opportunity not found"
+        )
+
+    # 2. Reload/lock the Application within the opportunity lock
+    application = (
+        db.query(Application)
+        .filter(
+            Application.id == application_id
+        )
+        .with_for_update()
+        .first()
+    )
+
+    if application.status != "pending":
+        raise HTTPException(
+            status_code=400,
+            detail="Application already processed"
+        )
 
     project = (
         db.query(Project)
@@ -209,6 +231,7 @@ def accept_application(
             status_code=403,
             detail="Not authorized"
         )
+
     accepted_count = (
         db.query(Application)
         .filter(
@@ -216,26 +239,24 @@ def accept_application(
             Application.status == "accepted"
         )
         .count()
-)
+    )
 
     if accepted_count >= opportunity.seats:
         raise HTTPException(
             status_code=400,
             detail="No seats remaining"
-    )
+        )
 
     application.status = "accepted"
 
-    application.user.reliability_score = (
+    application.user.reliability_score = min(100, (
         application.user.reliability_score or 0
-    ) + 5
-    
+    ) + 5)
 
     if accepted_count + 1 >= opportunity.seats:
         opportunity.status = "closed"
 
     db.commit()
-
     db.refresh(application)
 
     return application

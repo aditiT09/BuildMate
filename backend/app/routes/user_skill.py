@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi import Depends
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
 
@@ -68,9 +69,17 @@ def add_skill(
         new_skill
     )
 
-    db.commit()
     try:
-     redis_client.flushall()
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="Skill already added"
+        )
+
+    try:
+        redis_client.flushall()
     except Exception:
         pass
 
