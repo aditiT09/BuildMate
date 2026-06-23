@@ -47,6 +47,7 @@ class ProfileOut(ProfileCreate):
     user_id: int
     activity_score: int
     reliability_score: int
+    completeness_percentage: int
 
     class Config:
         from_attributes = True

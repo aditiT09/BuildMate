@@ -1,0 +1,118 @@
+name: BuildMate CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend-test:
+    name: Backend CI (Pytest & Alembic & Coverage)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: Aditi0909#
+          POSTGRES_DB: buildmate_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Alembic Database Migrations
+        env:
+          TESTING: "true"
+          DATABASE_URL: "postgresql://postgres:Aditi0909#@localhost:5432/buildmate_test"
+        run: |
+          cd backend
+          alembic upgrade head
+
+      - name: Validate Migration States (Current & Heads)
+        env:
+          TESTING: "true"
+          DATABASE_URL: "postgresql://postgres:Aditi0909#@localhost:5432/buildmate_test"
+        run: |
+          cd backend
+          alembic current
+          
+          # Verify single-head database state to catch divergent split-heads
+          heads_count=$(alembic heads | wc -l)
+          echo "Found $heads_count migration heads."
+          if [ "$heads_count" -ne 1 ]; then
+            echo "Error: Divergent/split migration heads detected!"
+            alembic heads
+            exit 1
+          fi
+
+      - name: Run Pytest Suite with Coverage Enforcement
+        env:
+          TESTING: "true"
+          TEST_DATABASE_URL: "postgresql://postgres:Aditi0909#@localhost:5432/buildmate_test"
+          REDIS_URL: "redis://localhost:6379/0"
+        run: |
+          cd backend
+          pytest --cov=app --cov-fail-under=80
+
+  frontend-build:
+    name: Frontend CI (Lint & Build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run ESLint Checks
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Build Frontend Application
+        run: |
+          cd frontend
+          npm run build

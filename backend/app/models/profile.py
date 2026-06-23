@@ -38,3 +38,17 @@ class Profile(Base):
     @property
     def reliability_score(self):
         return self.user.reliability_score if self.user else 50
+
+    @property
+    def completeness_percentage(self):
+        fields = [
+            self.full_name,
+            self.bio,
+            self.college,
+            self.github,
+            self.linkedin,
+            self.portfolio,
+            self.availability
+        ]
+        completed = sum(1 for f in fields if f is not None and str(f).strip() != "")
+        return int(round((completed / len(fields)) * 100))

@@ -1,46 +1,11 @@
 import uuid
-import fnmatch
-from tests.conftest import client
+from tests.conftest import client, mock_redis_store as mock_store
 from tests.helpers import (
     create_user,
     login_user,
     auth_headers
 )
 from app.utils.redis_client import redis_client
-
-# Setup in-memory mock store for Redis
-mock_store = {}
-
-def mock_get(key):
-    return mock_store.get(key)
-
-def mock_set(key, value, *args, **kwargs):
-    mock_store[key] = str(value)
-    return True
-
-def mock_setex(key, time, value):
-    mock_store[key] = str(value)
-    return True
-
-def mock_delete(*keys):
-    count = 0
-    for k in keys:
-        if k in mock_store:
-            del mock_store[k]
-            count += 1
-    return count
-
-def mock_scan_iter(match=None):
-    if match is None:
-        return iter(mock_store.keys())
-    return iter([k for k in mock_store.keys() if fnmatch.fnmatch(k, match)])
-
-# Apply mock to redis_client
-redis_client.get = mock_get
-redis_client.set = mock_set
-redis_client.setex = mock_setex
-redis_client.delete = mock_delete
-redis_client.scan_iter = mock_scan_iter
 
 
 def test_pagination_endpoints():
