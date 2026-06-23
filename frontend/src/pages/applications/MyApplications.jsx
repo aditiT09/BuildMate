@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getMyApplications } from "../../api/applications";
 import { getReceivedInvitations, respondToInvitation } from "../../api/invitations";
 import Layout from "../../components/layout/Layout";
+import LoadingState from "../../components/ui/LoadingState";
+import ErrorState from "../../components/ui/ErrorState";
+import EmptyState from "../../components/ui/EmptyState";
+
 
 const C = {
   brand:   "#E35336",
@@ -49,11 +53,7 @@ export default function MyApplications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchApplications();
-  }, []);
-
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     try {
       const [appData, inviteData] = await Promise.all([
         getMyApplications(),
@@ -61,13 +61,20 @@ export default function MyApplications() {
       ]);
       setApplications(appData);
       setInvitations(inviteData);
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("couldn't load your applications");
+
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      await fetchApplications();
+    };
+    init();
+  }, [fetchApplications]);
 
   const handleRespond = async (invitationId, status) => {
     try {
@@ -76,7 +83,6 @@ export default function MyApplications() {
       alert(`Invitation ${status}!`);
       await fetchApplications();
     } catch (err) {
-      console.error(err);
       alert(err?.response?.data?.detail || "Failed to respond to invitation.");
       setLoading(false);
     }
@@ -85,21 +91,7 @@ export default function MyApplications() {
   if (loading) {
     return (
       <Layout>
-        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{
-            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
-            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
-            display: "flex", alignItems: "center", gap: 10,
-          }}>
-            <span style={{
-              width: 16, height: 16, borderRadius: "50%",
-              border: `2px solid ${C.border}`, borderTopColor: C.brand,
-              animation: "spin 0.8s linear infinite",
-            }} />
-            checking your inbox...
-          </div>
-          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-        </div>
+        <LoadingState message="checking your inbox..." />
       </Layout>
     );
   }
@@ -107,20 +99,11 @@ export default function MyApplications() {
   if (error) {
     return (
       <Layout>
-        <div style={{
-          minHeight: "60vh", display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: 8,
-          fontFamily: '"DM Sans", sans-serif', color: C.dark2, textAlign: "center", padding: 20,
-        }}>
-          <span style={{ fontSize: 40 }}>🚫</span>
-          <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark }}>
-            can't show this
-          </p>
-          <p style={{ fontSize: 13, color: C.muted }}>{error}</p>
-        </div>
+        <ErrorState message={error} onRetry={fetchApplications} />
       </Layout>
     );
   }
+
 
   return (
     <Layout>
@@ -232,33 +215,18 @@ export default function MyApplications() {
           {applications.length === 0 ? (
             <div className="ma-fade" style={{
               border: `1.5px dashed ${C.border}`, borderRadius: 22, padding: "50px 24px",
-              textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+              background: C.surface, display: "flex", justifyContent: "center"
             }}>
-              <span style={{ fontSize: 40 }}>📭</span>
-              <p style={{
-                fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark, margin: 0,
-              }}>
-                nothing here yet
-              </p>
-              <p style={{
-                fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: C.muted, maxWidth: 320, margin: 0,
-              }}>
-                you haven't applied to any roles yet. go find a project that's looking for someone like you 👀
-              </p>
-              <button
-                className="ma-cta"
-                onClick={() => navigate("/discover")}
-                style={{
-                  background: C.brand, color: "white", border: "none",
-                  borderRadius: 999, padding: "13px 26px", marginTop: 6,
-                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
-                  cursor: "pointer", transition: "all .18s ease",
-                }}
-              >
-                browse projects
-              </button>
+              <EmptyState
+                icon={<span style={{ fontSize: 40 }}>📭</span>}
+                headline="nothing here yet"
+                sub="you haven't applied to any roles yet. go find a project that's looking for someone like you 👀"
+                cta="browse projects"
+                href="/discover"
+              />
             </div>
           ) : (
+
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {applications.map((application, i) => {
                 const meta = STATUS_META[application.status] || STATUS_META.pending;

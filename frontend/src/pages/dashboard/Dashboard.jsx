@@ -1,11 +1,18 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { getMyProjects } from "../../api/projects";
 import { getMyApplications } from "../../api/applications";
 import { getOverview } from "../../api/analytics";
 import { getMyProfile, getAuthorProfile } from "../../api/profile";
 import { getCurrentUser } from "../../api/users";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
+import ScoreRing from "../../components/ui/ScoreRing";
+import EmptyState from "../../components/ui/EmptyState";
+import AnimCount from "../../components/ui/AnimCount";
+import ProfileCompleteness from "./components/ProfileCompleteness";
+
+
 
 // ── Palette ────────────────────────────────────────────
 const C = {
@@ -62,13 +69,8 @@ const AwardIcon = ({ color = "currentColor", size = 20 }) => (
   </svg>
 );
 
-const FlameIcon = ({ color = "currentColor", size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-  </svg>
-);
-
 const LightningIcon = ({ color = "currentColor", size = 20 }) => (
+
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
   </svg>
@@ -196,159 +198,6 @@ function Skeleton({ w = "100%", h = 20, r = 8 }) {
   );
 }
 
-// ── Animated counter ────────────────────────────────────
-function AnimCount({ target, duration = 1200 }) {
-  const [val, setVal] = useState(0);
-  const prevTargetRef = useRef(0);
-
-  useEffect(() => {
-    const startVal = prevTargetRef.current;
-    prevTargetRef.current = target;
-    
-    let start = null;
-    const diff = target - startVal;
-
-    const step = (ts) => {
-      if (!start) start = ts;
-      const progress = Math.min((ts - start) / duration, 1);
-      setVal(Math.floor(startVal + progress * diff));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    
-    requestAnimationFrame(step);
-  }, [target, duration]);
-
-  return <>{val}</>;
-}
-
-// ── GitHub-style streak grid ─────────────────────────────
-/* eslint-disable-next-line no-unused-vars */
-function StreakGrid({ applications = [] }) {
-  // Build 52 weeks × 7 days based on actual application activity
-  const today = new Date();
-  const cells = [];
-  for (let w = 51; w >= 0; w--) {
-    for (let d = 6; d >= 0; d--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - (w * 7 + d));
-      cells.push(date);
-    }
-  }
-
-  // Map application count per day (use index for demo since we only have length)
-  const appSet = new Set(
-    applications.map((_, i) => {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i * 3);
-      return d.toDateString();
-    })
-  );
-
-  const getLevel = (date) => {
-    if (date > today) return 0;
-    const str = date.toDateString();
-    if (appSet.has(str)) return 3;
-    // pseudo-random seeded activity for visual richness
-    const seed = date.getDate() + date.getMonth() * 31;
-    if (seed % 7 === 0) return 2;
-    if (seed % 4 === 0) return 1;
-    return 0;
-  };
-
-  const colors = ["#EDD5B8", "#F4A460", "#E35336", "#B8391F"];
-
-  // Calculate streak
-  let streak = 0;
-  for (let i = 0; i < 365; i++) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    if (getLevel(d) > 0) streak++;
-    else if (i > 0) break;
-  }
-
-  const weeks = [];
-  for (let w = 0; w < 52; w++) {
-    weeks.push(cells.slice(w * 7, w * 7 + 7));
-  }
-
-  return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <FlameIcon color={C.brand} size={24} />
-        <div>
-          <p style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, fontSize: 22, color: C.dark, lineHeight: 1 }}>
-            {streak}-day streak
-          </p>
-          <p style={{ fontSize: 12, color: C.muted, fontFamily: '"DM Sans", sans-serif', marginTop: 2 }}>
-            Keep shipping — your GitHub streak thanks you
-          </p>
-        </div>
-        <div style={{ marginLeft: "auto", background: C.brand, color: "white", padding: "4px 14px", borderRadius: 9999, fontSize: 11, fontWeight: 700, fontFamily: '"DM Sans", sans-serif', letterSpacing: "0.08em", textTransform: "uppercase" }}>
-          Active
-        </div>
-      </div>
-
-      <div style={{ display: "flex", gap: 3, overflowX: "auto", paddingBottom: 4 }}>
-        {weeks.map((week, wi) => (
-          <div key={wi} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {week.map((day, di) => {
-              const level = getLevel(day);
-              return (
-                <div
-                  key={di}
-                  className="streak-cell"
-                  title={day.toDateString()}
-                  style={{
-                    width: 12, height: 12,
-                    borderRadius: 3,
-                    background: colors[level],
-                    cursor: "pointer",
-                    animation: level > 1 ? `streakPop 0.4s ease ${(wi * 0.01)}s both` : "none",
-                  }}
-                />
-              );
-            })}
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, justifyContent: "flex-end" }}>
-        <span style={{ fontSize: 11, color: C.muted, fontFamily: '"DM Sans", sans-serif' }}>Less</span>
-        {colors.map((c, i) => <div key={i} style={{ width: 11, height: 11, borderRadius: 2, background: c }} />)}
-        <span style={{ fontSize: 11, color: C.muted, fontFamily: '"DM Sans", sans-serif' }}>More</span>
-      </div>
-    </div>
-  );
-}
-
-// ── Score ring ───────────────────────────────────────────
-function ScoreRing({ score = 50, label, color, size = 88 }) {
-  const r = (size / 2) - 8;
-  const circ = 2 * Math.PI * r;
-  const pct = Math.min(score, 100) / 100;
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={C.sandDark} strokeWidth={7} />
-        <circle
-          cx={size/2} cy={size/2} r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth={7}
-          strokeLinecap="round"
-          strokeDasharray={circ}
-          strokeDashoffset={circ * (1 - pct)}
-          style={{ transition: "stroke-dashoffset 1.5s ease" }}
-        />
-        <text x={size/2} y={size/2 + 5} textAnchor="middle" fill={C.dark}
-              style={{ fontSize: 18, fontWeight: 700, transform: "rotate(90deg)", transformOrigin: `${size/2}px ${size/2}px`, fontFamily: '"Syne", sans-serif' }}>
-          <AnimCount target={score} />
-        </text>
-      </svg>
-      <span style={{ fontSize: 11, fontWeight: 600, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: '"DM Sans", sans-serif' }}>{label}</span>
-    </div>
-  );
-}
 
 // ── Status badge ─────────────────────────────────────────
 function StatusBadge({ status }) {
@@ -385,32 +234,8 @@ export default function Dashboard() {
   const [currentUser,  setCurrentUser]  = useState(null);
   const [authorProfile, setAuthorProfile] = useState(null);
   const [loading,      setLoading]      = useState(true);
-  const [greeting,     setGreeting]     = useState("Hey");
 
-  useEffect(() => {
-    const h = new Date().getHours();
-    if (h < 12) setGreeting("Good morning");
-    else if (h < 17) setGreeting("Good afternoon");
-    else setGreeting("Good evening");
-    loadDashboard();
-
-    const interval = setInterval(async () => {
-      try {
-        const [od, curUser] = await Promise.all([
-          getOverview(),
-          getCurrentUser().catch(() => null),
-        ]);
-        setOverview(od);
-        if (curUser) setCurrentUser(curUser);
-      } catch (err) {
-        console.error("Error polling overview stats:", err);
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     try {
       const [pd, ad, od, prd, curUser, authProf] = await Promise.all([
         getMyProjects(),
@@ -426,12 +251,43 @@ export default function Dashboard() {
       setProfile(prd);
       setCurrentUser(curUser);
       setAuthorProfile(authProf);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      // Suppressed console.error in production
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadDashboard();
+    };
+    init();
+
+
+    const interval = setInterval(async () => {
+      try {
+        const [od, curUser] = await Promise.all([
+          getOverview(),
+          getCurrentUser().catch(() => null),
+        ]);
+        setOverview(od);
+        if (curUser) setCurrentUser(curUser);
+      } catch {
+        // Redundant poll error logging removed
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [loadDashboard]);
+
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 17) return "Good afternoon";
+    return "Good evening";
+  })();
+
 
   const displayName = profile?.full_name || user?.name || "Builder";
   const firstName   = displayName.split(" ")[0];
@@ -832,7 +688,8 @@ export default function Dashboard() {
           </div>
         </div>
         {/* Profile Completeness Card (WHOLE / FULL WIDTH) */}
-        <ProfileCompleteness profile={profile} user={user} />
+        <ProfileCompleteness profile={profile} />
+
 
         {/* ══ BUILDMATE STATS (WHOLE / FULL WIDTH) ══════ */}
         <div className="dash-card" style={{
@@ -1254,103 +1111,4 @@ function ProjectCard({ project, delay }) {
     </Link>
   );
 }
-
-function EmptyState({ icon, headline, sub, cta, href }) {
-  return (
-    <div style={{ textAlign: "center", padding: "32px 20px" }}>
-      {icon && <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 12 }}>{icon}</div>}
-      <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 18, color: C.dark, marginBottom: 8 }}>
-        {headline}
-      </h3>
-      <p style={{ fontSize: 14, color: C.muted, marginBottom: 20, maxWidth: 300, margin: "0 auto 20px" }}>{sub}</p>
-      <Link to={href} style={{ textDecoration: "none" }}>
-        <button style={{
-          background: C.brand, color: "white", border: "none",
-          borderRadius: 9999, padding: "10px 24px",
-          fontSize: 14, fontWeight: 700, cursor: "pointer",
-          fontFamily: '"DM Sans", sans-serif',
-          transition: "background 0.2s",
-        }}
-          onMouseEnter={e => e.target.style.background = C.brandDark}
-          onMouseLeave={e => e.target.style.background = C.brand}
-        >{cta}</button>
-      </Link>
-    </div>
-  );
-}
-
-function ProfileCompleteness({ profile, user }) {
-  const fields = [
-    { label: "Full name",    done: !!profile?.full_name },
-    { label: "Bio",          done: !!profile?.bio },
-    { label: "College",      done: !!profile?.college },
-    { label: "GitHub",       done: !!profile?.github },
-    { label: "LinkedIn",     done: !!profile?.linkedin },
-    { label: "Portfolio",    done: !!profile?.portfolio },
-    { label: "Availability", done: !!profile?.availability },
-  ];
-  const completed = fields.filter(f => f.done).length;
-  const pct = Math.round((completed / fields.length) * 100);
-
-  return (
-    <div className="dash-card" style={{
-      background: C.surface, borderRadius: 24, padding: 36,
-      border: `1px solid ${C.border}`, marginBottom: 28,
-      animation: "slideUp 0.6s ease 0.45s both", opacity: 0,
-      width: "100%",
-      boxSizing: "border-box",
-    }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <SectionLabel icon={<UserIcon color={C.brand} size={18} />}>Profile Completeness</SectionLabel>
-        <Link to="/profile" style={{ textDecoration: "none" }}>
-          <ActionBtn secondary>Complete profile →</ActionBtn>
-        </Link>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 20 }}>
-        <div style={{ flex: 1, height: 12, borderRadius: 6, background: C.sandDark, overflow: "hidden" }}>
-          <div style={{
-            height: "100%", borderRadius: 6,
-            background: pct === 100
-              ? "#2E7D32"
-              : pct >= 70 ? C.orange : C.brand,
-            width: `${pct}%`,
-            transition: "width 1.5s ease",
-            boxShadow: `0 0 10px ${C.brand}44`,
-          }} />
-        </div>
-        <span style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22, color: C.dark, minWidth: 52 }}>
-          {pct}%
-        </span>
-      </div>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {fields.map(f => (
-          <div key={f.label} style={{
-            display: "flex", alignItems: "center", gap: 8,
-            padding: "6px 14px", borderRadius: 9999,
-            background: f.done ? "#D4EDDA" : C.cream,
-            border: `1px solid ${f.done ? "#C3E6CB" : C.border}`,
-            fontSize: 12, fontWeight: 500,
-            color: f.done ? "#155724" : C.muted,
-          }}>
-            <span style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: f.done ? "#2E7D32" : C.accent1,
-              display: "inline-block"
-            }} />
-            {f.label}
-          </div>
-        ))}
-      </div>
-
-      {pct < 100 && (
-        <p style={{ marginTop: 14, fontSize: 13, color: C.muted, fontStyle: "italic" }}>
-          A complete profile gets {Math.round((100 - pct) / 10 * 3)}x more visibility in matching — don't sleep on it
-        </p>
-      )}
-    </div>
-  );
-}
+

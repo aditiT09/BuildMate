@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
 import { getMyProjects } from "../../api/projects";
+import LoadingState from "../../components/ui/LoadingState";
+import ErrorState from "../../components/ui/ErrorState";
+import EmptyState from "../../components/ui/EmptyState";
 
 const C = {
   brand:   "#E35336",
@@ -47,12 +50,10 @@ export default function MyProjects() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    loadProjects();
-  }, []);
-
-  const loadProjects = async () => {
+  const loadProjects = useCallback(async () => {
     try {
+      setLoading(true);
+      setError(null);
       const data = await getMyProjects();
       setProjects(data);
     } catch (err) {
@@ -61,26 +62,27 @@ export default function MyProjects() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadProjects();
+    };
+    init();
+  }, [loadProjects]);
 
   if (loading) {
     return (
       <Layout>
-        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{
-            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
-            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
-            display: "flex", alignItems: "center", gap: 10,
-          }}>
-            <span style={{
-              width: 16, height: 16, borderRadius: "50%",
-              border: `2px solid ${C.border}`, borderTopColor: C.brand,
-              animation: "spin 0.8s linear infinite",
-            }} />
-            digging up your projects...
-          </div>
-          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-        </div>
+        <LoadingState message="digging up your projects..." />
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <ErrorState message={error} onRetry={loadProjects} />
       </Layout>
     );
   }
@@ -145,44 +147,18 @@ export default function MyProjects() {
             </button>
           </div>
 
-          {error && (
+          {projects.length === 0 ? (
             <div className="mp-fade" style={{
-              border: `1.5px solid ${C.border}`, borderRadius: 18, padding: "20px",
-              textAlign: "center", fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 14,
-              marginBottom: 24,
+              border: `1.5px dashed ${C.border}`, borderRadius: 22, padding: "20px 0",
+              background: C.surface
             }}>
-              🚫 {error}
-            </div>
-          )}
-
-          {!error && projects.length === 0 ? (
-            <div className="mp-fade" style={{
-              border: `1.5px dashed ${C.border}`, borderRadius: 22, padding: "50px 24px",
-              textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
-            }}>
-              <span style={{ fontSize: 40 }}>🗒️</span>
-              <p style={{
-                fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark, margin: 0,
-              }}>
-                shelf's empty
-              </p>
-              <p style={{
-                fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: C.muted, maxWidth: 320, margin: 0,
-              }}>
-                you haven't posted anything yet. drop your first idea and start building your team 🚀
-              </p>
-              <button
-                className="mp-new"
-                onClick={() => navigate("/projects/create")}
-                style={{
-                  background: C.brand, color: "white", border: "none",
-                  borderRadius: 999, padding: "13px 26px", marginTop: 6,
-                  fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 14,
-                  cursor: "pointer", transition: "all .18s ease",
-                }}
-              >
-                + post your first project
-              </button>
+              <EmptyState
+                icon={<span style={{ fontSize: 40 }}>🗒️</span>}
+                headline="shelf's empty"
+                sub="you haven't posted anything yet. drop your first idea and start building your team 🚀"
+                cta="+ post your first project"
+                href="/projects/create"
+              />
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

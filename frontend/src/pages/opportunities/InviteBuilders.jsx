@@ -1,6 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
+import LoadingState from "../../components/ui/LoadingState";
+
+
 import { getOpportunity } from "../../api/opportunities";
 import { getOpportunityMatches } from "../../api/matching";
 import { createInvitation, getSentInvitations, cancelInvitation } from "../../api/invitations";
@@ -38,12 +41,7 @@ export default function InviteBuilders() {
   const [loading, setLoading] = useState(true);
   const [invitingId, setInvitingId] = useState(null);
 
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line
-  }, [opportunityId]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const opp = await getOpportunity(opportunityId);
@@ -59,13 +57,19 @@ export default function InviteBuilders() {
         .filter((inv) => inv.opportunity_id === Number(opportunityId))
         .map((inv) => inv.user_id);
       setInvitedUserIds(new Set(activeInvites));
-    } catch (error) {
-      console.error(error);
+    } catch {
       alert("Failed to load match recommendations.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [opportunityId]);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadData();
+    };
+    init();
+  }, [loadData]);
 
   const handleInvite = async (userId) => {
     try {
@@ -74,14 +78,9 @@ export default function InviteBuilders() {
         user_id: userId,
         opportunity_id: Number(opportunityId),
       });
-      setInvitedUserIds((prev) => {
-        const next = new Set(prev);
-        next.add(userId);
-        return next;
-      });
-      alert("Invitation sent!");
+      setInvitedUserIds((prev) => new Set([...prev, userId]));
+      alert("Invitation sent successfully!");
     } catch (error) {
-      console.error(error);
       alert(error?.response?.data?.detail || "Failed to send invitation.");
     } finally {
       setInvitingId(null);
@@ -99,7 +98,6 @@ export default function InviteBuilders() {
       });
       alert("Invitation cancelled.");
     } catch (error) {
-      console.error(error);
       alert(error?.response?.data?.detail || "Failed to cancel invitation.");
     } finally {
       setInvitingId(null);
@@ -109,21 +107,7 @@ export default function InviteBuilders() {
   if (loading) {
     return (
       <Layout>
-        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{
-            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
-            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
-            display: "flex", alignItems: "center", gap: 10,
-          }}>
-            <span style={{
-              width: 16, height: 16, borderRadius: "50%",
-              border: `2px solid ${C.border}`, borderTopColor: C.brand,
-              animation: "spin 0.8s linear infinite",
-            }} />
-            scouting matching builders...
-          </div>
-          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-        </div>
+        <LoadingState message="scouting matching builders..." />
       </Layout>
     );
   }

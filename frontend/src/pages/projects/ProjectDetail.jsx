@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { getProjectById, deleteProject } from "../../api/projects";
 import { createApplication } from "../../api/applications";
 import { getProjectOpportunities } from "../../api/opportunities";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 import Layout from "../../components/layout/Layout";
+import LoadingState from "../../components/ui/LoadingState";
+import EmptyState from "../../components/ui/EmptyState";
+import { validateExternalLink } from "../../utils/validation";
+
 import {
   getProjectLinks,
   createProjectLink,
@@ -92,11 +96,7 @@ export default function ProjectDetail() {
 
   const isOwner = !!(user && project && user.id === project.owner_id);
 
-  useEffect(() => {
-    loadProject();
-  }, [id]);
-
-  const loadProject = async () => {
+  const loadProject = useCallback(async () => {
     try {
       const data = await getProjectById(id);
       setProject(data);
@@ -123,7 +123,14 @@ export default function ProjectDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, user]);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadProject();
+    };
+    init();
+  }, [loadProject]);
 
   const handleAddResource = async () => {
     try {
@@ -179,21 +186,7 @@ export default function ProjectDetail() {
   if (loading) {
     return (
       <Layout>
-        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{
-            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
-            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
-            display: "flex", alignItems: "center", gap: 10,
-          }}>
-            <span style={{
-              width: 16, height: 16, borderRadius: "50%",
-              border: `2px solid ${C.border}`, borderTopColor: C.brand,
-              animation: "spin 0.8s linear infinite",
-            }} />
-            loading the goods...
-          </div>
-          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-        </div>
+        <LoadingState message="loading the goods..." />
       </Layout>
     );
   }
@@ -201,17 +194,13 @@ export default function ProjectDetail() {
   if (!project) {
     return (
       <Layout>
-        <div style={{
-          minHeight: "60vh", display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: 8,
-          fontFamily: '"DM Sans", sans-serif', color: C.dark2,
-        }}>
-          <span style={{ fontSize: 40 }}>🫥</span>
-          <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark }}>
-            nothing here
-          </p>
-          <p style={{ fontSize: 13, color: C.muted }}>this project doesn't exist (or got deleted)</p>
-        </div>
+        <EmptyState
+          icon={<span style={{ fontSize: 40 }}>🫥</span>}
+          headline="nothing here"
+          sub="this project doesn't exist (or got deleted)"
+          cta="Back to projects"
+          href="/my-projects"
+        />
       </Layout>
     );
   }
@@ -724,7 +713,7 @@ export default function ProjectDetail() {
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <a
-                        href={link.url} target="_blank" rel="noreferrer"
+                        href={validateExternalLink(link.url) || "#"} target="_blank" rel="noreferrer"
                         className="pd-link"
                         style={{
                           fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,

@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
+import LoadingState from "../../components/ui/LoadingState";
+import EmptyState from "../../components/ui/EmptyState";
+
+
 
 import {
   getOpportunityApplications,
@@ -15,58 +19,55 @@ export default function OpportunityApplicants() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadApplications();
-  }, []);
-
-  const loadApplications = async () => {
+  const loadApplications = useCallback(async () => {
     try {
       const data = await getOpportunityApplications(
         opportunityId
       );
 
       setApplications(data);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // Suppressed console.error in production
     } finally {
       setLoading(false);
     }
-  };
+  }, [opportunityId]);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadApplications();
+    };
+    init();
+  }, [loadApplications]);
 
   const handleAccept = async (id) => {
     try {
       await acceptApplication(id);
-      loadApplications();
+      await loadApplications();
     } catch (error) {
       alert(
         error?.response?.data?.detail ||
           "Failed to accept application"
       );
-
-      console.error(error);
     }
   };
 
   const handleReject = async (id) => {
     try {
       await rejectApplication(id);
-      loadApplications();
+      await loadApplications();
     } catch (error) {
       alert(
         error?.response?.data?.detail ||
           "Failed to reject application"
       );
-
-      console.error(error);
     }
   };
 
   if (loading) {
     return (
       <Layout>
-        <div className="max-w-5xl mx-auto p-6">
-          Loading applicants...
-        </div>
+        <LoadingState message="Loading applicants..." />
       </Layout>
     );
   }
@@ -81,9 +82,13 @@ export default function OpportunityApplicants() {
 
         {applications.length === 0 ? (
           <div className="bg-white rounded-xl shadow p-6 text-center">
-            No applications yet.
+            <EmptyState
+              headline="No applications yet"
+              sub="No builders have applied to this role yet. We will notify you when applications arrive."
+            />
           </div>
         ) : (
+
           <div className="space-y-5">
 
             {applications.map((app) => (

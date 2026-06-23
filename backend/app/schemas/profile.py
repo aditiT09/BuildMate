@@ -27,9 +27,9 @@ class ProfileCreate(BaseModel):
         max_length=500
     )
 
-    github: HttpUrl | None = None
-    linkedin: HttpUrl | None = None
-    portfolio: HttpUrl | None = None
+    github: str | None = None
+    linkedin: str | None = None
+    portfolio: str | None = None
 
     avatar: str | None = Field(
         default=None,

@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
 import { getProfile } from "../../api/profile";
 import { getProjects } from "../../api/projects";
+import { validateExternalLink } from "../../utils/validation";
 
 const C = {
   brand:    "#E35336",
@@ -132,11 +133,7 @@ export default function PublicProfile() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadProfileAndProjects();
-  }, [userId]);
-
-  const loadProfileAndProjects = async () => {
+  const loadProfileAndProjects = useCallback(async () => {
     try {
       setLoading(true);
       const [profData, projsData] = await Promise.all([
@@ -154,7 +151,14 @@ export default function PublicProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadProfileAndProjects();
+    };
+    init();
+  }, [loadProfileAndProjects]);
 
   if (loading) {
     return (
@@ -307,15 +311,15 @@ export default function PublicProfile() {
               </Card>
 
               {/* External Connections Card */}
-              {(profile.github || profile.linkedin || profile.portfolio) && (
+              {(validateExternalLink(profile.github) || validateExternalLink(profile.linkedin) || validateExternalLink(profile.portfolio)) && (
                 <Card delay={0.15} style={{ padding: "20px 24px" }}>
                   <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".18em", textTransform: "uppercase", color: C.muted, fontFamily: '"DM Sans", sans-serif', marginBottom: 12 }}>
                     Links
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {profile.github && (
+                    {validateExternalLink(profile.github) && (
                       <a
-                        href={profile.github.startsWith("http") ? profile.github : `https://${profile.github}`}
+                        href={validateExternalLink(profile.github)}
                         target="_blank"
                         rel="noreferrer"
                         className="pp-link-btn"
@@ -341,9 +345,9 @@ export default function PublicProfile() {
                       </a>
                     )}
 
-                    {profile.linkedin && (
+                    {validateExternalLink(profile.linkedin) && (
                       <a
-                        href={profile.linkedin.startsWith("http") ? profile.linkedin : `https://${profile.linkedin}`}
+                        href={validateExternalLink(profile.linkedin)}
                         target="_blank"
                         rel="noreferrer"
                         className="pp-link-btn"
@@ -369,9 +373,9 @@ export default function PublicProfile() {
                       </a>
                     )}
 
-                    {profile.portfolio && (
+                    {validateExternalLink(profile.portfolio) && (
                       <a
-                        href={profile.portfolio.startsWith("http") ? profile.portfolio : `https://${profile.portfolio}`}
+                        href={validateExternalLink(profile.portfolio)}
                         target="_blank"
                         rel="noreferrer"
                         className="pp-link-btn"

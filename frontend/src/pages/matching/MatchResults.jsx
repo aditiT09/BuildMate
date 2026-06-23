@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { getProjectMatches } from "../../api/matching";
 import Layout from "../../components/layout/Layout";
+import LoadingState from "../../components/ui/LoadingState";
+import ErrorState from "../../components/ui/ErrorState";
+import EmptyState from "../../components/ui/EmptyState";
+
 
 const C = {
   brand:   "#E35336",
@@ -50,21 +54,23 @@ export default function MatchResults() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    loadMatches();
-  }, [id]);
-
-  const loadMatches = async () => {
+  const loadMatches = useCallback(async () => {
     try {
       const data = await getProjectMatches(id);
       setMatches(data);
     } catch (err) {
-      console.error(err);
       setError(err?.response?.data?.detail || "Failed to load matches");
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadMatches();
+    };
+    init();
+  }, [loadMatches]);
 
   const sortedMatches = [...matches].sort(
     (a, b) => b.overall_score - a.overall_score
@@ -73,21 +79,7 @@ export default function MatchResults() {
   if (loading) {
     return (
       <Layout>
-        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{
-            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
-            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
-            display: "flex", alignItems: "center", gap: 10,
-          }}>
-            <span style={{
-              width: 16, height: 16, borderRadius: "50%",
-              border: `2px solid ${C.border}`, borderTopColor: C.brand,
-              animation: "spin 0.8s linear infinite",
-            }} />
-            crunching the numbers...
-          </div>
-          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-        </div>
+        <LoadingState message="crunching the numbers..." />
       </Layout>
     );
   }
@@ -95,17 +87,7 @@ export default function MatchResults() {
   if (error) {
     return (
       <Layout>
-        <div style={{
-          minHeight: "60vh", display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: 8,
-          fontFamily: '"DM Sans", sans-serif', color: C.dark2, textAlign: "center", padding: 20,
-        }}>
-          <span style={{ fontSize: 40 }}>🚫</span>
-          <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark }}>
-            can't show this
-          </p>
-          <p style={{ fontSize: 13, color: C.muted }}>{error}</p>
-        </div>
+        <ErrorState message={error} onRetry={loadMatches} />
       </Layout>
     );
   }
@@ -113,22 +95,15 @@ export default function MatchResults() {
   if (sortedMatches.length === 0) {
     return (
       <Layout>
-        <div style={{
-          minHeight: "60vh", display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: 8,
-          fontFamily: '"DM Sans", sans-serif', color: C.dark2, textAlign: "center", padding: 20,
-        }}>
-          <span style={{ fontSize: 40 }}>🔍</span>
-          <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark }}>
-            no matches yet
-          </p>
-          <p style={{ fontSize: 13, color: C.muted, maxWidth: 320 }}>
-            nobody's skills line up well enough rn — check back once more people fill out their profiles 🌱
-          </p>
-        </div>
+        <EmptyState
+          icon={<span style={{ fontSize: 40 }}>🔍</span>}
+          headline="no matches yet"
+          sub="nobody's skills line up well enough rn — check back once more people fill out their profiles 🌱"
+        />
       </Layout>
     );
   }
+
 
   return (
     <Layout>

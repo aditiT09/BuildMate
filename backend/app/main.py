@@ -126,3 +126,15 @@ def health():
     return {
         "status": "healthy"
     }
+
+
+from pydantic import BaseModel, EmailStr
+
+class SubscribeRequest(BaseModel):
+    email: EmailStr
+
+@app.post("/subscribe")
+def subscribe(payload: SubscribeRequest):
+    return {
+        "message": "Subscription successful"
+    }

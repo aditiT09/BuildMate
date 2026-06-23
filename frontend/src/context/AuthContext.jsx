@@ -1,13 +1,6 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-} from "react";
-
+import { useState, useEffect } from "react";
+import { AuthContext } from "./AuthContextObject";
 import { getCurrentUser } from "../api/users";
-
-const AuthContext = createContext();
 
 export const AuthProvider = ({
   children,
@@ -36,54 +29,41 @@ export const AuthProvider = ({
     setUser(null);
     setLoading(false);
   };
-useEffect(() => {
-  const loadUser = async () => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-    try {
-      setLoading(true);
-      console.log("Loading user...");
 
-      const data =
-        await getCurrentUser();
+  useEffect(() => {
+    const loadUser = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const data = await getCurrentUser();
+        setUser(data);
+      } catch {
+        localStorage.removeItem("token");
+        setToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      console.log("User:", data);
-
-      setUser(data);
-    } catch (error) {
-      console.error(
-        "Failed loading user",
-        error
-      );
-
-      localStorage.removeItem("token");
-      setToken(null);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  loadUser();
-}, [token]);
+    loadUser();
+  }, [token]);
 
   return (
     <AuthContext.Provider
-    value={{
-  token,
-  user,
-  setUser,
-  login,
-  logout,
-  loading,
-}}
+      value={{
+        token,
+        user,
+        setUser,
+        login,
+        logout,
+        loading,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () =>
-  useContext(AuthContext);
+};

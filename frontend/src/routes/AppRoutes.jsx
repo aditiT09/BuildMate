@@ -6,6 +6,8 @@ import {
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import NotFound from "../pages/error/NotFound";
 import Dashboard from "../pages/dashboard/Dashboard";
 
 import ProtectedRoute from "../components/layout/ProtectedRoute";
@@ -161,7 +163,14 @@ function AppRoutes() {
     </ProtectedRoute>
   }
 />
-
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+        <Route
+          path="*"
+          element={<NotFound />}
+        />
       </Routes>
     </BrowserRouter>
   );

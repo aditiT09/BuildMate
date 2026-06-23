@@ -1,12 +1,15 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { getMyProfile, saveProfile } from "../../api/profile";
+
 import { getMySkills, getSkills, addSkill, removeSkill } from "../../api/userSkills";
 import { getMyProjects } from "../../api/projects";
 import { getMyApplications } from "../../api/applications";
 import { getCurrentUser } from "../../api/users";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import Layout from "../../components/layout/Layout";
+import { validateExternalLink, getErrorMessage } from "../../utils/validation";
+
 
 const C = {
   brand:"#E35336",brandDk:"#B8391F",orange:"#F4A460",
@@ -107,7 +110,8 @@ function Skel({w="100%",h=20,r=8}){
 }
 
 function Toast({msg,type,onClose}){
-  useEffect(()=>{const t=setTimeout(onClose,3000);return()=>clearTimeout(t);},[]);
+  useEffect(()=>{const t=setTimeout(onClose,3000);return()=>clearTimeout(t);},[onClose]);
+
   return(
     <div style={{position:"fixed",bottom:28,left:"50%",zIndex:9999,background:type==="success"?C.dark:"#B8391F",color:type==="success"?C.orange:"white",padding:"11px 26px",borderRadius:9999,fontSize:13,fontWeight:700,fontFamily:'"DM Sans",sans-serif',boxShadow:"0 8px 32px rgba(0,0,0,0.22)",display:"flex",alignItems:"center",gap:8,animation:"toastIn .28s ease both"}}>
       <Ic name={type==="success"?"checkCircle":"x"} size={14}/> {msg}
@@ -185,9 +189,10 @@ function FLabel({children,req,htmlFor}){
 
 function LinkRow({icon,label,value}){
   if(!value)return null;
-  const url=value.startsWith("http")?value:`https://${value}`;
+  const validatedUrl=validateExternalLink(value);
+  if(!validatedUrl)return null;
   return(
-    <a href={url} target="_blank" rel="noreferrer" style={{textDecoration:"none"}}>
+    <a href={validatedUrl} target="_blank" rel="noreferrer" style={{textDecoration:"none"}}>
       <div className="lc" style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:12,border:`1.5px solid ${C.border}`,background:C.cream,cursor:"pointer",transition:"all .18s"}}>
         <span style={{color:C.brand,flexShrink:0,display:"flex"}}>{icon}</span>
         <div style={{flex:1,minWidth:0}}>
@@ -276,43 +281,67 @@ export default function Profile(){
   const [skillQ,setSkillQ]=useState("");
   const [form,setForm]=useState({full_name:"",bio:"",college:"",degree:"",github:"",linkedin:"",portfolio:"",avatar:"",availability:""});
 
-  useEffect(()=>{
-    loadAll();
+  const fire = useCallback((msg, type) => setToast({ msg, type }), []);
+
+  const loadAll = useCallback(async () => {
+    try {
+
+      setLoading(true);
+      const [prof, mySk, allSk, projs, myApps, curUser] = await Promise.all([
+        getMyProfile().catch(() => null),
+        getMySkills().catch(() => []),
+        getSkills().catch(() => []),
+        getMyProjects().catch(() => []),
+        getMyApplications().catch(() => []),
+        getCurrentUser().catch(() => null),
+      ]);
+      if (prof) {
+        setProfile(prof);
+        setForm({
+          full_name: prof.full_name || "",
+          bio: prof.bio || "",
+          college: prof.college || "",
+          degree: prof.degree || "",
+          github: prof.github || "",
+          linkedin: prof.linkedin || "",
+          portfolio: prof.portfolio || "",
+          avatar: prof.avatar || "",
+          availability: prof.availability || "",
+        });
+      }
+      if (curUser) {
+        setCurrentUser(curUser);
+      }
+      setSkills(mySk);
+      setAllSkills(allSk);
+      setProjects(projs);
+      setApps(myApps);
+    } catch {
+      fire("Failed to load profile", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [fire]);
+
+
+  useEffect(() => {
+    const init = async () => {
+      await loadAll();
+    };
+    init();
 
     const interval = setInterval(async () => {
       try {
         const curUser = await getCurrentUser();
         if (curUser) setCurrentUser(curUser);
-      } catch (err) {
-        console.error("Error polling user score data:", err);
+      } catch {
+        // Redundant poll error logging removed
       }
     }, 3000);
 
     return () => clearInterval(interval);
-  },[]);
+  }, [loadAll]);
 
-  const loadAll=async()=>{
-    try{
-      setLoading(true);
-      const [prof,mySk,allSk,projs,myApps,curUser]=await Promise.all([
-        getMyProfile().catch(()=>null),
-        getMySkills().catch(()=>[]),
-        getSkills().catch(()=>[]),
-        getMyProjects().catch(()=>[]),
-        getMyApplications().catch(()=>[]),
-        getCurrentUser().catch(()=>null),
-      ]);
-      if(prof){
-        setProfile(prof);
-        setForm({full_name:prof.full_name||"",bio:prof.bio||"",college:prof.college||"",degree:prof.degree||"",github:prof.github||"",linkedin:prof.linkedin||"",portfolio:prof.portfolio||"",avatar:prof.avatar||"",availability:prof.availability||""});
-      }
-      if(curUser){
-        setCurrentUser(curUser);
-      }
-      setSkills(mySk);setAllSkills(allSk);setProjects(projs);setApps(myApps);
-    }catch(e){fire("Failed to load profile","error");}
-    finally{setLoading(false);}
-  };
 
   const handleSave=async()=>{
     setSaving(true);
@@ -321,7 +350,7 @@ export default function Profile(){
       setProfile(updated);
       fire("Profile saved","success");
       setTab("overview");
-    }catch(e){fire(e?.response?.data?.detail||"Save failed","error");}
+    }catch(e){fire(getErrorMessage(e?.response?.data?.detail)||"Save failed","error");}
     finally{setSaving(false);}
   };
 
@@ -330,7 +359,7 @@ export default function Profile(){
       await addSkill(Number(id));
       const u=await getMySkills();setSkills(u);
       fire("Skill added","success");
-    }catch(e){fire(e?.response?.data?.detail||"Couldn't add skill","error");}
+    }catch(e){fire(getErrorMessage(e?.response?.data?.detail)||"Couldn't add skill","error");}
   };
 
   const handleRemove=async(id)=>{
@@ -340,7 +369,7 @@ export default function Profile(){
     }catch{fire("Couldn't remove","error");}
   };
 
-  const fire=(msg,type)=>setToast({msg,type});
+
 
   const mySkillIds=new Set(skills.map(s=>s.skill_id||s.id));
   const filteredAll=allSkills.filter(s=>!mySkillIds.has(s.id)&&(!skillQ||s.name.toLowerCase().includes(skillQ.toLowerCase())));

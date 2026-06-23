@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
@@ -7,7 +7,7 @@ import {
   getProjectById,
   updateProject,
 } from "../../api/projects";
-import { getSkills, createSkill } from "../../api/userSkills";
+import { getSkills } from "../../api/userSkills";
 import { addProjectSkill, getProjectSkills, removeProjectSkill } from "../../api/projectSkills";
 
 const C = {
@@ -157,26 +157,16 @@ export default function CreateProject() {
   const [initialSkills, setInitialSkills] = useState([]);
   const [skillQ, setSkillQ] = useState("");
 
-  useEffect(() => {
-    loadSkills();
-    if (id) {
-      loadProject();
-    } else {
-      setLoadingProject(false);
-    }
-    // eslint-disable-next-line
-  }, [id]);
-
-  const loadSkills = async () => {
+  const loadSkills = useCallback(async () => {
     try {
       const list = await getSkills();
       setAllSkills(list);
     } catch (error) {
       console.error("Failed to load skills list:", error);
     }
-  };
+  }, []);
 
-  const loadProject = async () => {
+  const loadProject = useCallback(async () => {
     try {
       const project = await getProjectById(id);
       setForm({
@@ -194,7 +184,17 @@ export default function CreateProject() {
     } finally {
       setLoadingProject(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadSkills();
+      if (id) {
+        await loadProject();
+      }
+    };
+    init();
+  }, [id, loadSkills, loadProject]);
 
   const handleSelectSkill = (skill) => {
     if (!selectedSkills.find((s) => s.id === skill.id)) {

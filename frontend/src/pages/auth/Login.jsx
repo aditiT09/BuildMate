@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../api/axios";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
+import { getErrorMessage } from "../../utils/validation";
+
 
 const colors = {
   primary: "#E35336",
@@ -67,7 +69,7 @@ function Login() {
       login(response.data.access_token);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.detail || "Login failed. Check your credentials.");
+      setError(getErrorMessage(err.response?.data?.detail) || "Login failed. Check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -423,7 +425,7 @@ function Login() {
                 {loading ? (
                   <>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="animate-spin">
-                      <path d="M12 2v4eM12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                     </svg>
                     Signing in…
                   </>

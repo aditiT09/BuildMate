@@ -1,9 +1,11 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
+
 import { getProjects } from "../../api/projects";
 import { getProjectOpportunities } from "../../api/opportunities";
 import { createApplication, getMyApplications } from "../../api/applications";
 import Layout from "../../components/layout/Layout";
+import { getErrorMessage } from "../../utils/validation";
 
 const C = {
   brand:    "#E35336", brandDk: "#B8391F", orange: "#F4A460",
@@ -434,25 +436,27 @@ export default function ProjectSwipe() {
 
   useEffect(() => {
     Promise.all([
-      getProjects().then(d=>setProjects(d)).catch(console.error).finally(()=>setLoading(false)),
+      getProjects().then(d=>setProjects(d)).catch(()=>{}).finally(()=>setLoading(false)),
       getMyApplications().then(d=>setAppliedSet(new Set(d.map(a=>a.opportunity_id)))).catch(()=>{}),
     ]);
   },[]);
 
+
+  const fire = useCallback((msg, type) => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
   const handleApply = useCallback(async (oppId) => {
     try {
       await createApplication(oppId);
-      setAppliedSet(p=>new Set([...p,oppId]));
-      fire("Applied! You're in the game","success");
-    } catch(e) {
-      fire(e?.response?.data?.detail||"Couldn't apply — try again","error");
+      setAppliedSet(p => new Set([...p, oppId]));
+      fire("Applied! You're in the game", "success");
+    } catch (e) {
+      fire(getErrorMessage(e?.response?.data?.detail) || "Couldn't apply — try again", "error");
     }
-  },[]);
+  }, [fire]);
 
-  const fire = (msg,type) => {
-    setToast({msg,type});
-    setTimeout(()=>setToast(null),3000);
-  };
 
   const types     = ["All",...new Set(projects.map(p=>p.project_type).filter(Boolean))];
   const filtered  = projects.filter(p => {

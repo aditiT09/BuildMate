@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Layout from "../../components/layout/Layout";
 import { createOpportunity, getOpportunity, updateOpportunity } from "../../api/opportunities";
-import { getSkills, createSkill } from "../../api/userSkills";
+import { getSkills } from "../../api/userSkills";
+import LoadingState from "../../components/ui/LoadingState";
+
+
 
 const C = {
   brand:   "#E35336",
@@ -159,24 +162,24 @@ export default function CreateOpportunity() {
   const [loading, setLoading] = useState(false);
   const [loadingOpportunity, setLoadingOpportunity] = useState(!!opportunityId);
 
-  useEffect(() => {
-    loadSkills();
-    if (opportunityId) {
-      loadOpportunity();
-    }
-    // eslint-disable-next-line
-  }, [opportunityId]);
+  const [form, setForm] = useState({
+    role: "",
+    seats: 1,
+    status: "open",
+    project_id: id ? Number(id) : null,
+  });
 
-  const loadSkills = async () => {
+
+  const loadSkills = useCallback(async () => {
     try {
       const list = await getSkills();
       setAllSkills(list);
-    } catch (error) {
-      console.error("Failed to load skills list:", error);
+    } catch {
+      // Suppressed console.error in production
     }
-  };
+  }, []);
 
-  const loadOpportunity = async () => {
+  const loadOpportunity = useCallback(async () => {
     try {
       const opp = await getOpportunity(opportunityId);
       setForm({
@@ -191,13 +194,23 @@ export default function CreateOpportunity() {
           name: s.skill.name,
         })));
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       alert("Failed to load role details.");
     } finally {
       setLoadingOpportunity(false);
     }
-  };
+  }, [opportunityId]);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadSkills();
+      if (opportunityId) {
+        await loadOpportunity();
+      }
+    };
+    init();
+  }, [opportunityId, loadSkills, loadOpportunity]);
+
 
   const handleSelectSkill = (skill) => {
     if (!selectedSkills.find((s) => s.id === skill.id)) {
@@ -212,12 +225,7 @@ export default function CreateOpportunity() {
 
 
 
-  const [form, setForm] = useState({
-    role: "",
-    seats: 1,
-    status: "open",
-    project_id: id ? Number(id) : null,
-  });
+
 
   const handleChange = (e) => {
     setForm({
@@ -257,7 +265,6 @@ export default function CreateOpportunity() {
         navigate(`/projects/${id}`);
       }
     } catch (error) {
-      console.error(error);
       alert(
         error?.response?.data?.detail ||
         `Failed to ${opportunityId ? "update" : "create"} opportunity`
@@ -270,24 +277,11 @@ export default function CreateOpportunity() {
   if (loadingOpportunity) {
     return (
       <Layout>
-        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{
-            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
-            color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
-            display: "flex", alignItems: "center", gap: 10,
-          }}>
-            <span style={{
-              width: 16, height: 16, borderRadius: "50%",
-              border: `2px solid ${C.border}`, borderTopColor: C.brand,
-              animation: "spin 0.8s linear infinite",
-            }} />
-            loading role details...
-          </div>
-          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-        </div>
+        <LoadingState message="loading role details..." />
       </Layout>
     );
   }
+
 
   return (
     <Layout>

@@ -176,3 +176,37 @@ def test_rate_limiter_logic(monkeypatch):
     finally:
         # Reset override flag
         app.utils.rate_limiter._testing_override = False
+
+
+def test_forgot_password_success():
+    response = client.post(
+        "/auth/forgot-password",
+        json={"email": "test@example.com"}
+    )
+    assert response.status_code == 200
+    assert "password reset link" in response.json()["message"]
+
+
+def test_forgot_password_invalid_email():
+    response = client.post(
+        "/auth/forgot-password",
+        json={"email": "invalid-email"}
+    )
+    assert response.status_code == 422
+
+
+def test_subscribe_success():
+    response = client.post(
+        "/subscribe",
+        json={"email": "subscriber@example.com"}
+    )
+    assert response.status_code == 200
+    assert response.json()["message"] == "Subscription successful"
+
+
+def test_subscribe_invalid_email():
+    response = client.post(
+        "/subscribe",
+        json={"email": "invalid-email"}
+    )
+    assert response.status_code == 422

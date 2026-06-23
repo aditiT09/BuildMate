@@ -17,7 +17,8 @@ export default function Intro({ onDone }) {
     setTimeout(() => setPhase(3), 2800)
     // Fully gone + notify parent
     setTimeout(() => { setPhase(4); onDone?.() }, 3400)
-  }, [])
+  }, [onDone])
+
 
   if (phase === 4) return null
 

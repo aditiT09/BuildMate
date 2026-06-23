@@ -38,6 +38,11 @@ def get_my_profile(
         db.refresh(profile)
     else:
         recalculate_user_scores(current_user, db)
+    for field in ["github", "linkedin", "portfolio"]:
+        value = getattr(profile, field)
+
+        if value in ("", "abc"):
+            setattr(profile, field, None)
 
     return profile
 
