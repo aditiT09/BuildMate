@@ -1,18 +1,14 @@
 from pydantic import BaseModel, Field
-from enum import Enum
-
-
-class ProjectType(str, Enum):
-    WEB = "web"
-    MOBILE = "mobile"
-    AI = "ai"
-    DATA = "data"
-    OTHER = "other"
 
 
 class ProjectCreate(BaseModel):
     title: str = Field(..., min_length=3, max_length=100)
-    description: str = Field(..., min_length=20, max_length=5000)
+
+    description: str = Field(
+        ...,
+        min_length=20,
+        max_length=5000
+    )
 
     timeline: str = Field(
         ...,
@@ -20,7 +16,13 @@ class ProjectCreate(BaseModel):
         max_length=100
     )
 
-    project_type: ProjectType
+    project_type: str = Field(
+        ...,
+        min_length=2,
+        max_length=50
+    )
+
+
 class ProjectResponse(BaseModel):
     id: int
     title: str

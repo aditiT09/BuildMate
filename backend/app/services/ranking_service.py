@@ -8,7 +8,6 @@ def get_best_candidates(
     project_id: int,
     db: Session
 ):
-
     project = (
         db.query(Project)
         .filter(Project.id == project_id)
@@ -29,76 +28,69 @@ def get_best_candidates(
 
     for user in users:
 
+        # Exclude project owner
+        if user.id == project.owner_id:
+            continue
+
         user_skill_ids = {
             skill.skill_id
             for skill in user.skills
         }
 
         common_skills = len(
-            project_skill_ids &
-            user_skill_ids
+            project_skill_ids & user_skill_ids
         )
 
         if len(project_skill_ids) == 0:
-
             skill_match = 0
-
         else:
-
             skill_match = round(
                 (
-                    common_skills /
-                    len(project_skill_ids)
+                    common_skills
+                    / len(project_skill_ids)
                 ) * 100,
                 2
             )
 
-        activity_score = user.activity_score or 50
+        activity_score = (
+            50
+            if user.activity_score is None
+            else user.activity_score
+        )
 
-        reliability_score = user.reliability_score or 50
+        reliability_score = (
+            50
+            if user.reliability_score is None
+            else user.reliability_score
+        )
 
         overall_score = round(
+            (
+                skill_match * 0.70
+            )
+            +
+            (
+                activity_score * 0.15
+            )
+            +
+            (
+                reliability_score * 0.15
+            ),
+            2
+        )
 
-           (
-             skill_match * 0.70
-           ) 
-           +
-           (
-             activity_score * 0.15
-           )
-           +
-           (
-             reliability_score * 0.15
-           ),
-
-           2
-
-)
         rankings.append({
-
             "user_id": user.id,
-
             "name": user.name,
-
             "skill_match": skill_match,
-
-           "activity_score":
-            activity_score,
-
-           "reliability_score":
-            reliability_score,
-            "overall_score":
-            overall_score
-
+            "activity_score": activity_score,
+            "reliability_score": reliability_score,
+            "overall_score": overall_score,
         })
 
     rankings.sort(
-
-        key=lambda x:
-        x["overall_score"],
-
+        key=lambda x: x["overall_score"],
         reverse=True
-
     )
 
     return rankings

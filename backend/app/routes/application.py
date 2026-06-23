@@ -18,6 +18,8 @@ from app.schemas.application import (
 )
 
 from app.utils.security import get_current_user
+from app.utils.scoring import recalculate_user_scores
+from app.utils.scoring import recalculate_user_scores
 
 
 router = APIRouter(
@@ -78,7 +80,7 @@ def create_application(
     )
 
     db.add(new_application)
-    current_user.activity_score = min(100, (current_user.activity_score or 50) + 2)
+    
     try:
         db.commit()
     except IntegrityError:
@@ -249,14 +251,16 @@ def accept_application(
 
     application.status = "accepted"
 
-    application.user.reliability_score = min(100, (
-        application.user.reliability_score or 0
-    ) + 5)
-
     if accepted_count + 1 >= opportunity.seats:
         opportunity.status = "closed"
 
     db.commit()
+
+    recalculate_user_scores(
+        application.user,
+        db
+)
+
     db.refresh(application)
 
     return application
@@ -312,18 +316,16 @@ def reject_application(
             detail="Not authorized"
         )
 
-    current_score = (
-        application.user.reliability_score or 0
-)
 
-    application.user.reliability_score = max(
-        0,
-        current_score - 1
-)
     application.status = "rejected"
+
     db.commit()
+
+    recalculate_user_scores(
+        application.user,
+        db
+)
 
     db.refresh(application)
 
     return application
-   
