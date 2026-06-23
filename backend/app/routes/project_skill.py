@@ -13,7 +13,7 @@ from app.models.skill import Skill
 from app.schemas.project_skill import ProjectSkillCreate
 
 from app.utils.security import get_current_user
-from app.utils.redis_client import redis_client
+from app.utils.redis_client import invalidate_project_cache
 
 
 router = APIRouter(
@@ -79,9 +79,9 @@ def add_project_skill(
     db.commit()
 
     try:
-     redis_client.flushall()
+        invalidate_project_cache(data.project_id, db)
     except Exception:
-     pass
+        pass
 
     db.refresh(project_skill)
 
@@ -163,7 +163,7 @@ def remove_project_skill(
     db.commit()
 
     try:
-        redis_client.flushall()
+        invalidate_project_cache(project_id, db)
     except Exception:
         pass
 

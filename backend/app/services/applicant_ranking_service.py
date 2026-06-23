@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.application import Application
 from app.models.opportunity import Opportunity
@@ -12,6 +12,7 @@ def rank_applicants(
 ):
     opportunity = (
         db.query(Opportunity)
+        .options(joinedload(Opportunity.project).joinedload(Project.skills))
         .filter(
             Opportunity.id == opportunity_id
         )
@@ -21,14 +22,7 @@ def rank_applicants(
     if not opportunity:
         return []
 
-    project = (
-        db.query(Project)
-        .filter(
-            Project.id == opportunity.project_id
-        )
-        .first()
-    )
-
+    project = opportunity.project
     if not project:
         return []
 
@@ -39,6 +33,7 @@ def rank_applicants(
 
     applications = (
         db.query(Application)
+        .options(joinedload(Application.user).joinedload(User.skills))
         .filter(
             Application.opportunity_id
             == opportunity_id
@@ -49,15 +44,7 @@ def rank_applicants(
     rankings = []
 
     for application in applications:
-
-        user = (
-            db.query(User)
-            .filter(
-                User.id == application.user_id
-            )
-            .first()
-        )
-
+        user = application.user
         if not user:
             continue
 
@@ -125,4 +112,4 @@ def rank_applicants(
         reverse=True
     )
 
-    return rankings
+    return rankings

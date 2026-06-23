@@ -27,13 +27,15 @@ class UserSkill(Base):
     user_id = Column(
         Integer,
         ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     skill_id = Column(
         Integer,
         ForeignKey("skills.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     user = relationship(

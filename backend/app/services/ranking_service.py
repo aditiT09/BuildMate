@@ -1,15 +1,28 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.project import Project
 from app.models.user import User
+from app.utils.redis_client import redis_client
+
+import json
 
 
 def get_best_candidates(
     project_id: int,
     db: Session
 ):
+    cache_key = f"buildmate:project_rankings:{project_id}"
+
+    try:
+        cached_data = redis_client.get(cache_key)
+        if cached_data:
+            return json.loads(cached_data)
+    except Exception as e:
+        print("Redis Read Error (falling back to database):", e)
+
     project = (
         db.query(Project)
+        .options(joinedload(Project.skills))
         .filter(Project.id == project_id)
         .first()
     )
@@ -22,7 +35,7 @@ def get_best_candidates(
         for skill in project.skills
     }
 
-    users = db.query(User).all()
+    users = db.query(User).options(joinedload(User.skills)).all()
 
     rankings = []
 
@@ -93,4 +106,13 @@ def get_best_candidates(
         reverse=True
     )
 
-    return rankings
+    try:
+        redis_client.setex(
+            cache_key,
+            3600,
+            json.dumps(rankings)
+        )
+    except Exception as e:
+        print("Redis Write Error:", e)
+
+    return rankings

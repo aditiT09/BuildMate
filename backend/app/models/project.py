@@ -38,7 +38,8 @@ class Project(Base):
     owner_id = Column(
         Integer,
         ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     owner = relationship(

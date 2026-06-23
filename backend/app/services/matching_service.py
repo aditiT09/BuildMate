@@ -1,10 +1,11 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.project import Project
 from app.models.user import User
 from app.models.skill import Skill
 from app.models.opportunity import Opportunity
+from app.models.user_skill import UserSkill
 
 from app.utils.redis_client import redis_client
 
@@ -18,7 +19,7 @@ def get_project_matches(
     db: Session
 ):
 
-    cache_key = f"project_matches:{project_id}"
+    cache_key = f"buildmate:project_matches:{project_id}"
 
     try:
         cached_data = redis_client.get(cache_key)
@@ -29,6 +30,7 @@ def get_project_matches(
 
     project = (
         db.query(Project)
+        .options(joinedload(Project.skills))
         .filter(Project.id == project_id)
         .first()
     )
@@ -39,121 +41,99 @@ def get_project_matches(
             detail="Project not found"
         )
 
-    skill_map = {
-        skill.id: skill.name
-        for skill in db.query(Skill).all()
-    }
-
     project_skill_ids = {
         skill.skill_id
         for skill in project.skills
     }
 
-    users = db.query(User).all()
-
-    matches = []
-
-    for user in users:
-
-        # Don't recommend the project owner
-        if user.id == project.owner_id:
-            continue
-
-        user_skill_ids = {
-            skill.skill_id
-            for skill in user.skills
+    if not project_skill_ids:
+        matches = []
+    else:
+        skill_map = {
+            skill.id: skill.name
+            for skill in db.query(Skill).all()
         }
 
-        common_ids = (
-            project_skill_ids &
-            user_skill_ids
+        users = (
+            db.query(User)
+            .options(joinedload(User.skills))
+            .filter(User.skills.any(UserSkill.skill_id.in_(project_skill_ids)))
+            .all()
         )
 
-        missing_ids = (
-            project_skill_ids -
-            user_skill_ids
-        )
+        matches = []
 
-        matching_skills = [
-            skill_map[sid]
-            for sid in common_ids
-            if sid in skill_map
-        ]
+        for user in users:
+            # Don't recommend the project owner
+            if user.id == project.owner_id:
+                continue
 
-        missing_skills = [
-            skill_map[sid]
-            for sid in missing_ids
-            if sid in skill_map
-        ]
+            user_skill_ids = {
+                skill.skill_id
+                for skill in user.skills
+            }
 
-        common_skills = len(common_ids)
+            common_ids = (
+                project_skill_ids &
+                user_skill_ids
+            )
 
-        total_project_skills = len(
-            project_skill_ids
-        )
+            missing_ids = (
+                project_skill_ids -
+                user_skill_ids
+            )
 
-        if total_project_skills == 0:
-            skill_match = 0
+            matching_skills = [
+                skill_map[sid]
+                for sid in common_ids
+                if sid in skill_map
+            ]
 
-        else:
+            missing_skills = [
+                skill_map[sid]
+                for sid in missing_ids
+                if sid in skill_map
+            ]
+
+            common_skills = len(common_ids)
+            total_project_skills = len(project_skill_ids)
+
             skill_match = round(
-                (
-                    common_skills /
-                    total_project_skills
-                ) * 100,
+                (common_skills / total_project_skills) * 100,
                 2
             )
 
-        # Filter on skill_match only
-        if skill_match < MIN_MATCH_SCORE:
-            continue
+            # Filter on skill_match only
+            if skill_match < MIN_MATCH_SCORE:
+                continue
 
-        activity_score = user.activity_score or 0
+            activity_score = user.activity_score or 0
+            reliability_score = user.reliability_score or 0
 
-        reliability_score = user.reliability_score or 0
+            overall_score = round(
+                (
+                    skill_match * 0.7
+                    + activity_score * 0.2
+                    + reliability_score * 0.1
+                ),
+                2
+            )
 
-        overall_score = round(
-            (
-                skill_match * 0.7
-                + activity_score * 0.2
-                + reliability_score * 0.1
-            ),
-            2
+            matches.append({
+                "user_id": user.id,
+                "name": user.name,
+                "overall_score": overall_score,
+                "skill_match": skill_match,
+                "activity_score": activity_score,
+                "reliability_score": reliability_score,
+                "matching_skills": matching_skills,
+                "missing_skills": missing_skills
+            })
+
+        matches.sort(
+            key=lambda x: x["overall_score"],
+            reverse=True
         )
-
-        matches.append({
-
-            "user_id":
-                user.id,
-
-            "name":
-                user.name,
-
-            "overall_score":
-                overall_score,
-
-            "skill_match":
-                skill_match,
-
-            "activity_score":
-                activity_score,
-
-            "reliability_score":
-                reliability_score,
-
-            "matching_skills":
-                matching_skills,
-
-            "missing_skills":
-                missing_skills
-
-        })
-
-    matches.sort(
-        key=lambda x:
-        x["overall_score"],
-        reverse=True
-    )
 
     try:
         redis_client.setex(
@@ -171,8 +151,21 @@ def get_opportunity_matches(
     opportunity_id: int,
     db: Session
 ):
+    cache_key = f"buildmate:opportunity_matches:{opportunity_id}"
+
+    try:
+        cached_data = redis_client.get(cache_key)
+        if cached_data:
+            return json.loads(cached_data)
+    except Exception as e:
+        print("Redis Read Error (falling back to database):", e)
+
     opportunity = (
         db.query(Opportunity)
+        .options(
+            joinedload(Opportunity.skills),
+            joinedload(Opportunity.project).joinedload(Project.skills)
+        )
         .filter(Opportunity.id == opportunity_id)
         .first()
     )
@@ -199,7 +192,19 @@ def get_opportunity_matches(
         for skill in db.query(Skill).all()
     }
 
-    users = db.query(User).all()
+    if opportunity_skill_ids:
+        users = (
+            db.query(User)
+            .options(joinedload(User.skills))
+            .filter(User.skills.any(UserSkill.skill_id.in_(opportunity_skill_ids)))
+            .all()
+        )
+    else:
+        users = (
+            db.query(User)
+            .options(joinedload(User.skills))
+            .all()
+        )
 
     matches = []
 
@@ -278,4 +283,13 @@ def get_opportunity_matches(
         reverse=True
     )
 
-    return matches
+    try:
+        redis_client.setex(
+            cache_key,
+            3600,
+            json.dumps(matches)
+        )
+    except Exception as e:
+        print("Redis Write Error:", e)
+
+    return matches

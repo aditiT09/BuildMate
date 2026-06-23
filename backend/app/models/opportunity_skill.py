@@ -27,13 +27,15 @@ class OpportunitySkill(Base):
     opportunity_id = Column(
         Integer,
         ForeignKey("opportunities.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     skill_id = Column(
         Integer,
         ForeignKey("skills.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     opportunity = relationship(

@@ -36,7 +36,8 @@ class Opportunity(Base):
     project_id = Column(
         Integer,
         ForeignKey("projects.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     seats = Column(

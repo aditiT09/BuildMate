@@ -9,7 +9,7 @@ from app.models.user_skill import UserSkill
 from app.schemas.user_skill import UserSkillCreate
 
 from app.utils.security import get_current_user
-from app.utils.redis_client import redis_client
+from app.utils.redis_client import invalidate_all_matching_caches
 from app.models.skill import Skill
 
 
@@ -80,7 +80,7 @@ def add_skill(
         )
 
     try:
-        redis_client.flushall()
+        invalidate_all_matching_caches()
     except Exception:
         pass
 
@@ -145,7 +145,7 @@ def remove_skill(
     db.commit()
 
     try:
-        redis_client.flushall()
+        invalidate_all_matching_caches()
     except Exception:
         pass
 

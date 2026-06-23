@@ -27,13 +27,15 @@ class ProjectSkill(Base):
     project_id = Column(
         Integer,
         ForeignKey("projects.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     skill_id = Column(
         Integer,
         ForeignKey("skills.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     project = relationship(

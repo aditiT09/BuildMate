@@ -24,6 +24,8 @@ router = APIRouter(
 )
 def rank_candidates(
     project_id: int,
+    limit: int = 10,
+    offset: int = 0,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -45,7 +47,8 @@ def rank_candidates(
             detail="Only the project owner can view candidate rankings",
         )
 
-    return get_best_candidates(
+    rankings = get_best_candidates(
         project_id,
         db
     )
+    return rankings[offset : offset + limit]

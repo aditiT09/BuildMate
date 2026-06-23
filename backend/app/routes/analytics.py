@@ -54,52 +54,52 @@ def get_overview(
         .all()
     )
 
+    # 1. Query total user/project/opportunity counts in a single trip using scalar subqueries
+    total_users_sub = db.query(func.count(User.id)).scalar_subquery()
+    total_projects_sub = db.query(func.count(Project.id)).scalar_subquery()
+    total_opportunities_sub = db.query(func.count(Opportunity.id)).scalar_subquery()
+    counts = db.query(total_users_sub, total_projects_sub, total_opportunities_sub).first()
+    total_users, total_projects, total_opportunities = counts if counts else (0, 0, 0)
+
+    # 2. Query application counts grouped by status in a single trip
+    status_counts = (
+        db.query(
+            Application.status,
+            func.count(Application.id).label("count")
+        )
+        .group_by(Application.status)
+        .all()
+    )
+
+    accepted_apps = 0
+    rejected_apps = 0
+    pending_apps = 0
+    total_apps = 0
+
+    for status, count in status_counts:
+        total_apps += count
+        if status == "accepted":
+            accepted_apps = count
+        elif status == "rejected":
+            rejected_apps = count
+        elif status == "pending":
+            pending_apps = count
+
     return {
 
-        "total_users":
-        db.query(User).count(),
+        "total_users": total_users,
 
-        "total_projects":
-        db.query(Project).count(),
+        "total_projects": total_projects,
 
-        "total_opportunities":
-        db.query(Opportunity).count(),
+        "total_opportunities": total_opportunities,
 
-        "total_applications":
-        db.query(Application).count(),
+        "total_applications": total_apps,
 
-        "accepted_applications":
+        "accepted_applications": accepted_apps,
 
-        db.query(Application)
+        "rejected_applications": rejected_apps,
 
-        .filter(
-            Application.status
-            == "accepted"
-        )
-
-        .count(),
-
-        "rejected_applications":
-
-        db.query(Application)
-
-        .filter(
-            Application.status
-            == "rejected"
-        )
-
-        .count(),
-
-        "pending_applications":
-
-        db.query(Application)
-
-        .filter(
-            Application.status
-            == "pending"
-        )
-
-        .count(),
+        "pending_applications": pending_apps,
 
         "top_skills": [
             {

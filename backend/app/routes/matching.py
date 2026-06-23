@@ -21,6 +21,8 @@ router = APIRouter(
 )
 def get_matches(
     project_id: int,
+    limit: int = 10,
+    offset: int = 0,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -42,10 +44,11 @@ def get_matches(
             detail="Only the project owner can view matches"
         )
 
-    return get_project_matches(
+    matches = get_project_matches(
         project_id,
         db
     )
+    return matches[offset : offset + limit]
 
 @router.get(
     "/projects/{project_id}/users/{user_id}/skill-gap"
@@ -86,6 +89,8 @@ def get_project_user_skill_gap(
 )
 def get_opportunity_matches_route(
     opportunity_id: int,
+    limit: int = 10,
+    offset: int = 0,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -106,7 +111,8 @@ def get_opportunity_matches_route(
         )
 
     from app.services.matching_service import get_opportunity_matches
-    return get_opportunity_matches(
+    matches = get_opportunity_matches(
         opportunity_id,
         db
     )
+    return matches[offset : offset + limit]

@@ -13,7 +13,7 @@ from app.models.skill import Skill
 from app.schemas.opportunity_skill import OpportunitySkillCreate
 
 from app.utils.security import get_current_user
-from app.utils.redis_client import redis_client
+from app.utils.redis_client import invalidate_opportunity_cache
 
 
 router = APIRouter(
@@ -80,7 +80,7 @@ def add_opportunity_skill(
     db.commit()
 
     try:
-        redis_client.flushall()
+        invalidate_opportunity_cache(data.opportunity_id)
     except Exception:
         pass
 
@@ -156,7 +156,7 @@ def remove_opportunity_skill(
     db.commit()
 
     try:
-        redis_client.flushall()
+        invalidate_opportunity_cache(opportunity_id)
     except Exception:
         pass
 

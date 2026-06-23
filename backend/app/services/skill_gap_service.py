@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 
 from app.models.project import Project
@@ -15,6 +15,7 @@ def get_skill_gap(
     # Retrieve project
     project = (
         db.query(Project)
+        .options(joinedload(Project.skills))
         .filter(Project.id == project_id)
         .first()
     )
@@ -27,6 +28,7 @@ def get_skill_gap(
     # Retrieve user
     user = (
         db.query(User)
+        .options(joinedload(User.skills))
         .filter(User.id == user_id)
         .first()
     )
@@ -35,12 +37,6 @@ def get_skill_gap(
             status_code=404,
             detail="User not found"
         )
-
-    # Map all skills in db for quick lookup
-    skill_map = {
-        skill.id: skill.name
-        for skill in db.query(Skill).all()
-    }
 
     # Project and User skill IDs
     project_skill_ids = {
@@ -51,6 +47,14 @@ def get_skill_gap(
         us.skill_id
         for us in user.skills
     }
+
+    # Map only required skills in db for quick lookup
+    if project_skill_ids:
+        skills = db.query(Skill).filter(Skill.id.in_(project_skill_ids)).all()
+        skill_map = {skill.id: skill.name for skill in skills}
+    else:
+        skill_map = {}
+
 
     # Intersections
     matched_ids = project_skill_ids & user_skill_ids
