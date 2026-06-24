@@ -258,29 +258,9 @@ export default function Dashboard() {
     }
   }, []);
 
-  useEffect(() => {
-    const init = async () => {
-      await loadDashboard();
-    };
-    init();
-
-
-    const interval = setInterval(async () => {
-      try {
-        const [od, curUser] = await Promise.all([
-          getOverview(),
-          getCurrentUser().catch(() => null),
-        ]);
-        setOverview(od);
-        if (curUser) setCurrentUser(curUser);
-      } catch {
-        // Redundant poll error logging removed
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [loadDashboard]);
-
+useEffect(() => {
+  loadDashboard();
+}, [loadDashboard]);
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 12) return "Good morning";
@@ -1111,4 +1091,4 @@ function ProjectCard({ project, delay }) {
     </Link>
   );
 }
-
+
