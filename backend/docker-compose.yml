@@ -16,7 +16,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/buildmate
       REDIS_URL: redis://redis:6379/0
-      SECRET_KEY: ${SECRET_KEY:-secret}
+      SECRET_KEY: ${SECRET_KEY?SECRET_KEY is required}
 
     volumes:
       - .:/app

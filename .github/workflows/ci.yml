@@ -57,6 +57,7 @@ jobs:
         env:
           TESTING: "true"
           DATABASE_URL: "postgresql://postgres:BuildMate123@localhost:5432/buildmate_test"
+          SECRET_KEY: "this-is-a-long-random-ci-test-secret-at-least-32-characters"
         run: |
           cd backend
           alembic upgrade head
@@ -65,6 +66,7 @@ jobs:
         env:
           TESTING: "true"
           DATABASE_URL: "postgresql://postgres:BuildMate123@localhost:5432/buildmate_test"
+          SECRET_KEY: "this-is-a-long-random-ci-test-secret-at-least-32-characters"
         run: |
           cd backend
           alembic current
@@ -83,6 +85,7 @@ jobs:
           TESTING: "true"
           TEST_DATABASE_URL: "postgresql://postgres:BuildMate123@localhost:5432/buildmate_test"
           REDIS_URL: "redis://localhost:6379/0"
+          SECRET_KEY: "this-is-a-long-random-ci-test-secret-at-least-32-characters"
         run: |
           cd backend
           pytest --cov=app --cov-fail-under=80
