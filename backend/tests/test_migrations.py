@@ -22,27 +22,35 @@ def test_migration_chain():
             pass
         conn.execute(text(f"CREATE DATABASE {temp_db_name}"))
 
+    
     # 3. Run migrations on temp_db
     try:
-        # Load Alembic configuration from alembic.ini
+        # Load Alembic configuration
         alembic_cfg = Config("alembic.ini")
-        # Override database URL to point to the temporary database
-        alembic_cfg.set_main_option("sqlalchemy.url", temp_db_url)
+
+        # Use temporary database during migration testing
+        os.environ["DATABASE_URL"] = temp_db_url
 
         # Upgrade to head
         command.upgrade(alembic_cfg, "head")
 
         # Downgrade to base
         command.downgrade(alembic_cfg, "base")
-
+  
         # Upgrade back to head
         command.upgrade(alembic_cfg, "head")
 
     finally:
-        # 4. Clean up and drop the temporary database
+        # Remove temporary environment variable
+        os.environ.pop("DATABASE_URL", None)
+
+        # Drop temporary database
         with admin_engine.connect() as conn:
             try:
-                conn.execute(text(f"DROP DATABASE IF EXISTS {temp_db_name} WITH (FORCE)"))
+                conn.execute(
+                    text(f"DROP DATABASE IF EXISTS {temp_db_name} WITH (FORCE)")
+            )
             except Exception as e:
                 print(f"Error dropping temp database: {e}")
+
         admin_engine.dispose()
