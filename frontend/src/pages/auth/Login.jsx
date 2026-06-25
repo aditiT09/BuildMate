@@ -140,7 +140,7 @@ function Login() {
         letterSpacing: "0.12em",
       }}
     >
-      FIND • MATCH • BUILD
+      Find your missing piece.
     </p>
 
     <h1
@@ -151,7 +151,7 @@ function Login() {
         fontWeight: 700,
       }}
     >
-      Your Next
+      Find your
       <br />
       <em
         style={{
@@ -159,10 +159,10 @@ function Login() {
           fontStyle: "italic",
         }}
       >
-        Teammate
+        team.
       </em>
       <br />
-      Is One Swipe Away.
+      Build your dream.
     </h1>
 
     <p
