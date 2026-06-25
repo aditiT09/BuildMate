@@ -1,14 +1,20 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env"
+    )
+
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/buildmate"
 
     SECRET_KEY: str
 
     REDIS_URL: str = "redis://localhost:6379/0"
+
     TEST_DATABASE_URL: str | None = None
+
     TESTING: bool = False
 
     @field_validator("SECRET_KEY")
@@ -35,9 +41,6 @@ class Settings(BaseSettings):
             )
 
         return value
-
-    class Settings(BaseSettings):
-        model_config = SettingsConfigDict(env_file=".env")
 
 
 settings = Settings()

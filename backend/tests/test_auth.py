@@ -105,7 +105,11 @@ def test_duplicate_email():
     )
 
     assert second_response.status_code == 409
-    assert second_response.json()["detail"] == "Email already registered"
+    data = second_response.json()
+
+    assert data["success"] is False
+    assert data["message"] == "Email already registered"
+    assert data["error_code"] == "CONFLICT"
 
 def test_rate_limiter_logic(monkeypatch):
     import app.utils.rate_limiter
@@ -209,4 +213,4 @@ def test_subscribe_invalid_email():
         "/subscribe",
         json={"email": "invalid-email"}
     )
-    assert response.status_code == 422
+    assert response.status_code == 422

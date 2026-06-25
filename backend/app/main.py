@@ -38,7 +38,9 @@ from app.routes import profile
 from app.models.project_resource import ProjectResource
 from app.routes import profile
 from app.routes import project_resource
+from app.core.exception_handlers import register_exception_handlers
 app = FastAPI()
+register_exception_handlers(app)
 app.include_router(
     project_resource.router
 )

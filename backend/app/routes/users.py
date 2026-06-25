@@ -1,5 +1,6 @@
 
 from fastapi import APIRouter, Depends, Query, HTTPException, Request
+from app.core.exceptions import ConflictException
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -54,18 +55,14 @@ def create_user(
     except IntegrityError:
         db.rollback()
 
-        raise HTTPException(
-            status_code=409,
-            detail="Email already registered",
-        )
+        raise ConflictException(
+        "Email already registered"
+    )
 
     except Exception:
         db.rollback()
 
-        raise HTTPException(
-            status_code=500,
-            detail="Internal server error",
-        )
+        raise
 
 
 @router.get(
