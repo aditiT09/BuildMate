@@ -119,28 +119,7 @@ export default function Hero() {
         </a>
       </div>
 
-      {/* Ticker */}
-      <div style={{
-        marginTop: 64, width: '100%', overflow: 'hidden',
-        animation: 'fadeUp 0.8s ease 0.7s forwards', opacity: 0,
-      }}>
-        <div style={{
-          display: 'flex', whiteSpace: 'nowrap', gap: 32,
-          animation: 'ticker 25s linear infinite',
-          fontFamily: '"DM Sans", sans-serif',
-          fontSize: 14, fontWeight: 500,
-          color: 'rgba(44,24,16,0.22)',
-          userSelect: 'none',
-        }}>
-          {Array(2).fill([
-            '✦ 2,400+ builders', '✦ 580+ live projects', '✦ 12 countries',
-            '✦ React · Node · Python · Figma', '✦ Launch in weeks not months',
-            '✦ Real CVs Real ships', '✦ No awkward networking',
-          ]).flat().map((t, i) => (
-            <span key={i} style={{ display: 'inline-block' }}>{t}</span>
-          ))}
-        </div>
-      </div>
+
 
       <style>{`
         @keyframes fadeUp  { from { opacity:0; transform:translateY(40px) } to { opacity:1; transform:translateY(0) } }
