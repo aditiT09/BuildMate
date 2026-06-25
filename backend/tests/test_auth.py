@@ -60,7 +60,11 @@ def test_login_invalid_password():
     )
 
     assert login_response.status_code == 401
-    assert login_response.json()["detail"] == "Invalid credentials"
+    data = login_response.json()
+
+    assert data["success"] is False
+    assert data["message"] == "Invalid credentials"
+    assert data["error_code"] == "UNAUTHORIZED"
 
 def test_create_user():
     unique_email = f"{uuid.uuid4()}@test.com"

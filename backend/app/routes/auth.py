@@ -8,7 +8,7 @@ from app.database import get_db
 from app.models.user import User
 
 from app.schemas.auth import TokenResponse
-
+from app.core.exceptions import UnauthorizedException
 from app.utils.security import (
     verify_password,
     create_access_token
@@ -47,20 +47,17 @@ def login(
     # ── Timing-safe: same error for unknown email or wrong password ──
     # Never reveal whether the email exists in the database
     if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
-        )
+        raise UnauthorizedException(
+            "Invalid credentials"
+    )
 
     if not verify_password(
-        form_data.password,
-        user.password
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
-        )
-
+       form_data.password,
+       user.password
+):
+       raise UnauthorizedException(
+           "Invalid credentials"
+    )
     # JWT sub is the stored (already lowercase) email
     access_token = create_access_token(
         {

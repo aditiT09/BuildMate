@@ -44,3 +44,38 @@ class ValidationException(BuildMateException):
             status_code=400,
             error_code="VALIDATION_ERROR",
         )
+
+class BadRequestException(BuildMateException):
+    def __init__(self, message="Bad request"):
+        super().__init__(
+            message=message,
+            status_code=400,
+            error_code="BAD_REQUEST",
+        )
+
+
+class ForbiddenException(BuildMateException):
+    def __init__(self, message="Forbidden"):
+        super().__init__(
+            message=message,
+            status_code=403,
+            error_code="FORBIDDEN",
+        )
+
+
+class RateLimitException(BuildMateException):
+    def __init__(self, message="Too many requests"):
+        super().__init__(
+            message=message,
+            status_code=429,
+            error_code="RATE_LIMIT_EXCEEDED",
+        )
+
+
+class DatabaseException(BuildMateException):
+    def __init__(self, message="Database operation failed"):
+        super().__init__(
+            message=message,
+            status_code=500,
+            error_code="DATABASE_ERROR",
+        )
