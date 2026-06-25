@@ -60,7 +60,7 @@ function SmallCard({ icon, title, desc }) {
       </div>
 
       <h3 style={{
-        fontFamily: '"Syne", sans-serif',
+        fontFamily: '"Melody by W.", "Melody", sans-serif',
         fontSize: 26, fontWeight: 800,
         textTransform: 'uppercase', lineHeight: 1,
         marginBottom: 10,
@@ -111,6 +111,7 @@ export default function Cards() {
           position: 'relative', minHeight: 520,
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
           background: C.terra500,
+          border: '4px solid #7A4854',
         }}>
           {/* Gradient bg */}
           <div style={{
@@ -130,7 +131,7 @@ export default function Cards() {
               fontSize: 140, opacity: 0.1, filter: 'blur(2px)',
               userSelect: 'none', letterSpacing: -10,
             }}>
-              🔥🚀✨💡
+              💡
             </div>
           </div>
 
@@ -157,7 +158,7 @@ export default function Cards() {
             }}>✦ Explore</span>
 
             <h2 style={{
-              fontFamily: '"Syne", sans-serif',
+              fontFamily: '"Melody by W.", "Melody", sans-serif',
               fontSize: 'clamp(40px, 4.5vw, 66px)',
               fontWeight: 800,
               textTransform: 'uppercase',
@@ -173,9 +174,9 @@ export default function Cards() {
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 15, fontWeight: 300,
               color: 'rgba(255,255,255,0.6)',
-              maxWidth: 300, lineHeight: 1.65,
+              maxWidth: 550, lineHeight: 1.65,
             }}>
-              Browse real projects actively looking for contributors. No fluff, just builds that ship.
+              Explore a curated feed of live projects seeking developers, designers, and creators. Apply to open roles in one tap, join a collaborative workspace, and start shipping today.
             </p>
           </div>
         </div>
@@ -188,9 +189,9 @@ export default function Cards() {
             desc="Post your idea, set roles, and let the right people come to you. Your vision, your team."
           />
           <SmallCard
-            icon="👥"
-            title={"EXPLORE\nAPPLICANTS"}
-            desc="Review candidate profiles, check portfolios, and connect with builders in one tap."
+            icon="🙋‍♂️"
+            title={"COUNT ME\nIN!"}
+            desc="Look through open projects where teams are excited to welcome new contributors."
           />
         </div>
 
