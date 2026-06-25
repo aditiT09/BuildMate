@@ -297,7 +297,7 @@ function Register() {
                 id="name"
                 type="text"
                 name="name"
-                placeholder="Jane Doe"
+                placeholder=""
                 value={formData.name}
                 onChange={handleChange}
                 required
