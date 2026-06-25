@@ -259,7 +259,10 @@ export default function Dashboard() {
   }, []);
 
 useEffect(() => {
-  loadDashboard();
+  const init = async () => {
+    await loadDashboard();
+  };
+  init();
 }, [loadDashboard]);
   const greeting = (() => {
     const h = new Date().getHours();

@@ -18,7 +18,7 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: Aditi0909%123
+          POSTGRES_PASSWORD: Aditi0909_123
           POSTGRES_DB: buildmate_test
         ports:
           - 5432:5432
@@ -56,7 +56,7 @@ jobs:
       - name: Run Alembic Database Migrations
         env:
           TESTING: "true"
-          DATABASE_URL: "postgresql://postgres:Aditi0909%123@localhost:5432/buildmate_test"
+          DATABASE_URL: "postgresql://postgres:Aditi0909_123@localhost:5432/buildmate_test"
         run: |
           cd backend
           alembic upgrade head
@@ -64,7 +64,7 @@ jobs:
       - name: Validate Migration States (Current & Heads)
         env:
           TESTING: "true"
-          DATABASE_URL: "postgresql://postgres:Aditi0909%123@localhost:5432/buildmate_test"
+          DATABASE_URL: "postgresql://postgres:Aditi0909_123@localhost:5432/buildmate_test"
         run: |
           cd backend
           alembic current
@@ -81,7 +81,7 @@ jobs:
       - name: Run Pytest Suite with Coverage Enforcement
         env:
           TESTING: "true"
-          TEST_DATABASE_URL: "postgresql://postgres:Aditi0909%123@localhost:5432/buildmate_test"
+          TEST_DATABASE_URL: "postgresql://postgres:Aditi0909_123@localhost:5432/buildmate_test"
           REDIS_URL: "redis://localhost:6379/0"
         run: |
           cd backend
