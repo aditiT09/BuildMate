@@ -163,18 +163,16 @@ const STYLES = `
   .about-step {
     width: 48%;
     background: #FFF8F0;
-    border: 1.5px solid #E9DDD0;
+    border: 1px solid #F4A460;
     border-radius: 18px;
     padding: 28px;
-    box-shadow: 4px 4px 0px #2B1B12;
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    transition: transform 0.22s ease;
     position: relative;
     z-index: 2;
     box-sizing: border-box;
   }
   .about-step:hover {
     transform: translateY(-4px) scale(1.01);
-    box-shadow: 6px 6px 0px #E35336;
   }
   .about-step-1 { align-self: flex-start; }
   .about-step-2 { align-self: flex-end; }
@@ -218,7 +216,7 @@ function StatusBadge({ status }) {
       border: "1px solid #F4A460",
       fontSize: 10,
       fontWeight: 800,
-      fontFamily: '"DM Sans", sans-serif',
+      fontFamily: '"Manrope", sans-serif',
       display: "inline-flex",
       alignItems: "center",
       gap: 5,
@@ -318,7 +316,7 @@ useEffect(() => {
 
   // ── Layout ───────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, paddingTop: 24, fontFamily: '"DM Sans", sans-serif' }}>
+    <div style={{ minHeight: "100vh", background: C.bg, paddingTop: 24, fontFamily: '"Manrope", sans-serif' }}>
       <style>{STYLES}</style>
 
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "16px 28px 32px 28px" }}>
@@ -411,14 +409,14 @@ useEffect(() => {
             gap: 16, minWidth: 220,
             animation: "slideLeft 0.6s ease 0.1s both", opacity: 0,
           }}>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: '"DM Sans", sans-serif' }}>
+            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: '"Manrope", sans-serif' }}>
               Your scores
             </p>
             <div style={{ display: "flex", gap: 20 }}>
               <ScoreRing score={currentUser?.activity_score    ?? user?.activity_score    ?? 50} label="Activity"    color={C.brand}  />
               <ScoreRing score={currentUser?.reliability_score ?? user?.reliability_score ?? 50} label="Reliability" color={C.orange} />
             </div>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", lineHeight: 1.5, maxWidth: 160, fontFamily: '"DM Sans", sans-serif' }}>
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", lineHeight: 1.5, maxWidth: 160, fontFamily: '"Manrope", sans-serif' }}>
               Ship more projects to level up your scores.
             </p>
           </div>
@@ -458,6 +456,7 @@ useEffect(() => {
           {/* Top skills / Trending Skills */}
           <div className="dash-card" style={{
             background: C.dark, borderRadius: 24, padding: 36,
+            border: `1px solid ${C.orange}`,
             animation: "slideUp 0.6s ease 0.2s both", opacity: 0,
           }}>
             <SectionLabel light icon={<TrendingIcon color={C.orange} size={18} />} fontSize={18}>Trending Skills</SectionLabel>
@@ -519,6 +518,7 @@ useEffect(() => {
           {/* Application breakdown */}
           <div className="dash-card" style={{
             background: C.dark, borderRadius: 24, padding: 36, color: "white",
+            border: `1px solid ${C.orange}`,
             animation: "slideUp 0.6s ease 0.25s both", opacity: 0,
           }}>
             <SectionLabel light icon={<MailIcon color={C.orange} size={18} />} fontSize={18}>Application Breakdown</SectionLabel>
@@ -563,7 +563,7 @@ useEffect(() => {
                     color: "rgba(255,255,255,0.7)",
                     borderRadius: 10, padding: "10px",
                     fontSize: 13, cursor: "pointer",
-                    fontFamily: '"DM Sans", sans-serif',
+                    fontFamily: '"Manrope", sans-serif',
                     fontWeight: 600, letterSpacing: "0.04em",
                     transition: "all 0.2s",
                   }}
@@ -581,7 +581,7 @@ useEffect(() => {
         {/* ══ MY PROJECTS ══════════════════════════════ */}
         <div className="dash-card" style={{
           background: C.surface, borderRadius: 24, padding: 36,
-          border: `1px solid ${C.border}`, marginBottom: 28,
+          border: `1px solid ${C.orange}`, marginBottom: 28,
           animation: "slideUp 0.6s ease 0.3s both", opacity: 0,
           width: "100%",
           boxSizing: "border-box",
@@ -615,7 +615,7 @@ useEffect(() => {
         {/* ══ RECENT APPLICATIONS ══════════════════════ */}
         <div className="dash-card" style={{
           background: C.surface, borderRadius: 24, padding: 36,
-          border: `1px solid ${C.border}`, marginBottom: 28,
+          border: `1px solid ${C.orange}`, marginBottom: 28,
           animation: "slideUp 0.6s ease 0.35s both", opacity: 0,
           width: "100%",
           boxSizing: "border-box",
@@ -689,7 +689,7 @@ useEffect(() => {
         {/* ══ INCOMING APPLICATIONS ("incoming!") ══════ */}
         <div className="dash-card" style={{
           background: C.surface, borderRadius: 24, padding: 36,
-          border: `1px solid ${C.border}`, marginBottom: 28,
+          border: `1px solid ${C.orange}`, marginBottom: 28,
           animation: "slideUp 0.6s ease 0.38s both", opacity: 0,
           width: "100%",
           boxSizing: "border-box",
@@ -766,7 +766,7 @@ useEffect(() => {
         {/* ══ BADGES EARNED (WHOLE / FULL WIDTH) ══════ */}
         <div className="dash-card" style={{
           background: C.surface, borderRadius: 24, padding: 36,
-          border: `1px solid ${C.border}`, marginBottom: 28,
+          border: `1px solid ${C.orange}`, marginBottom: 28,
           minHeight: 400,
           display: "flex",
           flexDirection: "column",
@@ -783,7 +783,7 @@ useEffect(() => {
             <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 18, color: C.dark, marginBottom: 8, marginTop: 0 }}>
               No badges yet.
             </h3>
-            <p style={{ fontSize: 14, color: C.muted, fontFamily: '"DM Sans", sans-serif', margin: "0 auto", maxWidth: 320, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 14, color: C.muted, fontFamily: '"Manrope", sans-serif', margin: "0 auto", maxWidth: 320, lineHeight: 1.5 }}>
               Your builder arc is just getting started. Ship something cool.
             </p>
           </div>
@@ -795,7 +795,7 @@ useEffect(() => {
         {/* ══ ABOUT BUILDMATE (WHOLE / FULL WIDTH / BELOW STATS) ══════ */}
         <div className="dash-card" style={{
           background: C.surface, borderRadius: 24, padding: 36,
-          border: `1px solid ${C.border}`, marginBottom: 28,
+          border: `1px solid ${C.orange}`, marginBottom: 28,
           animation: "slideUp 0.6s ease 0.55s both", opacity: 0,
           width: "100%",
           boxSizing: "border-box",
@@ -805,30 +805,30 @@ useEffect(() => {
           <div className="about-flow">
             {/* Step 1 */}
             <div className="about-step about-step-1">
-              <h4 style={{ fontFamily: '"Flaviotte", "Geist", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 01. The Spark
               </h4>
-              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif', margin: 0 }}>
+              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"Manrope", sans-serif', margin: 0 }}>
                 BuildMate was born from a simple idea: great projects need great teammates. Too many students have ideas but struggle to find people who share their skills, passion, and drive.
               </p>
             </div>
 
             {/* Step 2 */}
             <div className="about-step about-step-2">
-              <h4 style={{ fontFamily: '"Flaviotte", "Geist", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 02. The Mission
               </h4>
-              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif', margin: 0 }}>
+              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"Manrope", sans-serif', margin: 0 }}>
                 We make collaboration easier by helping builders discover projects, connect with talented peers, and create teams that actually ship. No awkward networking, no endless searching—just the right people for the right project.
               </p>
             </div>
 
             {/* Step 3 */}
             <div className="about-step about-step-3">
-              <h4 style={{ fontFamily: '"Flaviotte", "Geist", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 03. The Vision
               </h4>
-              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"DM Sans", sans-serif', margin: 0 }}>
+              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"Manrope", sans-serif', margin: 0 }}>
                 At BuildMate, we believe the next big idea starts with one connection. Build together, learn together, and turn ambitious ideas into real achievements.
               </p>
             </div>
@@ -847,7 +847,7 @@ function StatCard({ color, icon, title, value, sub, delay, link }) {
   const inner = (
     <div className="dash-card" style={{
       background: C.surface, borderRadius: 20, padding: "28px 28px",
-      border: `1px solid ${C.border}`,
+      border: `1px solid ${C.orange}`,
       position: "relative", overflow: "hidden", minHeight: 210,
       display: "flex",
       flexDirection: "column",
@@ -867,7 +867,7 @@ function StatCard({ color, icon, title, value, sub, delay, link }) {
         <span style={{
           fontSize: 10, fontWeight: 700, letterSpacing: "0.15em",
           textTransform: "uppercase", color: color,
-          fontFamily: '"DM Sans", sans-serif',
+          fontFamily: '"Manrope", sans-serif',
         }}>{title}</span>
       </div>
        <div style={{
@@ -891,7 +891,7 @@ function MiniStat({ icon, label, value, delay, loading }) {
   return (
     <div style={{
       background: C.cream, borderRadius: 16, padding: "16px 18px",
-      border: `1px solid ${C.border}`,
+      border: `1px solid ${C.orange}`,
       display: "flex", alignItems: "center", gap: 12,
       animation: `slideUp 0.4s ease ${delay}s both`, opacity: 0,
     }}>
@@ -934,7 +934,7 @@ function ActionBtn({ children, secondary }) {
         border: secondary ? `1.5px solid ${C.brand}` : "none",
         borderRadius: 9999, padding: "8px 18px",
         fontSize: 13, fontWeight: 700, cursor: "pointer",
-        fontFamily: '"DM Sans", sans-serif',
+        fontFamily: '"Manrope", sans-serif',
         letterSpacing: "0.02em",
         transition: "all 0.2s",
       }}
@@ -951,7 +951,7 @@ function ProjectCard({ project, delay }) {
         onMouseLeave={() => setH(false)}
         style={{
           background: h ? C.sandDark : C.cream,
-          border: `1.5px solid ${h ? C.brand : C.border}`,
+          border: `1px solid ${h ? C.brand : C.orange}`,
           borderRadius: 16,
           padding: "28px 28px",
           minHeight: 260,
@@ -973,7 +973,7 @@ function ProjectCard({ project, delay }) {
                 fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
                 textTransform: "uppercase", color: C.brand,
                 background: `${C.brand}15`, padding: "3px 10px", borderRadius: 9999,
-                fontFamily: '"DM Sans", sans-serif',
+                fontFamily: '"Manrope", sans-serif',
               }}>{project.project_type}</span>
             )}
           </div>

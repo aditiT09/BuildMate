@@ -125,7 +125,7 @@ export default function MyApplications() {
               display: "inline-flex", alignItems: "center", gap: 6,
               background: C.orange, color: C.dark,
               padding: "4px 12px", borderRadius: 999,
-              fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
+              fontFamily: '"Manrope", sans-serif', fontSize: 11, fontWeight: 800,
               letterSpacing: "0.1em", textTransform: "uppercase",
               marginBottom: 18,
             }}>
@@ -145,7 +145,7 @@ export default function MyApplications() {
             </h1>
 
             <p style={{
-              fontFamily: '"DM Sans", sans-serif', fontSize: 14,
+              fontFamily: '"Manrope", sans-serif', fontSize: 14,
               color: "rgba(255,248,240,0.7)", marginTop: 14, maxWidth: 480, lineHeight: 1.6,
               display: "flex",
               alignItems: "center",
@@ -185,7 +185,7 @@ export default function MyApplications() {
                         {invite.opportunity?.project?.title}
                       </h3>
                       <p style={{
-                        fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: C.muted, margin: 0
+                        fontFamily: '"Manrope", sans-serif', fontSize: 13, color: C.muted, margin: 0
                       }}>
                         invited you to join as <span style={{ color: C.dark2, fontWeight: 700 }}>{invite.opportunity?.role}</span>
                       </p>
@@ -197,7 +197,7 @@ export default function MyApplications() {
                         style={{
                           background: C.green, color: "white", border: "none",
                           borderRadius: 999, padding: "8px 18px",
-                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                          fontFamily: '"Manrope", sans-serif', fontWeight: 800, fontSize: 13,
                           cursor: "pointer", transition: "all .15s ease",
                           display: "inline-flex", alignItems: "center", gap: 6,
                         }}
@@ -209,7 +209,7 @@ export default function MyApplications() {
                         style={{
                           background: "transparent", color: C.brand, border: `1.5px solid ${C.brand}40`,
                           borderRadius: 999, padding: "8px 18px",
-                          fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
+                          fontFamily: '"Manrope", sans-serif', fontWeight: 800, fontSize: 13,
                           cursor: "pointer", transition: "all .15s ease",
                         }}
                       >
@@ -263,7 +263,7 @@ export default function MyApplications() {
                           {application.opportunity?.project?.title || "untitled project"}
                         </h2>
                         <p style={{
-                          fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: C.muted, margin: 0,
+                          fontFamily: '"Manrope", sans-serif', fontSize: 13, color: C.muted, margin: 0,
                         }}>
                           applied for <span style={{ color: C.dark2, fontWeight: 700 }}>
                             {application.opportunity?.role}
@@ -277,7 +277,7 @@ export default function MyApplications() {
                         padding: "6px 14px",
                         borderRadius: 0,
                         border: "1px solid #F4A460",
-                        fontFamily: '"DM Sans", sans-serif',
+                        fontFamily: '"Manrope", sans-serif',
                         fontSize: 11,
                         fontWeight: 800,
                         textTransform: "uppercase",
@@ -293,7 +293,7 @@ export default function MyApplications() {
 
                     {application.opportunity?.description && (
                       <p style={{
-                        fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: C.dark2,
+                        fontFamily: '"Manrope", sans-serif', fontSize: 14, color: C.dark2,
                         lineHeight: 1.65, margin: "10px 0 12px",
                       }}>
                         {application.opportunity.description}
@@ -309,7 +309,7 @@ export default function MyApplications() {
                         }}
                         href={`/projects/${application.opportunity.project.id}`}
                         style={{
-                          display: "inline-flex", fontFamily: '"DM Sans", sans-serif',
+                          display: "inline-flex", fontFamily: '"Manrope", sans-serif',
                           fontWeight: 800, fontSize: 13, color: C.brand, textDecoration: "none",
                         }}
                       >

@@ -109,7 +109,7 @@ export default function IncomingDashboard() {
 
   return (
     <Layout>
-      <div style={{ minHeight: "100vh", background: C.bg, padding: "28px", fontFamily: '"DM Sans", sans-serif' }}>
+      <div style={{ minHeight: "100vh", background: C.bg, padding: "28px", fontFamily: '"Manrope", sans-serif' }}>
         <style>{STYLES}</style>
 
         <div style={{ maxWidth: 1400, margin: "0 auto" }}>
@@ -158,7 +158,7 @@ export default function IncomingDashboard() {
                 <button style={{
                   background: C.brand, color: "white", border: "none", borderRadius: 9999,
                   padding: "10px 24px", fontSize: 14, fontWeight: 700, cursor: "pointer",
-                  fontFamily: '"DM Sans", sans-serif', transition: "background 0.2s"
+                  fontFamily: '"Manrope", sans-serif', transition: "background 0.2s"
                 }}>
                   + Create a Project
                 </button>
@@ -253,7 +253,7 @@ export default function IncomingDashboard() {
                       <button style={{
                         background: "transparent", color: C.brand, border: `1.5px solid ${C.brand}`,
                         borderRadius: 9999, padding: "8px 20px", fontSize: 13, fontWeight: 700,
-                        cursor: "pointer", fontFamily: '"DM Sans", sans-serif', transition: "all 0.2s"
+                        cursor: "pointer", fontFamily: '"Manrope", sans-serif', transition: "all 0.2s"
                       }}
                         onMouseEnter={e => { e.currentTarget.style.background = C.brand; e.currentTarget.style.color = "white"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = C.brand; }}

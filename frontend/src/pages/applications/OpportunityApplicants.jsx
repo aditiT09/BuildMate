@@ -116,7 +116,7 @@ export default function OpportunityApplicants() {
                     padding: "6px 14px",
                     borderRadius: 0,
                     border: "1px solid #F4A460",
-                    fontFamily: '"DM Sans", sans-serif',
+                    fontFamily: '"Manrope", sans-serif',
                     fontSize: 11,
                     fontWeight: 800,
                     textTransform: "uppercase",
