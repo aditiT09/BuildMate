@@ -297,7 +297,7 @@ useEffect(() => {
           animation: "slideUp 0.6s ease both",
         }}>
           <span style={{
-            fontFamily: '"Eczar", serif',
+            fontFamily: '"Cormorant Garamond", serif',
             fontSize: 28,
             fontWeight: 800,
             color: C.brand,
