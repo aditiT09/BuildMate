@@ -15,11 +15,46 @@ const C = {
   surface:  '#FDFBF7',
 }
 
+const DashboardIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+)
+
+const DiscoverIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+)
+
+const ProjectsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+    <polyline points="2 17 12 22 22 17" />
+    <polyline points="2 12 12 17 22 12" />
+  </svg>
+)
+
+const ApplicationsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+  </svg>
+)
+
+const UserIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+)
+
 const NAV_LINKS = [
-  { label: 'Dashboard',    href: '/dashboard',    icon: '⚡' },
-  { label: 'Discover',     href: '/discover',     icon: '🔍' },
-  { label: 'My Projects',  href: '/my-projects',  icon: '🏗️'  },
-  { label: 'Applications', href: '/applications', icon: '📬' },
+  { label: 'Dashboard',    href: '/dashboard',    icon: <DashboardIcon /> },
+  { label: 'Discover',     href: '/discover',     icon: <DiscoverIcon /> },
+  { label: 'My Projects',  href: '/my-projects',  icon: <ProjectsIcon /> },
+  { label: 'Applications', href: '/applications', icon: <ApplicationsIcon /> },
 ]
 
 export default function DashboardNavbar() {
@@ -84,8 +119,12 @@ export default function DashboardNavbar() {
               width: 28, height: 28, borderRadius: 8,
               background: C.brand,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14,
-            }}>⚡</span>
+              color: 'white',
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+            </span>
             BuildMate
           </Link>
 
@@ -107,7 +146,7 @@ export default function DashboardNavbar() {
                   onMouseEnter={e => { if (!isActive(l.href)) { e.currentTarget.style.background = 'rgba(43,27,18,0.07)'; e.currentTarget.style.color = C.dark } }}
                   onMouseLeave={e => { if (!isActive(l.href)) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.dark2 } }}
                 >
-                  <span style={{ fontSize: 14 }}>{l.icon}</span>
+                  <span style={{ display: 'flex', alignItems: 'center' }}>{l.icon}</span>
                   {l.label}
                 </div>
               </Link>
@@ -153,10 +192,10 @@ export default function DashboardNavbar() {
 
                   {/* Menu items */}
                   {[
-                    { icon: '👤', label: 'Profile',         href: '/profile'      },
-                    { icon: '🏗️', label: 'My Projects',     href: '/my-projects'  },
-                    { icon: '📬', label: 'Applications',    href: '/applications' },
-                    { icon: '⚡', label: 'Dashboard',       href: '/dashboard'    },
+                    { icon: <UserIcon />, label: 'Profile',         href: '/profile'      },
+                    { icon: <ProjectsIcon />, label: 'My Projects',     href: '/my-projects'  },
+                    { icon: <ApplicationsIcon />, label: 'Applications',    href: '/applications' },
+                    { icon: <DashboardIcon />, label: 'Dashboard',       href: '/dashboard'    },
                   ].map(item => (
                     <Link key={item.href} to={item.href} style={{ textDecoration: 'none' }} onClick={() => setDropOpen(false)}>
                       <div style={{
@@ -169,7 +208,7 @@ export default function DashboardNavbar() {
                         onMouseEnter={e => e.currentTarget.style.background = '#F5EDE0'}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
-                        <span style={{ fontSize: 15 }}>{item.icon}</span> {item.label}
+                        <span style={{ display: 'flex', alignItems: 'center' }}>{item.icon}</span> {item.label}
                       </div>
                     </Link>
                   ))}
@@ -187,7 +226,12 @@ export default function DashboardNavbar() {
                       onMouseEnter={e => e.currentTarget.style.background = '#FEE8E3'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
-                      <span>🚪</span> Log out
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                      Log out
                     </button>
                   </div>
                 </div>
@@ -229,7 +273,7 @@ export default function DashboardNavbar() {
                   fontFamily: '"DM Sans", sans-serif',
                   display: 'flex', alignItems: 'center', gap: 8,
                 }}>
-                  <span>{l.icon}</span> {l.label}
+                  <span style={{ display: 'flex', alignItems: 'center' }}>{l.icon}</span> {l.label}
                 </div>
               </Link>
             ))}
