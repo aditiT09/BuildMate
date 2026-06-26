@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { subscribeEmail } from '../../api/newsletter'
 import useScrollReveal from '../../hooks/useScrollReveal'
-import { CheckIcon } from '../../components/common/Icons'
+import { CheckIcon, UserIcon, RocketIcon, UsersIcon, TargetIcon } from '../../components/common/Icons'
+import { getAuthorProfile } from '../../api/profile'
+import { getOverview } from '../../api/analytics'
+import AnimCount from '../../components/ui/AnimCount'
 
 const C = {
   terra300:  '#e8845a',
@@ -34,6 +37,18 @@ export default function Contact() {
   const [ref, visible]      = useScrollReveal(0.1)
   const [inputFocus, setInputFocus] = useState(false)
   const [btnHover,   setBtnHover]   = useState(false)
+  const [authorProfile, setAuthorProfile] = useState(null)
+  const [overview, setOverview] = useState(null)
+
+  useEffect(() => {
+    Promise.all([
+      getAuthorProfile().catch(() => null),
+      getOverview().catch(() => null)
+    ]).then(([authData, overviewData]) => {
+      setAuthorProfile(authData)
+      setOverview(overviewData)
+    })
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -73,6 +88,68 @@ export default function Contact() {
             transition: 'opacity 0.7s ease, transform 0.7s ease',
           }}
         >
+          {/* BuildMate Stats */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1.5px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: 24,
+            padding: '32px 36px',
+            color: C.sand200,
+            width: '100%',
+            boxSizing: 'border-box',
+            marginBottom: 56,
+            textAlign: 'left',
+          }}>
+            {/* Section label */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', color: C.terra300 }}>
+                <RocketIcon size={18} color="currentColor" />
+              </span>
+              <h3 style={{
+                fontFamily: '"DM Sans", sans-serif',
+                fontWeight: 700,
+                fontSize: 16,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                color: C.sand200,
+                margin: 0,
+              }}>
+                BuildMate Stats
+              </h3>
+              <div style={{ flex: 1, height: 1, background: 'rgba(255, 255, 255, 0.08)' }} />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginTop: 10 }}>
+              <div style={{ textAlign: 'center', padding: '16px 24px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 16, border: '1.5px solid rgba(255, 255, 255, 0.06)' }}>
+                <div style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: 6, color: C.terra300 }}>
+                  <RocketIcon color="currentColor" size={24} />
+                </div>
+                <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 32, color: C.sand200, margin: '6px 0 2px' }}>
+                  <AnimCount target={overview?.total_projects ?? 0} />
+                </h4>
+                <p style={{ fontSize: 11, color: 'rgba(245,237,224,0.4)', textTransform: 'uppercase', fontWeight: 700, margin: 0, fontFamily: '"DM Sans", sans-serif' }}>Projects</p>
+              </div>
+              <div style={{ textAlign: 'center', padding: '16px 24px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 16, border: '1.5px solid rgba(255, 255, 255, 0.06)' }}>
+                <div style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: 6, color: C.sand400 }}>
+                  <UsersIcon color="currentColor" size={24} />
+                </div>
+                <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 32, color: C.sand200, margin: '6px 0 2px' }}>
+                  <AnimCount target={overview?.total_users ?? 0} />
+                </h4>
+                <p style={{ fontSize: 11, color: 'rgba(245,237,224,0.4)', textTransform: 'uppercase', fontWeight: 700, margin: 0, fontFamily: '"DM Sans", sans-serif' }}>Builders</p>
+              </div>
+              <div style={{ textAlign: 'center', padding: '16px 24px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 16, border: '1.5px solid rgba(255, 255, 255, 0.06)' }}>
+                <div style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: 6, color: C.terra300 }}>
+                  <TargetIcon color="currentColor" size={24} />
+                </div>
+                <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 32, color: C.sand200, margin: '6px 0 2px' }}>
+                  <AnimCount target={overview?.total_opportunities ?? 0} />
+                </h4>
+                <p style={{ fontSize: 11, color: 'rgba(245,237,224,0.4)', textTransform: 'uppercase', fontWeight: 700, margin: 0, fontFamily: '"DM Sans", sans-serif' }}>Openings</p>
+              </div>
+            </div>
+          </div>
+
           <span style={{
             display: 'block',
             fontSize: 11, fontWeight: 700,
@@ -167,18 +244,151 @@ export default function Contact() {
             </form>
           )}
 
-          {/* Links */}
+          {/* Built by Aditi Tiwari card */}
           <div style={{
-            display: 'flex', flexWrap: 'wrap',
-            justifyContent: 'center', gap: 32,
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1.5px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: 24,
+            padding: '32px 36px',
             marginTop: 56,
+            textAlign: 'left',
+            boxSizing: 'border-box',
+            width: '100%',
+            position: 'relative',
           }}>
-            {[
-              { icon: MailIcon, label: 'adititiwari095@gmail.com', href: 'mailto:adititiwari095@gmail.com' },
-              { icon: LinkedinIcon, label: 'LinkedIn',             href: 'https://www.linkedin.com/in/aditi-tiwari-23606332a/' },
-            ].map(({ icon, label, href }) => (
-              <ContactLink key={label} icon={icon} label={label} href={href} />
-            ))}
+            {/* Header / Title */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', color: C.terra300 }}>
+                <UserIcon size={18} color="currentColor" />
+              </span>
+              <h3 style={{
+                fontFamily: '"DM Sans", sans-serif',
+                fontWeight: 700,
+                fontSize: 16,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                color: C.sand200,
+                margin: 0,
+              }}>
+                Built by Aditi Tiwari
+              </h3>
+              <div style={{ flex: 1, height: 1, background: 'rgba(255, 255, 255, 0.08)' }} />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 28, flexWrap: 'wrap' }}>
+              {/* Left Column */}
+              <div style={{ flex: 1, minWidth: 280 }}>
+                <p style={{
+                  fontSize: 22,
+                  color: C.sand200,
+                  lineHeight: 1.5,
+                  fontFamily: '"Cormorant Garamond", Georgia, serif',
+                  margin: '0 0 24px 0',
+                  fontWeight: 600,
+                }}>
+                  To every builder out there<br />
+                  —thanks for being part of BuildMate.<br />
+                  We can't wait to see what you'll create<br />
+                  together.
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(245,237,224,0.4)', fontFamily: '"DM Sans", sans-serif' }}>
+                    Connect with us:
+                  </span>
+                  <a
+                    href="https://www.linkedin.com/in/aditi-tiwari-23606332a/"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: C.terra300,
+                      textDecoration: 'none',
+                      fontFamily: '"DM Sans", sans-serif',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                    onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+                    onMouseLeave={e => e.target.style.textDecoration = 'none'}
+                  >
+                    LinkedIn ↗
+                  </a>
+                  <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
+                  <a
+                    href="https://instagram.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: C.terra300,
+                      textDecoration: 'none',
+                      fontFamily: '"DM Sans", sans-serif',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                    onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+                    onMouseLeave={e => e.target.style.textDecoration = 'none'}
+                  >
+                    Instagram ↗
+                  </a>
+                  <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
+                  <a
+                    href="mailto:adititiwari095@gmail.com"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: C.terra300,
+                      textDecoration: 'none',
+                      fontFamily: '"DM Sans", sans-serif',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                    onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+                    onMouseLeave={e => e.target.style.textDecoration = 'none'}
+                  >
+                    adititiwari095@gmail.com
+                  </a>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div style={{ flexShrink: 0 }}>
+                {authorProfile?.avatar ? (
+                  <img
+                    src={authorProfile.avatar}
+                    alt="Aditi Tiwari"
+                    style={{
+                      width: 90,
+                      height: 120,
+                      borderRadius: 12,
+                      border: `2px solid ${C.terra300}`,
+                      objectFit: 'cover',
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 90,
+                    height: 120,
+                    borderRadius: 12,
+                    background: `linear-gradient(135deg, ${C.terra300}, ${C.terra500})`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: '"Syne", sans-serif',
+                    fontWeight: 800,
+                    fontSize: 28,
+                    color: 'white',
+                    border: '2px solid rgba(255, 255, 255, 0.1)',
+                  }}>
+                    AT
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>

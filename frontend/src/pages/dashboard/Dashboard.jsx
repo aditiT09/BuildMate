@@ -4,13 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { getMyProjects } from "../../api/projects";
 import { getMyApplications } from "../../api/applications";
 import { getOverview } from "../../api/analytics";
-import { getMyProfile, getAuthorProfile } from "../../api/profile";
+import { getMyProfile } from "../../api/profile";
 import { getCurrentUser } from "../../api/users";
 import { useAuth } from "../../hooks/useAuth";
 import ScoreRing from "../../components/ui/ScoreRing";
 import EmptyState from "../../components/ui/EmptyState";
 import AnimCount from "../../components/ui/AnimCount";
-import ProfileCompleteness from "./components/ProfileCompleteness";
 
 
 
@@ -232,25 +231,22 @@ export default function Dashboard() {
   const [overview,     setOverview]     = useState(null);
   const [profile,      setProfile]      = useState(null);
   const [currentUser,  setCurrentUser]  = useState(null);
-  const [authorProfile, setAuthorProfile] = useState(null);
   const [loading,      setLoading]      = useState(true);
 
   const loadDashboard = useCallback(async () => {
     try {
-      const [pd, ad, od, prd, curUser, authProf] = await Promise.all([
+      const [pd, ad, od, prd, curUser] = await Promise.all([
         getMyProjects(),
         getMyApplications(),
         getOverview(),
         getMyProfile().catch(() => null),
         getCurrentUser().catch(() => null),
-        getAuthorProfile().catch(() => null),
       ]);
       setProjects(pd);
       setApplications(ad);
       setOverview(od);
       setProfile(prd);
       setCurrentUser(curUser);
-      setAuthorProfile(authProf);
     } catch {
       // Suppressed console.error in production
     } finally {
@@ -670,51 +666,9 @@ useEffect(() => {
             </p>
           </div>
         </div>
-        {/* Profile Completeness Card (WHOLE / FULL WIDTH) */}
-        <ProfileCompleteness profile={profile} />
 
 
-        {/* ══ BUILDMATE STATS (WHOLE / FULL WIDTH) ══════ */}
-        <div className="dash-card" style={{
-          background: C.surface, borderRadius: 24, padding: 36, color: C.dark,
-          border: `1px solid ${C.border}`,
-          animation: "slideUp 0.6s ease 0.5s both", opacity: 0,
-          width: "100%",
-          boxSizing: "border-box",
-          marginBottom: 28,
-          
-        }}>
-          <SectionLabel icon={<GlobeIcon color={C.brand} size={18} />}>BuildMate Stats</SectionLabel>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 10 }}>
-            <div style={{ textAlign: "center", padding: "16px 24px", background: C.cream, borderRadius: 16, border: `1px solid ${C.border}` }}>
-              <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
-                <RocketIcon color={C.brand} size={24} />
-              </div>
-              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 28, color: C.brand, margin: "6px 0 2px" }}>
-                <AnimCount target={overview?.total_projects ?? 0} />
-              </h4>
-              <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Projects</p>
-            </div>
-            <div style={{ textAlign: "center", padding: "16px 24px", background: C.cream, borderRadius: 16, border: `1px solid ${C.border}` }}>
-              <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
-                <UsersIcon color={C.orange} size={24} />
-              </div>
-              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 28, color: C.orange, margin: "6px 0 2px" }}>
-                <AnimCount target={overview?.total_users ?? 0} />
-              </h4>
-              <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Builders</p>
-            </div>
-            <div style={{ textAlign: "center", padding: "16px 24px", background: C.cream, borderRadius: 16, border: `1px solid ${C.border}` }}>
-              <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
-                <TargetIcon color="#7C5CBF" size={24} />
-              </div>
-              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 28, color: "#7C5CBF", margin: "6px 0 2px" }}>
-                <AnimCount target={overview?.total_opportunities ?? 0} />
-              </h4>
-              <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Openings</p>
-            </div>
-          </div>
-        </div>
+
 
         {/* ══ ABOUT BUILDMATE (WHOLE / FULL WIDTH / BELOW STATS) ══════ */}
         <div className="dash-card" style={{
@@ -759,183 +713,7 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* ══ AUTHOR FOOTER SIGNATURE ══════ */}
-        <div className="dash-card" style={{
-          background: C.surface,
-          border: `1px solid ${C.border}`,
-          borderRadius: 24,
-          padding: 36,
-          animation: "slideUp 0.6s ease 0.6s both",
-          opacity: 0,
-          width: "100%",
-          boxSizing: "border-box",
-          marginBottom: 28,
-        }}>
-          <SectionLabel icon={<UserIcon color={C.brand} size={18} />}>Built by Aditi Tiwari</SectionLabel>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 28, marginTop: 12 }}>
-            {/* Left Column */}
-            <div style={{ flex: 1 }}>
-              <p style={{
-                fontSize: 22,
-                color: C.dark,
-                lineHeight: 1.5,
-                fontFamily: '"Cormorant Garamond", Georgia, serif',
-                margin: "0 0 20px 0",
-                fontWeight: 600,
-              }}>
-                To every builder out there<br />
-                —thanks for being part of BuildMate.<br />
-                We can't wait to see what you'll create<br />
-                together.
-              </p>
-              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: C.muted, fontFamily: '"DM Sans", sans-serif' }}>
-                  Connect with us:
-                </span>
-                <a
-                  href="https://linkedin.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: C.brand,
-                    textDecoration: "none",
-                    fontFamily: '"DM Sans", sans-serif',
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                  onMouseLeave={e => e.target.style.textDecoration = "none"}
-                >
-                  LinkedIn ↗
-                </a>
-                <span style={{ color: C.border }}>|</span>
-                <a
-                  href="https://instagram.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: C.brand,
-                    textDecoration: "none",
-                    fontFamily: '"DM Sans", sans-serif',
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                  onMouseLeave={e => e.target.style.textDecoration = "none"}
-                >
-                  Instagram ↗
-                </a>
-                <span style={{ color: C.border }}>|</span>
-                <a
-                  href="mailto:adititiwari09@gmail.com"
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: C.brand,
-                    textDecoration: "none",
-                    fontFamily: '"DM Sans", sans-serif',
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                  onMouseEnter={e => e.target.style.textDecoration = "underline"}
-                  onMouseLeave={e => e.target.style.textDecoration = "none"}
-                >
-                  adititiwari09@gmail.com
-                </a>
-              </div>
-            </div>
 
-            {/* Right Column */}
-            <div style={{ flexShrink: 0 }}>
-              {authorProfile?.avatar ? (
-                isAditi ? (
-                  <Link to="/profile" style={{ textDecoration: "none" }}>
-                    <img
-                      src={authorProfile.avatar}
-                      alt="Aditi Tiwari"
-                      style={{
-                        width: 90,
-                        height: 120,
-                        borderRadius: 12,
-                        border: `2px solid ${C.brand}`,
-                        objectFit: "cover",
-                        transition: "transform 0.2s",
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
-                      onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-                    />
-                  </Link>
-                ) : (
-                  <img
-                    src={authorProfile.avatar}
-                    alt="Aditi Tiwari"
-                    style={{
-                      width: 90,
-                      height: 120,
-                      borderRadius: 12,
-                      border: `2px solid ${C.brand}`,
-                      objectFit: "cover",
-                    }}
-                  />
-                )
-              ) : (
-                isAditi ? (
-                  <Link to="/profile" style={{ textDecoration: "none" }}>
-                    <div style={{
-                      width: 90,
-                      height: 120,
-                      borderRadius: 12,
-                      border: `2px dashed ${C.brand}`,
-                      background: C.sand,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.background = C.sandDark;
-                        e.currentTarget.style.transform = "scale(1.05)";
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.background = C.sand;
-                        e.currentTarget.style.transform = "scale(1)";
-                      }}
-                    >
-                      <span style={{ fontSize: 24, color: C.brand, fontWeight: 700, lineHeight: 1 }}>+</span>
-                      <span style={{ fontSize: 10, color: C.brand, fontWeight: 700, marginTop: 4, fontFamily: '"DM Sans", sans-serif', textTransform: "uppercase" }}>Photo</span>
-                    </div>
-                  </Link>
-                ) : (
-                  <div style={{
-                    width: 90,
-                    height: 120,
-                    borderRadius: 12,
-                    background: `linear-gradient(135deg, ${C.brand}, ${C.brandDark})`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: '"Syne", sans-serif',
-                    fontWeight: 800,
-                    fontSize: 28,
-                    color: "white",
-                    border: `2px solid ${C.sandDark}`,
-                  }}>
-                    AT
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
