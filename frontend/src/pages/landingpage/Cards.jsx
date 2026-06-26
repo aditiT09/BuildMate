@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import useScrollReveal from '../../hooks/useScrollReveal'
 
 const C = {
@@ -148,6 +149,7 @@ function SmallCard({ icon, title, desc }) {
 
 export default function Cards() {
   const [ref, visible] = useScrollReveal(0.1)
+  const [bigHovered, setBigHovered] = useState(false)
 
   return (
     <section id="cards" style={{ padding: '0 20px 96px', maxWidth: 1200, margin: '0 auto' }} ref={ref}>
@@ -161,13 +163,22 @@ export default function Cards() {
       }}>
 
         {/* ── Big Discover Card ── */}
-        <div style={{
-          borderRadius: 28, overflow: 'hidden',
-          position: 'relative', minHeight: 340,
-          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-          background: C.terra500,
-          border: '2px solid #7A4854',
-        }}>
+        <Link to="/register" style={{ textDecoration: 'none', display: 'block', color: 'inherit' }}>
+          <div
+            onMouseEnter={() => setBigHovered(true)}
+            onMouseLeave={() => setBigHovered(false)}
+            style={{
+              borderRadius: 28, overflow: 'hidden',
+              position: 'relative', minHeight: 340,
+              display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+              background: C.terra500,
+              border: '2px solid #7A4854',
+              cursor: 'pointer',
+              transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+              transform: bigHovered ? 'translateY(-4px)' : 'translateY(0)',
+              boxShadow: bigHovered ? '0 20px 48px rgba(0,0,0,0.15)' : 'none',
+            }}
+          >
           {/* Gradient bg */}
           <div style={{
             position: 'absolute', inset: 0,
@@ -235,6 +246,7 @@ export default function Cards() {
             </p>
           </div>
         </div>
+      </Link>
 
         {/* ── Small Cards Row ── */}
         <div className="cards-bottom-row" style={{
