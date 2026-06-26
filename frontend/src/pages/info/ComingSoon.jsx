@@ -96,6 +96,92 @@ const PRIVACY_SECTIONS = [
   }
 ];
 
+const TERMS_SECTIONS = [
+  {
+    title: "1. What BuildMate Does",
+    text: "BuildMate helps users discover projects, create project listings, apply to roles, invite teammates, and build collaboration profiles.",
+    warning: "BuildMate is currently an MVP and may change over time."
+  },
+  {
+    title: "2. User Accounts",
+    text: "To use certain features, you must create an account.",
+    subtext: "You agree to:",
+    items: [
+      "Provide accurate information.",
+      "Keep your login details secure.",
+      "Use the platform responsibly.",
+      "Not impersonate another person.",
+      "Not create accounts for spam, abuse, or fraud."
+    ]
+  },
+  {
+    title: "3. User Content",
+    text: "You may create or upload content such as profiles, project descriptions, skills, links, resources, and applications.",
+    subtext: "You are responsible for the content you submit. You agree not to post:",
+    items: [
+      "False or misleading information.",
+      "Offensive, harmful, or abusive content.",
+      "Spam or irrelevant promotions.",
+      "Content that violates someone else’s rights.",
+      "Malicious links or unsafe files."
+    ]
+  },
+  {
+    title: "4. Projects and Collaborations",
+    subtext: "BuildMate helps users connect, but we do not guarantee:",
+    items: [
+      "That a project will be completed.",
+      "That a teammate will respond or contribute.",
+      "That a collaboration will be successful.",
+      "That profile scores or matching results are perfect."
+    ],
+    warning: "Users are responsible for deciding who they collaborate with."
+  },
+  {
+    title: "5. Matching, Scores, and Recommendations",
+    text: "BuildMate may show activity scores, reliability scores, skill matches, rankings, or recommendations.",
+    warning: "These are only platform-generated indicators and should not be treated as absolute judgments of a person’s ability, character, or trustworthiness."
+  },
+  {
+    title: "6. Acceptable Use",
+    subtext: "You agree not to:",
+    items: [
+      "Attack, disrupt, or overload the platform.",
+      "Try to access another user’s account.",
+      "Scrape data without permission.",
+      "Reverse-engineer protected parts of the service.",
+      "Use BuildMate for illegal, harmful, or abusive activity."
+    ]
+  },
+  {
+    title: "7. External Links",
+    text: "Users may share links to GitHub, LinkedIn, portfolios, or project resources. BuildMate is not responsible for external websites or their content.",
+    warning: "Open external links at your own discretion."
+  },
+  {
+    title: "8. Account Suspension or Removal",
+    text: "We may suspend or remove accounts or content if we believe they violate these terms, harm other users, or create security risks."
+  },
+  {
+    title: "9. Availability",
+    text: "BuildMate is provided as-is. We may update, pause, or remove features at any time.",
+    warning: "We do not guarantee that the platform will always be available, error-free, or secure."
+  },
+  {
+    title: "10. Limitation of Liability",
+    text: "To the maximum extent allowed by law, BuildMate and its creator are not responsible for indirect losses, failed collaborations, lost data, missed opportunities, or damages resulting from use of the platform."
+  },
+  {
+    title: "11. Changes to These Terms",
+    text: "We may update these Terms as BuildMate evolves. Changes will be posted on this page with an updated date."
+  },
+  {
+    title: "12. Contact",
+    text: "For questions about these Terms, contact:",
+    email: "adititiwari095@gmail.com"
+  }
+];
+
 export default function ComingSoon() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -103,6 +189,10 @@ export default function ComingSoon() {
 
   const title = isPrivacy ? "Privacy Policy" : "Terms of Service";
   const icon = isPrivacy ? ShieldIcon : DocumentIcon;
+  const introText = isPrivacy
+    ? "BuildMate is a platform that helps builders, students, and creators find teammates, projects, and collaboration opportunities."
+    : "Welcome to BuildMate. By using BuildMate, you agree to these Terms of Service.";
+  const sections = isPrivacy ? PRIVACY_SECTIONS : TERMS_SECTIONS;
 
   return (
     <div
@@ -123,15 +213,15 @@ export default function ComingSoon() {
           backgroundColor: C.surface,
           border: `2px solid ${C.dark}`,
           borderRadius: "32px",
-          padding: isPrivacy ? "40px 48px" : "48px 32px",
-          maxWidth: isPrivacy ? "720px" : "480px",
+          padding: "40px 48px",
+          maxWidth: "720px",
           width: "100%",
-          textAlign: isPrivacy ? "left" : "center",
+          textAlign: "left",
           boxShadow: `8px 8px 0px ${C.dark}`,
           animation: "floatUp 0.5s ease both",
         }}
       >
-        <div style={{ display: isPrivacy ? "flex" : "inline-block", alignItems: "center", gap: 16, marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 12 }}>
           <div style={{ display: "inline-block", color: C.brand }}>{icon}</div>
           <h1
             style={{
@@ -147,107 +237,73 @@ export default function ComingSoon() {
           </h1>
         </div>
 
-        {isPrivacy ? (
-          <div>
-            <p style={{ fontSize: 13, color: C.muted, marginBottom: 16, fontFamily: '"DM Sans", sans-serif', fontWeight: 600 }}>
-              Last updated: June 26, 2026
-            </p>
-            <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, marginBottom: 28, fontFamily: '"DM Sans", sans-serif' }}>
-              BuildMate is a platform that helps builders, students, and creators find teammates, projects, and collaboration opportunities.
-            </p>
+        <div>
+          <p style={{ fontSize: 13, color: C.muted, marginBottom: 16, fontFamily: '"DM Sans", sans-serif', fontWeight: 600 }}>
+            Last updated: June 26, 2026
+          </p>
+          <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, marginBottom: 28, fontFamily: '"DM Sans", sans-serif' }}>
+            {introText}
+          </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 36 }}>
-              {PRIVACY_SECTIONS.map((sec, i) => (
-                <div key={i} style={{ borderBottom: i < PRIVACY_SECTIONS.length - 1 ? `1px solid rgba(43,27,18,0.06)` : "none", paddingBottom: i < PRIVACY_SECTIONS.length - 1 ? 20 : 0 }}>
-                  <h3 style={{
-                    fontFamily: '"Syne", sans-serif',
-                    fontWeight: 700,
-                    fontSize: 16,
-                    color: C.dark,
-                    marginBottom: 10,
+          <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 36 }}>
+            {sections.map((sec, i) => (
+              <div key={i} style={{ borderBottom: i < sections.length - 1 ? `1px solid rgba(43,27,18,0.06)` : "none", paddingBottom: i < sections.length - 1 ? 20 : 0 }}>
+                <h3 style={{
+                  fontFamily: '"Syne", sans-serif',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  color: C.dark,
+                  marginBottom: 10,
+                }}>
+                  {sec.title}
+                </h3>
+                
+                {sec.intro && (
+                  <p style={{ fontSize: 14, color: "rgba(43,27,18,0.8)", lineHeight: 1.6, marginBottom: 8 }}>{sec.intro}</p>
+                )}
+                
+                {sec.text && (
+                  <p style={{ fontSize: 14, color: "rgba(43,27,18,0.8)", lineHeight: 1.6, marginBottom: sec.warning || sec.subtext || sec.email ? 8 : 0 }}>{sec.text}</p>
+                )}
+
+                {sec.subtext && (
+                  <p style={{ fontSize: 14, color: "rgba(43,27,18,0.8)", lineHeight: 1.6, marginBottom: 8, fontWeight: 500 }}>{sec.subtext}</p>
+                )}
+
+                {sec.items && (
+                  <ul style={{ paddingLeft: 20, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                    {sec.items.map((item, idx) => (
+                      <li key={idx} style={{ fontSize: 13.5, color: "rgba(43,27,18,0.7)", lineHeight: 1.6 }}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+
+                {sec.warning && (
+                  <div style={{
+                    marginTop: 8,
+                    padding: "8px 14px",
+                    background: "rgba(227, 83, 54, 0.08)",
+                    borderLeft: `3px solid ${C.brand}`,
+                    borderRadius: 4,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: C.brandDk,
                   }}>
-                    {sec.title}
-                  </h3>
-                  
-                  {sec.intro && (
-                    <p style={{ fontSize: 14, color: "rgba(43,27,18,0.8)", lineHeight: 1.6, marginBottom: 8 }}>{sec.intro}</p>
-                  )}
-                  
-                  {sec.text && (
-                    <p style={{ fontSize: 14, color: "rgba(43,27,18,0.8)", lineHeight: 1.6, marginBottom: sec.warning || sec.subtext || sec.email ? 8 : 0 }}>{sec.text}</p>
-                  )}
+                    ⚠️ {sec.warning}
+                  </div>
+                )}
 
-                  {sec.subtext && (
-                    <p style={{ fontSize: 14, color: "rgba(43,27,18,0.8)", lineHeight: 1.6, marginBottom: 8, fontWeight: 500 }}>{sec.subtext}</p>
-                  )}
-
-                  {sec.items && (
-                    <ul style={{ paddingLeft: 20, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-                      {sec.items.map((item, idx) => (
-                        <li key={idx} style={{ fontSize: 13.5, color: "rgba(43,27,18,0.7)", lineHeight: 1.6 }}>{item}</li>
-                      ))}
-                    </ul>
-                  )}
-
-                  {sec.warning && (
-                    <div style={{
-                      marginTop: 8,
-                      padding: "8px 14px",
-                      background: "rgba(227, 83, 54, 0.08)",
-                      borderLeft: `3px solid ${C.brand}`,
-                      borderRadius: 4,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: C.brandDk,
-                    }}>
-                      ⚠️ {sec.warning}
-                    </div>
-                  )}
-
-                  {sec.email && (
-                    <a href={`mailto:${sec.email}`} style={{ fontSize: 14, color: C.brand, fontWeight: 600, textDecoration: "none" }}>
-                      {sec.email}
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
+                {sec.email && (
+                  <a href={`mailto:${sec.email}`} style={{ fontSize: 14, color: C.brand, fontWeight: 600, textDecoration: "none" }}>
+                    {sec.email}
+                  </a>
+                )}
+              </div>
+            ))}
           </div>
-        ) : (
-          <>
-            <div
-              style={{
-                display: "inline-block",
-                backgroundColor: "rgba(227, 83, 54, 0.1)",
-                color: C.brand,
-                fontSize: "12px",
-                fontWeight: 700,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                padding: "6px 16px",
-                borderRadius: "9999px",
-                marginBottom: "20px",
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              Coming Soon
-            </div>
+        </div>
 
-            <p
-              style={{
-                fontSize: "15px",
-                color: C.muted,
-                lineHeight: 1.6,
-                marginBottom: "32px",
-                margin: "0 0 32px 0",
-              }}
-            >
-              We are finalizing our Terms of Service to establish clear guidelines for projects, builders, and collaborations. Check back soon for the official update.
-            </p>
-          </>
-        )}
-
-        <div style={{ display: "flex", justifyContent: isPrivacy ? "flex-start" : "center" }}>
+        <div style={{ display: "flex", justifyContent: "flex-start" }}>
           <button
             onClick={() => navigate(-1)}
             style={{
