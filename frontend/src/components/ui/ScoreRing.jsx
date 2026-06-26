@@ -20,7 +20,7 @@ export default function ScoreRing({ score = 50, label, color, size = 88 }) {
           style={{ transition: "stroke-dashoffset 1.5s ease" }}
         />
         <text x={size/2} y={size/2 + 5} textAnchor="middle" fill="#2B1B12"
-              style={{ fontSize: 18, fontWeight: 700, transform: "rotate(90deg)", transformOrigin: `${size/2}px ${size/2}px`, fontFamily: '"Syne", sans-serif' }}>
+              style={{ fontSize: 18, fontWeight: 700, transform: "rotate(90deg)", transformOrigin: `${size/2}px ${size/2}px`, fontFamily: '"Melody by W.", "Melody", sans-serif' }}>
           <AnimCount target={score} />
         </text>
       </svg>

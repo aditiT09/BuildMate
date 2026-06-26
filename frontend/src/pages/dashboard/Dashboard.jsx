@@ -446,7 +446,7 @@ useEffect(() => {
                       display: "flex", alignItems: "center", gap: 10,
                       animation: `slideUp 0.4s ease ${0.2 + i * 0.06}s both`, opacity: 0,
                     }}>
-                      <span style={{ color: C.orange, fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 16, width: 24 }}>
+                      <span style={{ color: C.orange, fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, width: 24 }}>
                         {i + 1}.
                       </span>
                       <div style={{
@@ -466,7 +466,7 @@ useEffect(() => {
                           {name}
                         </span>
                         {isObj && (
-                          <span style={{ position: "relative", color: C.orange, fontSize: 13, fontWeight: 700, fontFamily: '"Syne", sans-serif' }}>
+                          <span style={{ position: "relative", color: C.orange, fontSize: 13, fontWeight: 700, fontFamily: '"Melody by W.", "Melody", sans-serif' }}>
                             {count} {count === 1 ? "builder" : "builders"}
                           </span>
                         )}
@@ -690,7 +690,7 @@ useEffect(() => {
               <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
                 <RocketIcon color={C.brand} size={24} />
               </div>
-              <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.brand, margin: "6px 0 2px" }}>
+              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 28, color: C.brand, margin: "6px 0 2px" }}>
                 <AnimCount target={overview?.total_projects ?? 0} />
               </h4>
               <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Projects</p>
@@ -699,7 +699,7 @@ useEffect(() => {
               <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
                 <UsersIcon color={C.orange} size={24} />
               </div>
-              <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: C.orange, margin: "6px 0 2px" }}>
+              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 28, color: C.orange, margin: "6px 0 2px" }}>
                 <AnimCount target={overview?.total_users ?? 0} />
               </h4>
               <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Builders</p>
@@ -708,7 +708,7 @@ useEffect(() => {
               <div style={{ display: "inline-flex", justifyContent: "center", marginBottom: 6 }}>
                 <TargetIcon color="#7C5CBF" size={24} />
               </div>
-              <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 28, color: "#7C5CBF", margin: "6px 0 2px" }}>
+              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 28, color: "#7C5CBF", margin: "6px 0 2px" }}>
                 <AnimCount target={overview?.total_opportunities ?? 0} />
               </h4>
               <p style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", fontWeight: 700 }}>Openings</p>
@@ -970,8 +970,8 @@ function StatCard({ color, icon, title, value, sub, delay, link }) {
           fontFamily: '"DM Sans", sans-serif',
         }}>{title}</span>
       </div>
-      <div style={{
-        fontFamily: '"Syne", sans-serif', fontSize: 52, fontWeight: 800,
+       <div style={{
+        fontFamily: '"Melody by W.", "Melody", sans-serif', fontSize: 52, fontWeight: 800,
         color: C.dark, lineHeight: 1,
         animation: "countUp 0.6s ease both",
       }}>
@@ -999,7 +999,7 @@ function MiniStat({ icon, label, value, delay, loading }) {
       <div>
         {loading
           ? <Skeleton h={24} w={40} r={4} />
-          : <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22, color: C.dark, lineHeight: 1 }}><AnimCount target={value} /></p>
+          : <p style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 22, color: C.dark, lineHeight: 1 }}><AnimCount target={value} /></p>
         }
         <p style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{label}</p>
       </div>
