@@ -49,11 +49,10 @@ app.include_router(
 app.add_middleware(
     CORSMiddleware,
    allow_origins=[
-    "http://localhost:5173",
-    "http://localhost:5174",
-     
-    "https://build-mate-r1b414v3p-adititiwari095-8972s-projects.vercel.app"
-    "https://buildmate-frontend-git-main-adititiwari095-8972-projects.vercel.app",
+       "http://localhost:5173",
+       "http://localhost:5174",
+       "https://build-mate-r1b414v3p-adititiwari095-8972s-projects.vercel.app",
+       "https://buildmate-frontend-git-main-adititiwari095-8972-projects.vercel.app",
 ],
     allow_credentials=True,
     allow_methods=["*"],
