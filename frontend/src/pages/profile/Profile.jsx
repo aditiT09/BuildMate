@@ -9,7 +9,26 @@ import { getCurrentUser } from "../../api/users";
 import { useAuth } from "../../hooks/useAuth";
 import Layout from "../../components/layout/Layout";
 import { validateExternalLink, getErrorMessage } from "../../utils/validation";
-
+const DEFAULT_SKILLS = new Set([
+  "React", "React Native", "Next.Js", "Vue.Js", "Angular", "HTML5", "CSS3",
+  "Javascript", "Typescript", "Node.Js", "Express.Js", "Python", "Django",
+  "Fastapi", "Flask", "Go (Golang)", "Rust", "Java", "Spring Boot", "C++",
+  "C#", ".Net", "Ruby On Rails", "SQL", "Postgresql", "Mysql", "Mongodb",
+  "Redis", "Graphql", "Docker", "Kubernetes", "AWS", "Google Cloud Platform (Gcp)",
+  "Microsoft Azure", "Firebase", "Git / Github", "CI/CD (GitHub Actions)",
+  "Figma", "Adobe Xd", "UI/UX Design", "Product Management", "Agile / Scrum",
+  "Machine Learning", "Deep Learning", "Natural Language Processing (Nlp)",
+  "Computer Vision", "Data Analysis", "Pandas / Numpy", "Scikit-Learn",
+  "Tensorflow / Pytorch", "Data Visualization (D3.Js / Tableau)", "Solidity",
+  "Web3 / Blockchain", "Smart Contracts", "Tailwind Css", "Sass / Scss",
+  "Redux / Zustand", "Websockets", "Socket.Io", "Unity / C#", "Unreal Engine",
+  "Swift (Ios)", "Kotlin (Android)", "Flutter", "System Design", "Microservices",
+  "Openapi / Swagger", "Testing (Jest / Cypress)", "Pytest", "Linux / Bash",
+  "Cybersecurity", "Penetration Testing", "Seo", "Digital Marketing", "Copywriting",
+  "Technical Writing", "Devops", "Terraform", "Prometheus / Grafana", "Elk Stack",
+  "Webassembly", "Three.Js", "Webgl", "Framer Motion", "Opencv", "Pygame",
+  "Pydantic", "Sqlalchemy", "Celery", "Apache Kafka"
+]);
 
 const C = {
   brand:"#E35336",brandDk:"#B8391F",orange:"#F4A460",
@@ -371,8 +390,17 @@ export default function Profile(){
 
 
 
-  const mySkillIds=new Set(skills.map(s=>s.skill_id||s.id));
-  const filteredAll=allSkills.filter(s=>!mySkillIds.has(s.id)&&(!skillQ||s.name.toLowerCase().includes(skillQ.toLowerCase())));
+  const mySkillIds = new Set(skills.map(s => s.skill_id || s.id));
+  const filteredAll = allSkills.filter(s => {
+    const isAdded = mySkillIds.has(s.id);
+    if (isAdded) return false;
+    
+    if (!skillQ) {
+      return DEFAULT_SKILLS.has(s.name);
+    } else {
+      return s.name.toLowerCase().includes(skillQ.toLowerCase());
+    }
+  });
   const displayName=profile?.full_name||user?.name||"Builder";
   const acceptedApps=apps.filter(a=>a.status==="accepted").length;
   const successRate=apps.length?Math.round((acceptedApps/apps.length)*100):0;
