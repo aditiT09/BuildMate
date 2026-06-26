@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { subscribeEmail } from '../../api/newsletter'
 import useScrollReveal from '../../hooks/useScrollReveal'
 
@@ -199,15 +200,18 @@ export default function Contact() {
 
 
         <div style={{ display: 'flex', gap: 20 }}>
-          {['Privacy', 'Terms'].map(t => (
-            <a key={t} href="#" style={{
-              fontSize: 12, color: 'rgba(255,255,255,0.25)',
-              fontFamily: '"DM Sans", sans-serif', textDecoration: 'none',
+          {[
+            { label: 'Privacy', path: '/privacy' },
+            { label: 'Terms',   path: '/terms' }
+          ].map(({ label, path }) => (
+            <Link key={label} to={path} style={{
+              fontSize: 14, color: 'rgba(255,255,255,0.25)',
+              fontFamily: '"Melody by W.", "Melody", sans-serif', textDecoration: 'none',
               transition: 'color 0.2s',
             }}
               onMouseEnter={e => e.target.style.color = 'rgba(255,255,255,0.55)'}
               onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.25)'}
-            >{t}</a>
+            >{label}</Link>
           ))}
         </div>
       </footer>

@@ -26,6 +26,7 @@ import LandingPage from "../pages/landingpage/LandingPage";
 import Profile from "../pages/profile/Profile";
 import PublicProfile from
 "../pages/profile/PublicProfile";
+import ComingSoon from "../pages/info/ComingSoon";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -166,6 +167,14 @@ function AppRoutes() {
         <Route
           path="/forgot-password"
           element={<ForgotPassword />}
+        />
+        <Route
+          path="/privacy"
+          element={<ComingSoon />}
+        />
+        <Route
+          path="/terms"
+          element={<ComingSoon />}
         />
         <Route
           path="*"
