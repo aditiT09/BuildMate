@@ -27,8 +27,8 @@ const C = {
 const STYLES = `
   @keyframes floatUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   .pp-fade { animation: floatUp 0.45s ease both; }
-  .pp-card { transition: all 0.2s ease; border: 2px solid #2B1B12; border-radius: 24px; padding: 28px; background: #FDFBF7; box-shadow: 6px 6px 0px #2B1B12; }
-  .pp-card:hover { transform: translateY(-3px); box-shadow: 10px 10px 0px #2B1B12; }
+  .pp-card { transition: all 0.2s ease; border: 1px solid #F4A460; border-radius: 24px; padding: 28px; background: #FDFBF7; }
+  .pp-card:hover { transform: translateY(-3px); }
   .pp-link-btn { transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
   .pp-link-btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0px #2B1B12 !important; background: #F5EDE0 !important; }
   .proj-row { transition: all 0.18s ease; border: 1px solid #E9DDD0; border-radius: 12px; background: #FBF5EE; cursor: pointer; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
@@ -237,68 +237,152 @@ export default function PublicProfile() {
             ← back
           </button>
 
-          {/* Grid Layout */}
-          <div className="profile-grid" style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 24, alignItems: "start" }}>
+          {/* Centered Stacked Layout */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 720, margin: "0 auto" }}>
             
-            {/* LEFT SIDEBAR */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              
-              {/* Profile Card */}
-              <Card delay={0.05} style={{ textAlign: "center", padding: "36px 20px" }}>
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-                  {profile.avatar ? (
-                    <img
-                      src={profile.avatar}
-                      alt="Avatar"
-                      style={{
-                        width: 96, height: 96, borderRadius: "50%",
-                        border: `2px solid ${C.dark}`, objectFit: "cover",
-                        background: C.sand,
-                      }}
-                    />
-                  ) : (
-                    <div style={{
+            {/* Profile Card (Samuel Card) in the middle */}
+            <Card delay={0.05} style={{ textAlign: "center", padding: "36px 20px" }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+                {profile.avatar ? (
+                  <img
+                    src={profile.avatar}
+                    alt="Avatar"
+                    style={{
                       width: 96, height: 96, borderRadius: "50%",
-                      border: `2px solid ${C.dark}`, background: C.brand,
-                      color: "white", display: "flex", alignItems: "center", justifyContent: "center",
-                      fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 32,
-                    }}>
-                      {initials}
-                    </div>
-                  )}
-                </div>
-
-                <h2 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark, marginBottom: 4, lineHeight: 1.2 }}>
-                  {displayName}
-                </h2>
-
-                {profile.availability && (
-                  <span style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    background: "#E8F5E9", color: C.success,
-                    border: "1px solid #C8E6C9", padding: "4px 14px",
-                    borderRadius: 9999, fontSize: 11, fontWeight: 700,
-                    fontFamily: '"DM Sans", sans-serif', letterSpacing: ".06em",
-                    marginTop: 8,
+                      border: `2px solid ${C.dark}`, objectFit: "cover",
+                      background: C.sand,
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 96, height: 96, borderRadius: "50%",
+                    border: `2px solid ${C.dark}`, background: C.brand,
+                    color: "white", display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 32,
                   }}>
-                    <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.success, display: "inline-block" }} />
-                    {profile.availability}
-                  </span>
+                    {initials}
+                  </div>
                 )}
+              </div>
 
-                {profile.college && (
-                  <p style={{
-                    fontSize: 12, color: C.muted, marginTop: 14,
-                    fontFamily: '"DM Sans", sans-serif', lineHeight: 1.5,
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
-                  }}>
-                    <Ic name="book" size={12} color={C.muted} /> {profile.college}{profile.degree && ` · ${profile.degree}`}
+              <h2 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark, marginBottom: 4, lineHeight: 1.2 }}>
+                {displayName}
+              </h2>
+
+              {profile.availability && (
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  background: "#E8F5E9", color: C.success,
+                  border: "1px solid #C8E6C9", padding: "4px 14px",
+                  borderRadius: 9999, fontSize: 11, fontWeight: 700,
+                  fontFamily: '"DM Sans", sans-serif', letterSpacing: ".06em",
+                  marginTop: 8,
+                }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.success, display: "inline-block" }} />
+                  {profile.availability}
+                </span>
+              )}
+
+              {profile.college && (
+                <p style={{
+                  fontSize: 12, color: C.muted, marginTop: 14,
+                  fontFamily: '"DM Sans", sans-serif', lineHeight: 1.5,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                }}>
+                  <Ic name="book" size={12} color={C.muted} /> {profile.college}{profile.degree && ` · ${profile.degree}`}
+                </p>
+              )}
+            </Card>
+
+            {/* About Card below the profile card */}
+            <Card delay={0.1}>
+              <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
+                <Ic name="user" size={16} color={C.brand} /> About Builder
+              </h3>
+              <p style={{
+                fontFamily: '"DM Sans", sans-serif', fontSize: 15, lineHeight: 1.8,
+                color: C.dark2, fontStyle: "italic", borderLeft: `3px solid ${C.brand}`,
+                paddingLeft: 16, margin: 0, whiteSpace: "pre-line",
+              }}>
+                {profile.bio ? `"${profile.bio}"` : <span style={{ display: "flex", alignItems: "center", gap: 6 }}><UserIcon size={14} /> No bio added yet</span>}
+              </p>
+            </Card>
+
+            {/* Projects Card below the About card */}
+            <Card delay={0.15}>
+              <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
+                <Ic name="layers" size={16} color={C.brand} /> Projects Built ({projects.length})
+              </h3>
+              {projects.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "20px 0" }}>
+                  <p style={{ fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 13, margin: 0 }}>
+                    No public projects added by this builder yet.
                   </p>
-                )}
-              </Card>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {projects.map((proj) => (
+                    <Link key={proj.id} to={`/projects/${proj.id}`} style={{ textDecoration: "none" }}>
+                      <div className="proj-row">
+                        <div style={{ width: 38, height: 38, borderRadius: 10, background: C.sandDk, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Ic name="layers" size={18} color={C.dark2} />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
+                            {proj.title}
+                          </p>
+                          {proj.project_type && (
+                            <p style={{ fontSize: 11, color: C.muted, fontFamily: '"DM Sans", sans-serif', margin: 0 }}>
+                              {proj.project_type}
+                            </p>
+                          )}
+                        </div>
+                        <Ic name="chevronRight" size={14} color={C.muted} />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </Card>
 
+            {/* Skills Card below the Projects card */}
+            <Card delay={0.2}>
+              <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
+                <Ic name="wrench" size={16} color={C.brand} /> Tech Stack & Skills
+              </h3>
+              {skillsArray.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "20px 0" }}>
+                  <p style={{ fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 13, margin: 0 }}>
+                    No skills listed by this builder yet.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {skillsArray.map((skill) => (
+                    <span
+                      key={skill}
+                      style={{
+                        background: "#FEE8E3",
+                        color: "#B8391F",
+                        border: `1.5px solid ${C.border}`,
+                        borderRadius: 9999,
+                        padding: "6px 16px",
+                        fontFamily: '"DM Sans", sans-serif',
+                        fontWeight: 700,
+                        fontSize: 13,
+                      }}
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            {/* Scores and Links cards side by side */}
+            <div className="profile-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, width: "100%" }}>
               {/* Scores Card */}
-              <Card delay={0.1} style={{ padding: "20px 24px" }}>
+              <Card delay={0.25} style={{ padding: "20px 24px" }}>
                 <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".18em", textTransform: "uppercase", color: C.muted, fontFamily: '"DM Sans", sans-serif', marginBottom: 16, textAlign: "center" }}>
                   Builder Scores
                 </p>
@@ -311,9 +395,9 @@ export default function PublicProfile() {
                 </p>
               </Card>
 
-              {/* External Connections Card */}
-              {(validateExternalLink(profile.github) || validateExternalLink(profile.linkedin) || validateExternalLink(profile.portfolio)) && (
-                <Card delay={0.15} style={{ padding: "20px 24px" }}>
+              {/* Links Card */}
+              {(validateExternalLink(profile.github) || validateExternalLink(profile.linkedin) || validateExternalLink(profile.portfolio)) ? (
+                <Card delay={0.3} style={{ padding: "20px 24px" }}>
                   <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".18em", textTransform: "uppercase", color: C.muted, fontFamily: '"DM Sans", sans-serif', marginBottom: 12 }}>
                     Links
                   </p>
@@ -403,93 +487,12 @@ export default function PublicProfile() {
                     )}
                   </div>
                 </Card>
-              )}
-            </div>
-
-            {/* RIGHT MAIN DETAILS */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              
-              {/* About Bio Card */}
-              <Card delay={0.12}>
-                <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
-                  <Ic name="user" size={16} color={C.brand} /> About Builder
-                </h3>
-                <p style={{
-                  fontFamily: '"DM Sans", sans-serif', fontSize: 15, lineHeight: 1.8,
-                  color: C.dark2, fontStyle: "italic", borderLeft: `3px solid ${C.brand}`,
-                  paddingLeft: 16, margin: 0, whiteSpace: "pre-line",
-                }}>
-                  {profile.bio ? `"${profile.bio}"` : <span style={{ display: "flex", alignItems: "center", gap: 6 }}><UserIcon size={14} /> No bio added yet</span>}
-                </p>
-              </Card>
-
-              {/* Skills Card */}
-              {skillsArray.length > 0 && (
-                <Card delay={0.18}>
-                  <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
-                    <Ic name="wrench" size={16} color={C.brand} /> Tech Stack & Skills
-                  </h3>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {skillsArray.map((skill) => (
-                      <span
-                        key={skill}
-                        style={{
-                          background: "#FEE8E3",
-                          color: "#B8391F",
-                          border: `1.5px solid ${C.border}`,
-                          borderRadius: 9999,
-                          padding: "6px 16px",
-                          fontFamily: '"DM Sans", sans-serif',
-                          fontWeight: 700,
-                          fontSize: 13,
-                        }}
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
+              ) : (
+                <Card delay={0.3} style={{ padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <p style={{ fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 13, margin: 0 }}>No links shared</p>
                 </Card>
               )}
-
-              {/* Projects Card */}
-              <Card delay={0.24}>
-                <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
-                  <Ic name="layers" size={16} color={C.brand} /> Projects Built ({projects.length})
-                </h3>
-                {projects.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "20px 0" }}>
-                    <p style={{ fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 13, margin: 0 }}>
-                      No public projects added by this builder yet.
-                    </p>
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {projects.map((proj) => (
-                      <Link key={proj.id} to={`/projects/${proj.id}`} style={{ textDecoration: "none" }}>
-                        <div className="proj-row">
-                          <div style={{ width: 38, height: 38, borderRadius: 10, background: C.sandDk, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <Ic name="layers" size={18} color={C.dark2} />
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
-                              {proj.title}
-                            </p>
-                            {proj.project_type && (
-                              <p style={{ fontSize: 11, color: C.muted, fontFamily: '"DM Sans", sans-serif', margin: 0 }}>
-                                {proj.project_type}
-                              </p>
-                            )}
-                          </div>
-                          <Ic name="chevronRight" size={14} color={C.muted} />
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </Card>
-
             </div>
-
           </div>
 
         </div>

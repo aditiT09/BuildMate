@@ -1,10 +1,15 @@
+import os
+from pathlib import Path
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+env_file_path = str(BASE_DIR / ".env")
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env"
+        env_file=env_file_path
     )
 
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/buildmate"

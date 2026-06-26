@@ -12,6 +12,8 @@ from app.schemas.profile import (
 
 from app.utils.security import get_current_user
 from app.utils.scoring import recalculate_user_scores
+from app.models.skill import Skill
+from app.models.user_skill import UserSkill
 
 router = APIRouter()
 
@@ -43,6 +45,15 @@ def get_my_profile(
 
         if value in ("", "abc"):
             setattr(profile, field, None)
+
+    # Populate skills from user_skills table
+    user_skills = (
+        db.query(Skill.name)
+        .join(UserSkill, UserSkill.skill_id == Skill.id)
+        .filter(UserSkill.user_id == current_user.id)
+        .all()
+    )
+    profile.skills = ", ".join([sk.name for sk in user_skills])
 
     return profile
 
@@ -88,6 +99,15 @@ def get_profile(
 
     if profile.user:
         recalculate_user_scores(profile.user, db)
+
+    # Populate skills from user_skills table
+    user_skills = (
+        db.query(Skill.name)
+        .join(UserSkill, UserSkill.skill_id == Skill.id)
+        .filter(UserSkill.user_id == user_id)
+        .all()
+    )
+    profile.skills = ", ".join([sk.name for sk in user_skills])
 
     return profile
 
@@ -136,5 +156,14 @@ def save_profile(
 
     db.commit()
     db.refresh(profile)
+
+    # Populate skills from user_skills table
+    user_skills = (
+        db.query(Skill.name)
+        .join(UserSkill, UserSkill.skill_id == Skill.id)
+        .filter(UserSkill.user_id == current_user.id)
+        .all()
+    )
+    profile.skills = ", ".join([sk.name for sk in user_skills])
 
     return profile

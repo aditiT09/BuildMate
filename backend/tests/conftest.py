@@ -1,12 +1,14 @@
 import os
+from pathlib import Path
 import pytest
 import dotenv
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
-# Load the test environment configuration
-dotenv.load_dotenv(".env.test")
+# Load the test environment configuration dynamically relative to this file
+BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv.load_dotenv(str(BASE_DIR / ".env.test"))
 
 import fnmatch
 from app.config import settings

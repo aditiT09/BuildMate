@@ -25,8 +25,11 @@ def test_migration_chain():
     
     # 3. Run migrations on temp_db
     try:
-        # Load Alembic configuration
-        alembic_cfg = Config("alembic.ini")
+        from pathlib import Path
+        # Load Alembic configuration dynamically relative to this file
+        base_dir = Path(__file__).resolve().parent.parent
+        alembic_ini_path = str(base_dir / "alembic.ini")
+        alembic_cfg = Config(alembic_ini_path)
 
         # Use temporary database during migration testing
         os.environ["DATABASE_URL"] = temp_db_url
