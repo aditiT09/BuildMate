@@ -83,13 +83,6 @@ const UserIcon = ({ color = "currentColor", size = 20 }) => (
   </svg>
 );
 
-const InfoIcon = ({ color = "currentColor", size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="16" x2="12" y2="12" />
-    <line x1="12" y1="8" x2="12.01" y2="8" />
-  </svg>
-);
 
 const TrendingIcon = ({ color = "currentColor", size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
@@ -152,38 +145,6 @@ const STYLES = `
   .streak-cell { transition: all 0.15s ease; }
   .streak-cell:hover { transform: scale(1.3); }
 
-  .about-flow {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    gap: 28px;
-    margin-top: 28px;
-    width: 100%;
-  }
-  .about-step {
-    width: 48%;
-    background: #FFF8F0;
-    border: 1px solid #F4A460;
-    border-radius: 18px;
-    padding: 28px;
-    transition: transform 0.22s ease;
-    position: relative;
-    z-index: 2;
-    box-sizing: border-box;
-  }
-  .about-step:hover {
-    transform: translateY(-4px) scale(1.01);
-  }
-  .about-step-1 { align-self: flex-start; }
-  .about-step-2 { align-self: flex-end; }
-  .about-step-3 { align-self: flex-start; }
-
-  @media (max-width: 991px) {
-    .about-step {
-      width: 100% !important;
-      align-self: center !important;
-    }
-  }
 `;
 
 // ── Skeleton loader ──────────────────────────────────────
@@ -792,48 +753,7 @@ useEffect(() => {
 
 
 
-        {/* ══ ABOUT BUILDMATE (WHOLE / FULL WIDTH / BELOW STATS) ══════ */}
-        <div className="dash-card" style={{
-          background: C.surface, borderRadius: 24, padding: 36,
-          border: `1px solid ${C.orange}`, marginBottom: 28,
-          animation: "slideUp 0.6s ease 0.55s both", opacity: 0,
-          width: "100%",
-          boxSizing: "border-box",
-        }}>
-          <SectionLabel icon={<InfoIcon color={C.brand} size={18} />}>About BuildMate</SectionLabel>
-          
-          <div className="about-flow">
-            {/* Step 1 */}
-            <div className="about-step about-step-1">
-              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                01. The Spark
-              </h4>
-              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"Manrope", sans-serif', margin: 0 }}>
-                BuildMate was born from a simple idea: great projects need great teammates. Too many students have ideas but struggle to find people who share their skills, passion, and drive.
-              </p>
-            </div>
 
-            {/* Step 2 */}
-            <div className="about-step about-step-2">
-              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                02. The Mission
-              </h4>
-              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"Manrope", sans-serif', margin: 0 }}>
-                We make collaboration easier by helping builders discover projects, connect with talented peers, and create teams that actually ship. No awkward networking, no endless searching—just the right people for the right project.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="about-step about-step-3">
-              <h4 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 18, color: C.brand, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                03. The Vision
-              </h4>
-              <p style={{ fontSize: 15, color: C.dark, lineHeight: 1.6, fontFamily: '"Manrope", sans-serif', margin: 0 }}>
-                At BuildMate, we believe the next big idea starts with one connection. Build together, learn together, and turn ambitious ideas into real achievements.
-              </p>
-            </div>
-          </div>
-        </div>
 
 
       </div>
