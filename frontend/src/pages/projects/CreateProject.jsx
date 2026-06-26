@@ -10,6 +10,7 @@ import {
 } from "../../api/projects";
 import { getSkills } from "../../api/userSkills";
 import { addProjectSkill, getProjectSkills, removeProjectSkill } from "../../api/projectSkills";
+import { getErrorMessage } from "../../utils/validation";
 
 const C = {
   brand:   "#E35336",
@@ -218,10 +219,36 @@ export default function CreateProject() {
     e.preventDefault();
     try {
       setLoading(true);
+      const payload = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        timeline: form.timeline.trim(),
+        project_type: form.project_type.trim(),
+      };
+
+      if (payload.title.length < 3) {
+        alert("Project title must be at least 3 characters.");
+        return;
+      }
+
+      if (payload.description.length < 20) {
+        alert("Project description must be at least 20 characters.");
+        return;
+      }
+
+      if (payload.timeline.length < 2) {
+        alert("Timeline must be at least 2 characters.");
+        return;
+      }
+
+      if (payload.project_type.length < 2) {
+        alert("Please choose or enter a project type.");
+        return;
+      }
 
       let project;
       if (id) {
-        project = await updateProject(id, form);
+        project = await updateProject(id, payload);
         
         const initialIds = initialSkills.map(s => s.id);
         const selectedIds = selectedSkills.map(s => s.id);
@@ -236,7 +263,7 @@ export default function CreateProject() {
         
         alert("Project updated successfully!");
       } else {
-        project = await createProject(form);
+        project = await createProject(payload);
         
         await Promise.all(
           selectedSkills.map(s => addProjectSkill(project.id, s.id))
@@ -248,7 +275,7 @@ export default function CreateProject() {
       navigate(`/projects/${project.id}`);
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.detail || `Failed to ${id ? "update" : "create"} project`);
+      alert(getErrorMessage(error?.response?.data?.detail) || `Failed to ${id ? "update" : "create"} project`);
     } finally {
       setLoading(false);
     }

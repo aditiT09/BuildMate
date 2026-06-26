@@ -10,7 +10,7 @@ import { useAuth } from "../../hooks/useAuth";
 import Layout from "../../components/layout/Layout";
 import LoadingState from "../../components/ui/LoadingState";
 import EmptyState from "../../components/ui/EmptyState";
-import { validateExternalLink } from "../../utils/validation";
+import { getErrorMessage, validateExternalLink } from "../../utils/validation";
 
 import {
   getProjectLinks,
@@ -45,13 +45,26 @@ const BarChartIcon = ({ size = 16, color = "currentColor", ...props }) => (
 
 const RESOURCE_ICONS = {
   GitHub: <GitHubIcon size={14} />,
+  github: <GitHubIcon size={14} />,
   Demo: <PlayIcon size={14} />,
   Figma: <PaletteIcon size={14} />,
+  figma: <PaletteIcon size={14} />,
   "Google Drive": <FolderIcon size={14} />,
   Notion: <ClipboardIcon size={14} />,
   Presentation: <MonitorIcon size={14} />,
   Other: <LinkIcon size={14} />,
+  other: <LinkIcon size={14} />,
 };
+
+const RESOURCE_TYPES = [
+  "GitHub",
+  "Demo",
+  "Figma",
+  "Google Drive",
+  "Notion",
+  "Presentation",
+  "Other",
+];
 
 const tilt = (n) => {
   const seq = [-1.6, 1.2, -0.8, 1.8, -1.2, 0.9];
@@ -144,6 +157,21 @@ export default function ProjectDetail() {
   const handleAddResource = async () => {
     try {
       setAddingResource(true);
+      const title = resourceForm.title.trim();
+      const resourceType = resourceForm.resource_type.trim();
+
+      if (!title) {
+        alert("Please add a title for this resource.");
+        setAddingResource(false);
+        return;
+      }
+
+      if (!resourceType) {
+        alert("Please choose a resource type.");
+        setAddingResource(false);
+        return;
+      }
+
       const normalizedUrl = validateExternalLink(resourceForm.url);
       if (!normalizedUrl) {
         alert("Please enter a valid URL (e.g., https://github.com/user or github.com)");
@@ -151,7 +179,8 @@ export default function ProjectDetail() {
         return;
       }
       const payload = {
-        ...resourceForm,
+        title,
+        resource_type: resourceType,
         url: normalizedUrl,
       };
       const created = await createProjectLink(id, payload);
@@ -160,7 +189,7 @@ export default function ProjectDetail() {
       setShowResourceForm(false);
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.detail || "Failed to add resource");
+      alert(getErrorMessage(error?.response?.data?.detail) || "Failed to add resource");
     } finally {
       setAddingResource(false);
     }
@@ -682,13 +711,9 @@ export default function ProjectDetail() {
                   }}
                 >
                   <option value="">type?</option>
-                  <option value="GitHub">GitHub</option>
-                  <option value="Demo">Demo</option>
-                  <option value="Figma">Figma</option>
-                  <option value="Google Drive">Google Drive</option>
-                  <option value="Notion">Notion</option>
-                  <option value="Presentation">Presentation</option>
-                  <option value="Other">Other</option>
+                  {RESOURCE_TYPES.map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
                 </select>
                 <input
                   type="text"
