@@ -1,8 +1,5 @@
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import api from "../../api/axios";
-import { getErrorMessage } from "../../utils/validation";
-import { WarningIcon, CheckIcon } from "../../components/common/Icons";
+import { LockIcon } from "../../components/common/Icons";
 
 const colors = {
   primary: "#E35336",
@@ -45,25 +42,6 @@ const FloatingDot = ({ style }) => (
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [focused, setFocused] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      setError("");
-      await api.post("/auth/forgot-password", { email });
-      setSuccess(true);
-    } catch (err) {
-      setError(getErrorMessage(err.response?.data?.detail) || "Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div
@@ -75,10 +53,11 @@ export default function ForgotPassword() {
         className="hidden lg:flex flex-col justify-center relative overflow-hidden"
         style={{
           width: "55%",
+          flexShrink: 0,
           backgroundColor: colors.textPrimary,
           padding: "3.5rem",
           borderTopRightRadius: "80px",
-          borderBottomRightRadius: "80px",
+          borderBottomRightRadius: "50px",
         }}
       >
         <GridPattern />
@@ -113,8 +92,11 @@ export default function ForgotPassword() {
       </div>
 
       {/* ── Right Panel (Form) ── */}
-      <div className="w-full lg:w-[45%] flex flex-col justify-center px-8 sm:px-16 lg:px-20 py-12 relative">
-        <div className="w-full max-w-md mx-auto">
+      <div
+        className="w-full lg:w-[45%] flex flex-col justify-center px-8 sm:px-16 lg:px-60 py-12 right"
+        style={{ flexShrink: 0 }}
+      >
+        <div className="w-full max-w-md lg:ml-auto lg:mr-0 mx-auto">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-10 cursor-pointer" onClick={() => navigate("/")}>
             <div
@@ -136,164 +118,73 @@ export default function ForgotPassword() {
             </span>
           </div>
 
-          {!success ? (
-            <>
-              <h2
-                className="text-3xl font-bold mb-3 tracking-tight"
-                style={{ color: colors.textPrimary, fontFamily: "'Syne', sans-serif" }}
-              >
-                Forgot Password?
-              </h2>
-              <p className="text-sm mb-8" style={{ color: colors.textSecondary }}>
-                Enter the email address associated with your account.
-              </p>
-
-              {error && (
-                <div
-                  role="alert"
-                  style={{
-                    backgroundColor: "#FEF2F2",
-                    border: "1.5px solid #FECACA",
-                    color: "#DC2626",
-                    borderRadius: "12px",
-                    padding: "12px 16px",
-                    fontSize: "14px",
-                    marginBottom: "20px",
-                    fontWeight: 500,
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <WarningIcon size={16} color="#DC2626" />
-                    <span>{error}</span>
-                  </div>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} noValidate>
-                <div className="mb-6 relative">
-                  <label
-                    htmlFor="email"
-                    style={{
-                      display: "block",
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      color: colors.textPrimary,
-                      marginBottom: "8px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onFocus={() => setFocused(true)}
-                    onBlur={() => setFocused(false)}
-                    placeholder="e.g. you@university.edu"
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "14px 16px",
-                      borderRadius: "12px",
-                      border: `2px solid ${focused ? colors.primary : colors.border}`,
-                      backgroundColor: colors.inputBg,
-                      color: colors.textPrimary,
-                      fontSize: "15px",
-                      transition: "all 0.2s ease",
-                      outline: "none",
-                      boxShadow: focused ? `0 0 0 4px ${colors.primary}1A` : "none",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || !email.trim()}
-                  style={{
-                    width: "100%",
-                    padding: "14px",
-                    borderRadius: "9999px",
-                    backgroundColor: colors.primary,
-                    color: "#FFFFFF",
-                    fontSize: "15px",
-                    fontWeight: 700,
-                    border: "none",
-                    cursor: loading || !email.trim() ? "not-allowed" : "pointer",
-                    transition: "all 0.2s",
-                    boxShadow: `0 4px 14px ${colors.primary}33`,
-                    opacity: loading || !email.trim() ? 0.7 : 1,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading && email.trim()) e.target.style.backgroundColor = colors.primaryHover;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loading) e.target.style.backgroundColor = colors.primary;
-                  }}
-                >
-                  {loading ? "Sending reset link..." : "Send Reset Link"}
-                </button>
-              </form>
-            </>
-          ) : (
+          <div
+            className="text-center"
+            style={{
+              backgroundColor: colors.cardBg,
+              border: `2px solid ${colors.textPrimary}`,
+              boxShadow: `6px 6px 0px #6F4E37`,
+              borderRadius: "24px",
+              padding: "40px 24px",
+            }}
+          >
             <div
-              className="text-center"
               style={{
-                backgroundColor: colors.cardBg,
-                border: `2px solid ${colors.textPrimary}`,
-                boxShadow: `6px 6px 0px ${colors.textPrimary}`,
-                borderRadius: "24px",
-                padding: "32px 24px",
+                width: "56px",
+                height: "56px",
+                borderRadius: "50%",
+                backgroundColor: colors.accentLight,
+                color: colors.primary,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: "20px",
+                border: `2px solid ${colors.border}`,
               }}
             >
-              <div
-                style={{
-                  width: "56px",
-                  height: "56px",
-                  borderRadius: "50%",
-                  backgroundColor: "#E8F5E9",
-                  color: colors.success,
-                  fontSize: "28px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: "16px",
-                  border: "2px solid #C8E6C9",
-                }}
-              >
-                <CheckIcon size={24} color={colors.success} />
-              </div>
-              <h2
-                className="text-2xl font-bold mb-3"
-                style={{ color: colors.textPrimary, fontFamily: "'Syne', sans-serif" }}
-              >
-                Check Your Inbox
-              </h2>
-              <p
-                role="alert"
-                className="text-sm leading-relaxed mb-6"
-                style={{ color: colors.textSecondary }}
-              >
-                If an account exists with <strong>{email}</strong>, we have sent a secure password reset link. Please check your spam folder if it doesn't arrive in a few minutes.
-              </p>
+              <LockIcon size={24} color={colors.primary} />
             </div>
-          )}
+            <h2
+              className="text-3xl font-bold mb-3"
+              style={{
+                color: colors.textPrimary,
+                fontFamily: '"Melody by W.", "Melody", sans-serif',
+                fontWeight: 800,
+              }}
+            >
+              Coming Soon
+            </h2>
+            <p
+              className="text-sm leading-relaxed mb-4"
+              style={{ color: colors.textSecondary }}
+            >
+              We are working hard to build secure password recovery features. Password reset functionality will be available in a future update!
+            </p>
+          </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-12 text-center">
             <Link
               to="/login"
               style={{
-                color: colors.primary,
-                fontSize: "14px",
-                fontWeight: 700,
+                display: "inline-block",
+                padding: "14px 36px",
+                borderRadius: "9999px",
+                backgroundColor: colors.primary,
+                color: "#FFFFFF",
+                fontSize: "15px",
+                fontWeight: 800,
                 textDecoration: "none",
-                transition: "color 0.15s",
+                transition: "all 0.2s ease",
+                boxShadow: `0 4px 12px ${colors.primary}33`,
               }}
-              onMouseEnter={(e) => (e.target.style.color = colors.primaryHover)}
-              onMouseLeave={(e) => (e.target.style.color = colors.primary)}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.primaryHover;
+                e.target.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = colors.primary;
+                e.target.style.transform = "translateY(0)";
+              }}
             >
               ← Back to Login
             </Link>

@@ -139,7 +139,7 @@ export default function MyProjects() {
 
             <button
               className="mp-new"
-              onClick={() => navigate("/projects/create")}
+              onClick={() => navigate("/create-project")}
               style={{
                 background: C.brand, color: "white", border: "none",
                 borderRadius: 999, padding: "13px 24px",
@@ -162,7 +162,7 @@ export default function MyProjects() {
                 headline="shelf's empty"
                 sub="you haven't posted anything yet. drop your first idea and start building your team"
                 cta="+ post your first project"
-                href="/projects/create"
+                href="/create-project"
               />
             </div>
           ) : (
