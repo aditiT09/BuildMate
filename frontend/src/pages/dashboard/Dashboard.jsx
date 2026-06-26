@@ -55,12 +55,6 @@ const GlobeIcon = ({ color = "currentColor", size = 20 }) => (
   </svg>
 );
 
-const RocketIcon = ({ color = "currentColor", size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-    <path d="M4.5 16.5c-1.5 1.26-2 3.3-2 3.3s2.04-.5 3.3-2L18.5 5.5a4.24 4.24 0 1 0-6-6L4.5 16.5z" />
-    <path d="M12 15l-3-3m5.5 8.5L12 18l-3-3-2.5 2.5a1 1 0 0 0-.2.3l-1.5 4a.5.5 0 0 0 .6.6l4-1.5a1 1 0 0 0 .3-.2l2.5-2.5z" />
-  </svg>
-);
 
 const AwardIcon = ({ color = "currentColor", size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
@@ -76,12 +70,6 @@ const LightningIcon = ({ color = "currentColor", size = 20 }) => (
   </svg>
 );
 
-const UserIcon = ({ color = "currentColor", size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
 
 
 const TrendingIcon = ({ color = "currentColor", size = 20 }) => (
@@ -99,13 +87,6 @@ const UsersIcon = ({ color = "currentColor", size = 20 }) => (
   </svg>
 );
 
-const TargetIcon = ({ color = "currentColor", size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-    <circle cx="12" cy="12" r="10" />
-    <circle cx="12" cy="12" r="6" />
-    <circle cx="12" cy="12" r="2" />
-  </svg>
-);
 
 const ClockIcon = ({ color = "currentColor", size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
@@ -268,7 +249,6 @@ useEffect(() => {
 
   const displayName = profile?.full_name || user?.name || "Builder";
   const firstName   = displayName.split(" ")[0];
-  const isAditi     = user?.email === "adititiwari09@gmail.com";
 
   const pendingApps  = applications.filter(a => a.status === "pending").length;
   const acceptedApps = applications.filter(a => a.status === "accepted").length;

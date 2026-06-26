@@ -24,12 +24,6 @@ const C = {
   warn:     "#D48A2D",
 };
 
-const ClockIcon = ({ color = "currentColor", size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block", flexShrink: 0 }}>
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
-  </svg>
-);
 
 const STYLES = `
   @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -56,7 +50,7 @@ export default function IncomingDashboard() {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingOpps, setLoadingOpps] = useState(false);
 
-  // Fetch initial projects
+// Fetch initial projects
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -65,8 +59,8 @@ export default function IncomingDashboard() {
         if (pd && pd.length > 0) {
           setSelectedProject(pd[0]);
         }
-      } catch (err) {
-        // Suppressed console.error in production
+      } catch {
+        // Suppressed in production
       } finally {
         setLoadingProjects(false);
       }
@@ -91,14 +85,14 @@ export default function IncomingDashboard() {
             try {
               const apps = await getOpportunityApplications(opp.id);
               counts[opp.id] = apps.length;
-            } catch (err) {
+            } catch {
               counts[opp.id] = 0;
             }
           })
         );
         setAppCounts(counts);
-      } catch (err) {
-        // Suppressed console.error in production
+      } catch {
+        // Suppressed in production
       } finally {
         setLoadingOpps(false);
       }
