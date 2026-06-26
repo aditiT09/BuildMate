@@ -264,9 +264,13 @@ export default function CreateProject() {
         alert("Project updated successfully!");
       } else {
         project = await createProject(payload);
-        
+
+        const validSelectedSkills = selectedSkills.filter((skill) => (
+          Number.isFinite(Number(skill.id))
+        ));
+
         await Promise.all(
-          selectedSkills.map(s => addProjectSkill(project.id, s.id))
+          validSelectedSkills.map(s => addProjectSkill(project.id, s.id))
         );
         
         alert("Project created successfully!");

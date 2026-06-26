@@ -34,14 +34,35 @@ export const validateExternalLink = (url) => {
 export const getErrorMessage = (detail) => {
   if (!detail) return "";
   if (typeof detail === "string") return detail;
+
   if (Array.isArray(detail)) {
-    return detail.map(d => {
+    return detail.map((d) => {
+      if (typeof d === "string") return d;
+
       const field = d.loc ? d.loc[d.loc.length - 1] : "";
-      return `${field ? field + ": " : ""}${d.msg || JSON.stringify(d)}`;
+
+      if (d.msg) {
+        return `${field ? field + ": " : ""}${d.msg}`;
+      }
+
+      if (d.message) {
+        return `${field ? field + ": " : ""}${d.message}`;
+      }
+
+      if (d.detail) {
+        return `${field ? field + ": " : ""}${getErrorMessage(d.detail)}`;
+      }
+
+      return `${field ? field + ": " : ""}${JSON.stringify(d)}`;
     }).join(", ");
   }
+
   if (typeof detail === "object") {
-    return detail.message || detail.detail || JSON.stringify(detail);
+    if (detail.message) return detail.message;
+    if (detail.detail) return getErrorMessage(detail.detail);
+    if (detail.errors) return getErrorMessage(detail.errors);
+    return JSON.stringify(detail);
   }
+
   return String(detail);
 };

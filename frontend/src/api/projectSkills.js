@@ -4,11 +4,14 @@ export const addProjectSkill = async (
   projectId,
   skillId
 ) => {
+  const numericProjectId = Number(projectId);
+  const numericSkillId = Number(skillId);
+
   const response = await api.post(
     "/project-skills/",
     {
-      project_id: projectId,
-      skill_id: skillId,
+      project_id: numericProjectId,
+      skill_id: numericSkillId,
     }
   );
 
