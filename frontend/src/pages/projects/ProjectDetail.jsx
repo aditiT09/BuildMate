@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { GitHubIcon, PlayIcon, PaletteIcon, FolderIcon, ClipboardIcon, MonitorIcon, LinkIcon, UserXIcon, TimelineIcon, PinIcon, TargetIcon, SparklesIcon, PenIcon, HandshakeIcon, TrashIcon, DoorIcon, UserPlusIcon, PaperclipIcon, MailIcon, LightbulbIcon, CelebrationIcon } from "../../components/common/Icons";
+import { GitHubIcon, PlayIcon, PaletteIcon, FolderIcon, ClipboardIcon, MonitorIcon, LinkIcon, UserXIcon, TimelineIcon, PinIcon, TargetIcon, SparklesIcon, PenIcon, HandshakeIcon, TrashIcon, DoorIcon, UserPlusIcon, PaperclipIcon, MailIcon, LightbulbIcon, CelebrationIcon, CheckIcon } from "../../components/common/Icons";
 
 import { getProjectById, deleteProject } from "../../api/projects";
-import { createApplication } from "../../api/applications";
+import { createApplication, getMyApplications } from "../../api/applications";
 import { getProjectOpportunities } from "../../api/opportunities";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -104,6 +104,7 @@ export default function ProjectDetail() {
   const [loading, setLoading] = useState(true);
   const [opportunities, setOpportunities] = useState([]);
   const [applyingId, setApplyingId] = useState(null);
+  const [appliedSet, setAppliedSet] = useState(new Set());
 
   const [links, setLinks] = useState([]);
   const [showResourceForm, setShowResourceForm] = useState(false);
@@ -138,6 +139,12 @@ export default function ProjectDetail() {
           setSkillGap(gap);
         } catch (err) {
           console.error("Failed loading skill gap:", err);
+        }
+        try {
+          const apps = await getMyApplications();
+          setAppliedSet(new Set(apps.map(a => a.opportunity_id)));
+        } catch (err) {
+          console.error("Failed loading applications:", err);
         }
       }
     } catch (error) {
@@ -222,6 +229,7 @@ export default function ProjectDetail() {
     try {
       setApplyingId(opportunityId);
       await createApplication(opportunityId);
+      setAppliedSet((prev) => new Set([...prev, opportunityId]));
       alert("Application submitted!");
     } catch (error) {
       console.error(error);
@@ -624,19 +632,28 @@ export default function ProjectDetail() {
                       )}
                     </div>
                     <button
-                      className="pd-btn-prime"
+                      className={appliedSet.has(opportunity.id) ? "" : "pd-btn-prime"}
                       onClick={() => handleApply(opportunity.id)}
-                      disabled={applyingId === opportunity.id}
+                      disabled={appliedSet.has(opportunity.id) || applyingId === opportunity.id}
                       style={{
-                        background: C.brand, color: "white", border: "none",
-                        borderRadius: 999, padding: "10px 22px",
-                        fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
-                        cursor: applyingId === opportunity.id ? "wait" : "pointer",
+                        background: appliedSet.has(opportunity.id) ? C.sand : C.brand,
+                        color: appliedSet.has(opportunity.id) ? C.muted : "white",
+                        border: "none",
+                        borderRadius: 999,
+                        padding: "10px 22px",
+                        fontFamily: '"DM Sans", sans-serif',
+                        fontWeight: 800,
+                        fontSize: 13,
+                        cursor: appliedSet.has(opportunity.id) ? "default" : (applyingId === opportunity.id ? "wait" : "pointer"),
                         transition: "all .18s",
                         opacity: applyingId === opportunity.id ? 0.7 : 1,
                       }}
                     >
-                      {applyingId === opportunity.id ? "sending..." : (
+                      {applyingId === opportunity.id ? "sending..." : appliedSet.has(opportunity.id) ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                          <CheckIcon size={13} color="currentColor" /> applied
+                        </span>
+                      ) : (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                           <UserPlusIcon size={13} color="currentColor" /> apply
                         </span>
