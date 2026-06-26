@@ -2,7 +2,8 @@ import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { getMyProjects } from "../../api/projects";
-import { getMyApplications } from "../../api/applications";
+import { getMyApplications, getOpportunityApplications } from "../../api/applications";
+import { getProjectOpportunities } from "../../api/opportunities";
 import { getOverview } from "../../api/analytics";
 import { getMyProfile } from "../../api/profile";
 import { getCurrentUser } from "../../api/users";
@@ -231,6 +232,7 @@ export default function Dashboard() {
   const [overview,     setOverview]     = useState(null);
   const [profile,      setProfile]      = useState(null);
   const [currentUser,  setCurrentUser]  = useState(null);
+  const [incomingApps, setIncomingApps] = useState([]);
   const [loading,      setLoading]      = useState(true);
 
   const loadDashboard = useCallback(async () => {
@@ -247,6 +249,34 @@ export default function Dashboard() {
       setOverview(od);
       setProfile(prd);
       setCurrentUser(curUser);
+
+      if (pd && pd.length > 0) {
+        try {
+          const oppsPromises = pd.map(p => getProjectOpportunities(p.id).catch(() => []));
+          const oppsResults = await Promise.all(oppsPromises);
+          const allOpps = oppsResults.flat();
+
+          const appsPromises = allOpps.map(o => getOpportunityApplications(o.id).catch(() => []));
+          const appsResults = await Promise.all(appsPromises);
+
+          const allIncomingApps = appsResults.flatMap((apps, oppIdx) => {
+            const opp = allOpps[oppIdx];
+            const proj = pd.find(p => p.id === opp.project_id);
+            return apps.map(app => ({
+              ...app,
+              opportunity: {
+                ...opp,
+                project: proj,
+              },
+            }));
+          });
+
+          allIncomingApps.sort((a, b) => b.id - a.id);
+          setIncomingApps(allIncomingApps);
+        } catch (err) {
+          console.error("Failed loading incoming applications:", err);
+        }
+      }
     } catch {
       // Suppressed console.error in production
     } finally {
@@ -635,6 +665,83 @@ useEffect(() => {
               {applications.length > 6 && (
                 <Link to="/applications" style={{ textDecoration: "none", textAlign: "center", display: "block", padding: "10px", color: C.brand, fontWeight: 600, fontSize: 13 }}>
                   +{applications.length - 6} more applications →
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ══ INCOMING APPLICATIONS ("incoming!") ══════ */}
+        <div className="dash-card" style={{
+          background: C.surface, borderRadius: 24, padding: 36,
+          border: `1px solid ${C.border}`, marginBottom: 28,
+          animation: "slideUp 0.6s ease 0.38s both", opacity: 0,
+          width: "100%",
+          boxSizing: "border-box",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <SectionLabel icon={<UsersIcon color={C.brand} size={18} />}>incoming!</SectionLabel>
+            <Link to="/incoming" style={{ textDecoration: "none" }}>
+              <ActionBtn>view</ActionBtn>
+            </Link>
+          </div>
+          <p style={{ fontSize: 13, color: C.muted, marginTop: -15, marginBottom: 20, fontStyle: "italic" }}>
+            New knock on the door! Let's see if they're a fit for the build
+          </p>
+
+          {loading ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[1,2,3].map(i => <Skeleton key={i} h={56} r={12} />)}
+            </div>
+          ) : incomingApps.length === 0 ? (
+            <EmptyState
+              icon={<UsersIcon color={C.muted} size={48} />}
+              headline="no new knocks on the door"
+              sub="Post opportunities and invite builders to get applications flowing!"
+            />
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {incomingApps.slice(0, 5).map((app, i) => (
+                <div key={app.id} style={{
+                  display: "flex", alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "12px 16px",
+                  background: C.cream, borderRadius: 12,
+                  border: `1px solid ${C.border}`,
+                  animation: `slideUp 0.4s ease ${i * 0.05}s both`,
+                  opacity: 0,
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 10,
+                      background: C.sand,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontFamily: '"Eczar", serif', fontWeight: 800, fontSize: 13, color: C.brand
+                    }}>
+                      {(app.user?.name || "U").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <p style={{ fontWeight: 600, fontSize: 14, color: C.dark }}>
+                        {app.user?.name || "Builder"} applied for <span style={{ color: C.brand }}>{app.opportunity?.role || "Role"}</span>
+                      </p>
+                      <p style={{ fontSize: 12, color: C.muted }}>
+                        Project: {app.opportunity?.project?.title || "Project"}
+                      </p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <StatusBadge status={app.status} />
+                    <Link to={`/opportunities/${app.opportunity?.id}/applicants`} style={{
+                      textDecoration: "none", fontSize: 12, color: C.brand, fontWeight: 700
+                    }}>
+                      review →
+                    </Link>
+                  </div>
+                </div>
+              ))}
+              {incomingApps.length > 5 && (
+                <Link to="/incoming" style={{ textDecoration: "none", textAlign: "center", display: "block", padding: "10px", color: C.brand, fontWeight: 600, fontSize: 13 }}>
+                  +{incomingApps.length - 5} more incoming applications →
                 </Link>
               )}
             </div>

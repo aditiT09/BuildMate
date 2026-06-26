@@ -22,6 +22,7 @@ import InviteBuilders from "../pages/opportunities/InviteBuilders";
 import OpportunityApplicants
 from "../pages/applications/OpportunityApplicants";
 import MyProjects from "../pages/projects/MyProjects";
+import IncomingDashboard from "../pages/applications/IncomingDashboard";
 import LandingPage from "../pages/landingpage/LandingPage";
 import Profile from "../pages/profile/Profile";
 import PublicProfile from
@@ -96,6 +97,14 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <Dashboard />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/incoming"
+  element={
+    <ProtectedRoute>
+      <IncomingDashboard />
     </ProtectedRoute>
   }
 />
