@@ -8,6 +8,46 @@ const C = {
   sand300:  '#edd5b8',
 }
 
+const CodeIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#f5ede0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="16 18 22 12 16 6" />
+    <polyline points="8 6 2 12 8 18" />
+  </svg>
+);
+
+const RocketIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#f5ede0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 2s-8 7-9 8a5 5 0 1 0-7 7c1 1 8-9 8-9" />
+    <path d="M17 17s-2.5 2.5-6 2.5a1 1 0 0 1-.7-.3l-3-3a1 1 0 0 1-.3-.7c0-3.5 2.5-6 2.5-6" />
+    <path d="M2 22l4-4M19 5l-1 1M18 5l1 1" />
+  </svg>
+);
+
+const FileTextIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c4622d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <line x1="10" y1="9" x2="8" y2="9" />
+  </svg>
+);
+
+const UsersIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c4622d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const ZapIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c4622d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+
 function AnimBar({ visible, pct }) {
   return (
     <div style={{ height: 4, borderRadius: 2, marginTop: 32, overflow: 'hidden', background: 'rgba(255,255,255,0.12)' }}>
@@ -21,7 +61,7 @@ function AnimBar({ visible, pct }) {
   )
 }
 
-function ExplainerCard({ emoji, title, body, delay }) {
+function ExplainerCard({ icon, title, body, delay }) {
   const [r, v] = useScrollReveal(0.15)
   return (
     <div ref={r} style={{
@@ -31,7 +71,7 @@ function ExplainerCard({ emoji, title, body, delay }) {
       transform: v ? 'translateY(0)' : 'translateY(32px)',
       transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
     }}>
-      <span style={{ fontSize: 32, display: 'block', marginBottom: 16 }}>{emoji}</span>
+      <span style={{ display: 'block', marginBottom: 16 }}>{icon}</span>
       <h4 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 18, marginBottom: 8, color: C.terra900 }}>{title}</h4>
       <p style={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 300, fontSize: 14, lineHeight: 1.65, color: 'rgba(44,24,16,0.6)' }}>{body}</p>
     </div>
@@ -110,30 +150,30 @@ export default function Mission() {
 
         <MissionCard bg={C.terra900} delay={0}>
           <span style={bigNumStyle}>01</span>
-          <span style={{ fontSize: 44, display: 'block', marginBottom: 28 }}>👩‍💻</span>
+          <div style={{ color: C.sand200, marginBottom: 28, display: 'inline-block' }}>{CodeIcon}</div>
           <h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontWeight: 700, lineHeight: 1.05, marginBottom: 16, fontSize: 'clamp(32px,3vw,44px)', color: C.sand200 }}>
             Devs &amp;<br />Designers
           </h3>
           <p style={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 300, fontSize: 15, lineHeight: 1.7, color: 'rgba(245,237,224,0.6)', maxWidth: 340 }}>
-            You want real experience for your CV — not more tutorials. BuildMate connects you with live projects where your code ships and your name goes in the credits.
+            Your resume needs shipped projects, not just certification links. Find active student and open-source projects where you can contribute, learn side-by-side, and make your portfolio stand out.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 28 }}>
-            {['Real work', 'CV-ready', 'Ship fast'].map(t => <Pill key={t} label={t} />)}
+            {['Real work', 'Resume-ready', 'Ship fast'].map(t => <Pill key={t} label={t} />)}
           </div>
           <div ref={b1}><AnimBar visible={bar1Visible} pct={74} /></div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: '"DM Sans", sans-serif' }}>
             <span>Talent pool growing</span><span>74%</span>
           </div>
         </MissionCard>
-
+ 
         <MissionCard bg={C.terra500} delay={150}>
           <span style={bigNumStyle}>02</span>
-          <span style={{ fontSize: 44, display: 'block', marginBottom: 28 }}>🚀</span>
+          <div style={{ color: C.sand200, marginBottom: 28, display: 'inline-block' }}>{RocketIcon}</div>
           <h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontWeight: 700, lineHeight: 1.05, marginBottom: 16, fontSize: 'clamp(32px,3vw,44px)', color: C.sand200 }}>
             Builders &amp;<br />Founders
           </h3>
           <p style={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 300, fontSize: 15, lineHeight: 1.7, color: 'rgba(245,237,224,0.65)', maxWidth: 340 }}>
-            You have the vision but need the hands. Post your project and get matched with passionate contributors who are invested from day one — not just freelancers chasing invoices.
+            You have the ideas; we have the hands. Post your build, set your tech stack, and find dedicated teammates ready to contribute and help you ship from day one.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 28 }}>
             {['Find talent', 'Async-ready', 'Move fast'].map(t => <Pill key={t} label={t} light />)}
@@ -143,14 +183,14 @@ export default function Mission() {
             <span>Projects matched</span><span>88%</span>
           </div>
         </MissionCard>
-
+ 
       </div>
-
+ 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18, marginTop: 18 }}>
         {[
-          { emoji: '📄', title: 'Build your CV', body: 'Every project you contribute to becomes a portfolio piece with real commits and shipped features.', delay: 0   },
-          { emoji: '🤝', title: 'No cold DMs',   body: 'Apply through structured project pages. Get context before you commit. No cringe intros.',         delay: 100 },
-          { emoji: '⚡', title: 'Ship in weeks', body: 'Pre-vetted teammates, async-friendly workflows, and momentum from day one.',                        delay: 200 },
+          { icon: FileTextIcon, title: 'Build your resume', body: 'Every project you contribute to becomes a portfolio piece with real commits and shipped features.', delay: 0   },
+          { icon: UsersIcon, title: 'No cold DMs',   body: 'Apply through structured project pages. Get context before you commit. No cringe intros.',         delay: 100 },
+          { icon: ZapIcon, title: 'Ship in weeks', body: 'Pre-vetted teammates, async-friendly workflows, and momentum from day one.',                        delay: 200 },
         ].map(p => <ExplainerCard key={p.title} {...p} />)}
       </div>
 

@@ -621,7 +621,7 @@ export default function ProjectSwipe() {
               <h2 style={{ fontFamily:'"Cormorant Garamond",serif', fontWeight:700, fontSize:"clamp(26px,3.5vw,46px)", color:"#FFF8F0", marginBottom:8, lineHeight:1.1 }}>
                 Every project you join keeps<br/>your GitHub green
               </h2>
-              <p style={{ color:"rgba(255,255,255,0.4)", fontSize:13, marginBottom:22, fontFamily:'"DM Sans",sans-serif' }}>Real work. Real commits. Real CV material.</p>
+              <p style={{ color:"rgba(255,255,255,0.4)", fontSize:13, marginBottom:22, fontFamily:'"DM Sans",sans-serif' }}>Real work. Real commits. Real resume material.</p>
               <Link to="/create-project" style={{ textDecoration:"none" }}>
                 <button style={{
                   background:C.brand, color:"white", border:"none",

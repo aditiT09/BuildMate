@@ -47,6 +47,7 @@ body::before {
 @media (max-width: 768px) {
   /* Cards: stack on mobile */
   #cards > div { grid-template-columns: 1fr !important; }
+  .cards-bottom-row { grid-template-columns: 1fr !important; }
   /* Mission: stack on mobile */
   #mission > div > div { grid-template-columns: 1fr !important; }
   /* Bottom explainer row */
