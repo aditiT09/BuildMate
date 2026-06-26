@@ -147,6 +147,8 @@ const STYLES = `
 
   .dash-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
   .dash-card:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(43,27,18,0.06); }
+  .clickable-row { transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease; cursor: pointer; }
+  .clickable-row:hover { background: #EDD5B8 !important; border-color: #E35336 !important; transform: translateY(-1px); }
   .streak-cell { transition: all 0.15s ease; }
   .streak-cell:hover { transform: scale(1.3); }
 
@@ -209,14 +211,21 @@ function StatusBadge({ status }) {
   const s = map[status] || map.pending;
   return (
     <span style={{
-      background: s.bg, color: s.color,
-      padding: "4px 10px", borderRadius: 9999,
-      fontSize: 11, fontWeight: 600,
+      background: s.bg,
+      color: s.color,
+      padding: "6px 12px",
+      borderRadius: 0,
+      border: "1px solid #F4A460",
+      fontSize: 10,
+      fontWeight: 800,
       fontFamily: '"DM Sans", sans-serif',
-      display: "inline-flex", alignItems: "center", gap: 6,
-      border: `1px solid ${s.dot}20`,
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 5,
+      textTransform: "uppercase",
+      letterSpacing: "0.05em",
     }}>
-      <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.dot }} />
+      <span style={{ width: 5, height: 5, borderRadius: "50%", background: s.dot }} />
       {status}
     </span>
   );
@@ -633,34 +642,40 @@ useEffect(() => {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {applications.slice(0, 6).map((app, i) => (
-                <div key={app.id} style={{
-                  display: "flex", alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "12px 16px",
-                  background: C.cream, borderRadius: 12,
-                  border: `1px solid ${C.border}`,
-                  animation: `slideUp 0.4s ease ${i * 0.05}s both`,
-                  opacity: 0,
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 10,
-                      background: C.sand,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}>
-                      <FileTextIcon color={C.dark} size={18} />
+                <Link
+                  key={app.id}
+                  to={`/projects/${app.opportunity?.project?.id || app.opportunity?.project_id}`}
+                  style={{ textDecoration: "none", display: "block" }}
+                >
+                  <div className="clickable-row" style={{
+                    display: "flex", alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "12px 16px",
+                    background: C.cream, borderRadius: 12,
+                    border: `1px solid ${C.border}`,
+                    animation: `slideUp 0.4s ease ${i * 0.05}s both`,
+                    opacity: 0,
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: 10,
+                        background: C.sand,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        <FileTextIcon color={C.dark} size={18} />
+                      </div>
+                      <div>
+                        <p style={{ fontWeight: 600, fontSize: 14, color: C.dark }}>
+                          {app.opportunity?.role || "Collaborator"}
+                        </p>
+                        <p style={{ fontSize: 12, color: C.muted }}>
+                          {app.opportunity?.project?.title || "BuildMate Project"}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p style={{ fontWeight: 600, fontSize: 14, color: C.dark }}>
-                        {app.opportunity?.role || "Collaborator"}
-                      </p>
-                      <p style={{ fontSize: 12, color: C.muted }}>
-                        {app.opportunity?.project?.title || "BuildMate Project"}
-                      </p>
-                    </div>
+                    <StatusBadge status={app.status} />
                   </div>
-                  <StatusBadge status={app.status} />
-                </div>
+                </Link>
               ))}
               {applications.length > 6 && (
                 <Link to="/applications" style={{ textDecoration: "none", textAlign: "center", display: "block", padding: "10px", color: C.brand, fontWeight: 600, fontSize: 13 }}>

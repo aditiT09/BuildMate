@@ -272,11 +272,20 @@ export default function MyApplications() {
                       </div>
 
                       <span style={{
-                        display: "inline-flex", alignItems: "center", gap: 6,
-                        background: meta.bg, color: meta.fg, border: `1px solid ${meta.border}`,
-                        borderRadius: 999, padding: "6px 14px",
-                        fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 800,
-                        textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap",
+                        background: meta.bg,
+                        color: meta.fg,
+                        padding: "6px 14px",
+                        borderRadius: 0,
+                        border: "1px solid #F4A460",
+                        fontFamily: '"DM Sans", sans-serif',
+                        fontSize: 11,
+                        fontWeight: 800,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        whiteSpace: "nowrap",
                       }}>
                         <span style={{ display: "flex", alignItems: "center" }}>{meta.icon}</span> {meta.label}
                       </span>

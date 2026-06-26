@@ -110,16 +110,20 @@ export default function OpportunityApplicants() {
                     </p>
                   </div>
 
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      app.status === "pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : app.status === "accepted"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {app.status.toUpperCase()}
+                  <span style={{
+                    background: app.status === "pending" ? "#FFF8F0" : app.status === "accepted" ? "#F3FAF5" : "#FFF5F5",
+                    color: app.status === "pending" ? "#D48A2D" : app.status === "accepted" ? "#2E7D32" : "#B8391F",
+                    padding: "6px 14px",
+                    borderRadius: 0,
+                    border: "1px solid #F4A460",
+                    fontFamily: '"DM Sans", sans-serif',
+                    fontSize: 11,
+                    fontWeight: 800,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    whiteSpace: "nowrap",
+                  }}>
+                    {app.status}
                   </span>
 
                 </div>
