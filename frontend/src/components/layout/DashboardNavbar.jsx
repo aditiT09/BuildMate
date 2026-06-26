@@ -161,10 +161,10 @@ export default function DashboardNavbar() {
               <button
                 onClick={() => setDropOpen(o => !o)}
                 style={{
-                  width: 36, height: 36, borderRadius: '50%',
+                  width: 36, height: 36, borderRadius: 10,
                   background: dropOpen ? C.dark : C.brand,
-                  color: 'white', border: 'none',
-                  fontFamily: '"Syne", sans-serif',
+                  color: 'white', border: '1px solid white',
+                  fontFamily: '"Eczar", serif',
                   fontWeight: 800, fontSize: 13,
                   cursor: 'pointer', transition: 'all 0.18s',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',

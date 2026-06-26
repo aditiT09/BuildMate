@@ -313,7 +313,7 @@ function PinCard({ project, idx, appliedSet, onApply }) {
 
         {/* Title */}
         <h3 style={{
-          fontFamily:'"Syne",sans-serif', fontWeight:800,
+          fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight:800,
           fontSize:"clamp(15px,1.5vw,20px)",
           color:acc.text, lineHeight:1.18, marginBottom:8,
         }}>{project.title}</h3>

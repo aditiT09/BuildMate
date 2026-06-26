@@ -172,7 +172,7 @@ function ScoreRing({score=50,label,color,size=88}){
           strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={circ*(1-pct)}
           style={{transition:"stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1)"}}/>
         <text x={size/2} y={size/2+6} textAnchor="middle"
-          style={{fontSize:19,fontWeight:800,fontFamily:'"Syne",sans-serif',transform:`rotate(90deg)`,transformOrigin:`${size/2}px ${size/2}px`,fill:C.dark}}>
+          style={{fontSize:19,fontWeight:800,fontFamily:'"Melody by W.", "Melody", sans-serif',transform:`rotate(90deg)`,transformOrigin:`${size/2}px ${size/2}px`,fill:C.dark}}>
           <AnimCount target={score} />
         </text>
       </svg>
@@ -192,7 +192,7 @@ function Card({children,delay=0,style={}}){
 function STitle({children,action}){
   return(
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-      <h2 style={{fontFamily:'"Syne",sans-serif',fontWeight:800,fontSize:16,color:C.dark,display:"flex",alignItems:"center",gap:8,margin:0}}>{children}</h2>
+      <h2 style={{fontFamily:'"Melody by W.", "Melody", sans-serif',fontWeight:800,fontSize:16,color:C.dark,display:"flex",alignItems:"center",gap:8,margin:0}}>{children}</h2>
       {action}
     </div>
   );
@@ -229,7 +229,7 @@ function AvatarDisplay({src,name="",size=96}){
   return src?(
     <img src={src} alt={name} style={{width:size,height:size,borderRadius:"50%",objectFit:"cover",border:`3px solid ${C.brand}`,animation:"ringPulse 3s ease-in-out infinite",flexShrink:0}}/>
   ):(
-    <div style={{width:size,height:size,borderRadius:"50%",background:`linear-gradient(135deg,${C.brand},${C.brandDk})`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:'"Syne",sans-serif',fontWeight:800,fontSize:size*.34,color:"white",border:`3px solid ${C.sandDk}`,animation:"ringPulse 3s ease-in-out infinite",userSelect:"none",flexShrink:0}}>
+    <div style={{width:size,height:size,borderRadius:"50%",background:`linear-gradient(135deg,${C.brand},${C.brandDk})`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:'"Melody by W.", "Melody", sans-serif',fontWeight:800,fontSize:size*.34,color:"white",border:`3px solid ${C.sandDk}`,animation:"ringPulse 3s ease-in-out infinite",userSelect:"none",flexShrink:0}}>
       {init}
     </div>
   );
@@ -248,8 +248,8 @@ function CompletenessBar({profile,skills}){
   return(
     <div style={{background:C.cream,borderRadius:16,padding:"16px 20px",border:`1px solid ${C.border}`}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-        <p style={{fontFamily:'"Syne",sans-serif',fontWeight:700,fontSize:13,color:C.dark,margin:0}}>Profile completeness</p>
-        <span style={{fontFamily:'"Syne",sans-serif',fontWeight:800,fontSize:22,color}}>{pct}%</span>
+        <p style={{fontFamily:'"Melody by W.", "Melody", sans-serif',fontWeight:700,fontSize:13,color:C.dark,margin:0}}>Profile completeness</p>
+        <span style={{fontFamily:'"Melody by W.", "Melody", sans-serif',fontWeight:800,fontSize:22,color}}>{pct}%</span>
       </div>
       <div style={{height:8,borderRadius:4,background:C.sandDk,overflow:"hidden",marginBottom:12}}>
         <div style={{height:"100%",borderRadius:4,background:color,width:`${pct}%`,transition:"width 1.4s cubic-bezier(.4,0,.2,1)",boxShadow:`0 0 8px ${color}55`}}/>
@@ -459,7 +459,7 @@ export default function Profile(){
                 <div style={{display:"flex",justifyContent:"center",marginBottom:16}}>
                   <AvatarDisplay src={tab==="edit"?form.avatar:profile?.avatar} name={displayName} size={96}/>
                 </div>
-                <h2 style={{fontFamily:'"Syne",sans-serif',fontWeight:800,fontSize:20,color:C.dark,marginBottom:4,lineHeight:1.2}}>{displayName}</h2>
+                <h2 style={{fontFamily:'"Melody by W.", "Melody", sans-serif',fontWeight:800,fontSize:20,color:C.dark,marginBottom:4,lineHeight:1.2}}>{displayName}</h2>
                 {user?.email&&<p style={{fontSize:12,color:C.muted,fontFamily:'"DM Sans",sans-serif',marginBottom:10}}>{user.email}</p>}
                 {profile?.availability&&(
                   <span style={{display:"inline-flex",alignItems:"center",gap:6,background:"#E8F5E9",color:C.success,border:"1px solid #C8E6C9",padding:"4px 14px",borderRadius:9999,fontSize:11,fontWeight:700,fontFamily:'"DM Sans",sans-serif',letterSpacing:".06em"}}>
@@ -506,7 +506,7 @@ export default function Profile(){
                     <span style={{fontSize:13,color:C.dark2,fontFamily:'"DM Sans",sans-serif',display:"flex",alignItems:"center",gap:7}}>
                       <Ic name={s.icon} size={14} color={C.muted}/> {s.label}
                     </span>
-                    <span style={{fontFamily:'"Syne",sans-serif',fontWeight:800,fontSize:16,color:C.dark}}>{s.val}</span>
+                    <span style={{fontFamily:'"Melody by W.", "Melody", sans-serif',fontWeight:800,fontSize:16,color:C.dark}}>{s.val}</span>
                   </div>
                 ))}
               </Card>
@@ -574,7 +574,7 @@ export default function Profile(){
                                 <Ic name="layers" size={18} color={C.dark2}/>
                               </div>
                               <div style={{flex:1,minWidth:0}}>
-                                <p style={{fontFamily:'"Syne",sans-serif',fontWeight:700,fontSize:14,color:C.dark,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",margin:0}}>{p.title}</p>
+                                <p style={{fontFamily:'"Melody by W.", "Melody", sans-serif',fontWeight:700,fontSize:14,color:C.dark,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",margin:0}}>{p.title}</p>
                                 {p.project_type&&<p style={{fontSize:11,color:C.muted,fontFamily:'"DM Sans",sans-serif',margin:0}}>{p.project_type}</p>}
                               </div>
                               <Ic name="chevronRight" size={14} color={C.muted}/>

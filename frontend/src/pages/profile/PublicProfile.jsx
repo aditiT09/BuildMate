@@ -108,7 +108,7 @@ function ScoreRing({ score = 50, label, color, size = 80 }) {
           style={{ transition: "stroke-dashoffset 1.5s ease" }}
         />
         <text x={size / 2} y={size / 2 + 5} textAnchor="middle" fill={C.dark}
-          style={{ fontSize: 16, fontWeight: 800, transform: "rotate(90deg)", transformOrigin: `${size / 2}px ${size / 2}px`, fontFamily: '"Syne", sans-serif' }}>
+          style={{ fontSize: 16, fontWeight: 800, transform: "rotate(90deg)", transformOrigin: `${size / 2}px ${size / 2}px`, fontFamily: '"Melody by W.", "Melody", sans-serif' }}>
           <AnimCount target={score} />
         </text>
       </svg>
@@ -166,7 +166,7 @@ export default function PublicProfile() {
       <Layout>
         <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{
-            fontFamily: '"Syne", sans-serif', fontSize: 14, fontWeight: 700,
+            fontFamily: '"Melody by W.", "Melody", sans-serif', fontSize: 14, fontWeight: 700,
             color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase",
             display: "flex", alignItems: "center", gap: 10,
           }}>
@@ -188,7 +188,7 @@ export default function PublicProfile() {
       <Layout>
         <div style={{ minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
           <div style={{ color: C.muted }}><UserIcon size={44} color="currentColor" /></div>
-          <h2 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22, color: C.dark }}>
+          <h2 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 22, color: C.dark }}>
             Profile Not Found
           </h2>
           <p style={{ fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 14 }}>
@@ -261,14 +261,14 @@ export default function PublicProfile() {
                       width: 96, height: 96, borderRadius: "50%",
                       border: `2px solid ${C.dark}`, background: C.brand,
                       color: "white", display: "flex", alignItems: "center", justifyContent: "center",
-                      fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 32,
+                      fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 32,
                     }}>
                       {initials}
                     </div>
                   )}
                 </div>
 
-                <h2 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark, marginBottom: 4, lineHeight: 1.2 }}>
+                <h2 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 20, color: C.dark, marginBottom: 4, lineHeight: 1.2 }}>
                   {displayName}
                 </h2>
 
@@ -411,7 +411,7 @@ export default function PublicProfile() {
               
               {/* About Bio Card */}
               <Card delay={0.12}>
-                <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
+                <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
                   <Ic name="user" size={16} color={C.brand} /> About Builder
                 </h3>
                 <p style={{
@@ -426,7 +426,7 @@ export default function PublicProfile() {
               {/* Skills Card */}
               {skillsArray.length > 0 && (
                 <Card delay={0.18}>
-                  <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
+                  <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
                     <Ic name="wrench" size={16} color={C.brand} /> Tech Stack & Skills
                   </h3>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -453,7 +453,7 @@ export default function PublicProfile() {
 
               {/* Projects Card */}
               <Card delay={0.24}>
-                <h3 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
+                <h3 style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
                   <Ic name="layers" size={16} color={C.brand} /> Projects Built ({projects.length})
                 </h3>
                 {projects.length === 0 ? (
@@ -471,7 +471,7 @@ export default function PublicProfile() {
                             <Ic name="layers" size={18} color={C.dark2} />
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
+                            <p style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
                               {proj.title}
                             </p>
                             {proj.project_type && (
