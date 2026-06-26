@@ -701,7 +701,7 @@ useEffect(() => {
             />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {incomingApps.slice(0, 5).map((app, i) => (
+              {incomingApps.slice(0, 4).map((app, i) => (
                 <div key={app.id} style={{
                   display: "flex", alignItems: "center",
                   justifyContent: "space-between",
@@ -739,9 +739,9 @@ useEffect(() => {
                   </div>
                 </div>
               ))}
-              {incomingApps.length > 5 && (
+              {incomingApps.length > 4 && (
                 <Link to="/incoming" style={{ textDecoration: "none", textAlign: "center", display: "block", padding: "10px", color: C.brand, fontWeight: 600, fontSize: 13 }}>
-                  +{incomingApps.length - 5} more incoming applications →
+                  +{incomingApps.length - 4} more incoming applications (view all) →
                 </Link>
               )}
             </div>
