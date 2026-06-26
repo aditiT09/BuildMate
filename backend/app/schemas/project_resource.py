@@ -9,6 +9,12 @@ class ResourceType(str, Enum):
     SLACK = "slack"
     DISCORD = "discord"
     OTHER = "other"
+    GITHUB_CAP = "GitHub"
+    DEMO = "Demo"
+    GOOGLE_DRIVE = "Google Drive"
+    NOTION = "Notion"
+    PRESENTATION = "Presentation"
+    OTHER_CAP = "Other"
 
 
 class ProjectResourceCreate(BaseModel):

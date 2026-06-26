@@ -17,7 +17,7 @@ export const addSkill = async (skillId) => {
 };
 
 export const getSkills = async () => {
-  const response = await api.get("/skills/skills");
+  const response = await api.get("/skills/skills?limit=1000");
   return response.data;
 };
 export const removeSkill = async (skillId) => {

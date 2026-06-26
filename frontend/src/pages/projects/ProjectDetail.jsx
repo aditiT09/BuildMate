@@ -144,7 +144,17 @@ export default function ProjectDetail() {
   const handleAddResource = async () => {
     try {
       setAddingResource(true);
-      const created = await createProjectLink(id, resourceForm);
+      const normalizedUrl = validateExternalLink(resourceForm.url);
+      if (!normalizedUrl) {
+        alert("Please enter a valid URL (e.g., https://github.com/user or github.com)");
+        setAddingResource(false);
+        return;
+      }
+      const payload = {
+        ...resourceForm,
+        url: normalizedUrl,
+      };
+      const created = await createProjectLink(id, payload);
       setLinks((prev) => [...prev, created]);
       setResourceForm({ title: "", resource_type: "", url: "" });
       setShowResourceForm(false);
