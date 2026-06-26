@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { GlobeIcon, SmartphoneIcon, BotIcon, PaletteIcon, ZapIcon, LockOpenIcon, BookIcon, ClipboardIcon, FolderIcon, TimelineIcon } from "../../components/common/Icons";
 
 import Layout from "../../components/layout/Layout";
 import { getMyProjects } from "../../api/projects";
@@ -20,13 +21,13 @@ const C = {
   sand:    "#F5EDE0",
 };
 
-const TYPE_EMOJI = {
-  "Web App": "🌐",
-  "Mobile App": "📱",
-  "AI / ML": "🤖",
-  "Design": "🎨",
-  "Hackathon": "⚡",
-  "Open Source": "🔓",
+const TYPE_ICON = {
+  "Web App": <GlobeIcon size={14} />,
+  "Mobile App": <SmartphoneIcon size={14} />,
+  "AI / ML": <BotIcon size={14} />,
+  "Design": <PaletteIcon size={14} />,
+  "Hackathon": <ZapIcon size={14} />,
+  "Open Source": <LockOpenIcon size={14} />,
 };
 
 const tilt = (n) => {
@@ -120,8 +121,12 @@ export default function MyProjects() {
                 fontFamily: '"Syne", sans-serif', fontWeight: 800,
                 fontSize: "clamp(28px, 5.5vw, 46px)", lineHeight: 1.08,
                 letterSpacing: "-0.02em", margin: 0,
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 12,
               }}>
-                your project shelf 📚
+                your project shelf <BookIcon size={32} color="currentColor" />
               </h1>
 
               <p style={{
@@ -153,9 +158,9 @@ export default function MyProjects() {
               background: C.surface
             }}>
               <EmptyState
-                icon={<span style={{ fontSize: 40 }}>🗒️</span>}
+                icon={<ClipboardIcon size={40} color={C.muted} />}
                 headline="shelf's empty"
-                sub="you haven't posted anything yet. drop your first idea and start building your team 🚀"
+                sub="you haven't posted anything yet. drop your first idea and start building your team"
                 cta="+ post your first project"
                 href="/projects/create"
               />
@@ -187,15 +192,18 @@ export default function MyProjects() {
                             letterSpacing: "0.06em", textTransform: "uppercase",
                             display: "inline-flex", alignItems: "center", gap: 6,
                           }}>
-                            {TYPE_EMOJI[project.project_type] || "🗂️"} {project.project_type}
+                            <span style={{ display: "inline-flex", alignItems: "center" }}>{TYPE_ICON[project.project_type] || <FolderIcon size={14} />}</span> {project.project_type}
                           </span>
                         )}
                         {project.timeline && (
                           <span style={{
                             fontFamily: '"DM Sans", sans-serif', fontSize: 12,
                             color: C.muted,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
                           }}>
-                            ⏳ {project.timeline}
+                            <TimelineIcon size={12} color="currentColor" /> {project.timeline}
                           </span>
                         )}
                       </div>

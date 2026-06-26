@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { GitHubIcon, PlayIcon, PaletteIcon, FolderIcon, ClipboardIcon, MonitorIcon, LinkIcon, UserXIcon, TimelineIcon, PinIcon, TargetIcon, SparklesIcon, PenIcon, HandshakeIcon, TrashIcon, DoorIcon, UserPlusIcon, PaperclipIcon, MailIcon, LightbulbIcon, CelebrationIcon } from "../../components/common/Icons";
 
 import { getProjectById, deleteProject } from "../../api/projects";
 import { createApplication } from "../../api/applications";
@@ -34,14 +35,22 @@ const C = {
   sand:    "#F5EDE0",
 };
 
+const BarChartIcon = ({ size = 16, color = "currentColor", ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} {...props}>
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+  </svg>
+);
+
 const RESOURCE_ICONS = {
-  GitHub: "🐙",
-  Demo: "🎬",
-  Figma: "🎨",
-  "Google Drive": "📁",
-  Notion: "🗒️",
-  Presentation: "📽️",
-  Other: "🔗",
+  GitHub: <GitHubIcon size={14} />,
+  Demo: <PlayIcon size={14} />,
+  Figma: <PaletteIcon size={14} />,
+  "Google Drive": <FolderIcon size={14} />,
+  Notion: <ClipboardIcon size={14} />,
+  Presentation: <MonitorIcon size={14} />,
+  Other: <LinkIcon size={14} />,
 };
 
 const tilt = (n) => {
@@ -195,7 +204,7 @@ export default function ProjectDetail() {
     return (
       <Layout>
         <EmptyState
-          icon={<span style={{ fontSize: 40 }}>🫥</span>}
+          icon={<UserXIcon size={40} color={C.muted} />}
           headline="nothing here"
           sub="this project doesn't exist (or got deleted)"
           cta="Back to projects"
@@ -285,7 +294,7 @@ export default function ProjectDetail() {
                 fontFamily: '"DM Sans", sans-serif', fontSize: 13,
                 color: "rgba(255,248,240,0.75)",
               }}>
-                <span style={{ fontSize: 16 }}>⏳</span>
+                <TimelineIcon size={14} color="currentColor" />
                 <span>{project.timeline}</span>
               </div>
             )}
@@ -301,10 +310,11 @@ export default function ProjectDetail() {
             position: "relative",
             transform: `rotate(${tilt(1)}deg)`,
           }}>
-            <span style={{
+            <div style={{
               position: "absolute", top: -14, left: 24,
-              fontSize: 28, transform: `rotate(${tilt(2)}deg)`,
-            }}>📌</span>
+              color: C.brand, transform: `rotate(${tilt(2)}deg)`,
+              display: "flex",
+            }}><PinIcon size={24} color="currentColor" /></div>
             <p style={{
               fontFamily: '"DM Sans", sans-serif', fontSize: 11, fontWeight: 800,
               color: C.muted, textTransform: "uppercase", letterSpacing: "0.14em",
@@ -316,7 +326,7 @@ export default function ProjectDetail() {
               fontFamily: '"DM Sans", sans-serif', fontSize: 16, lineHeight: 1.75,
               color: C.dark2, margin: 0, whiteSpace: "pre-wrap",
             }}>
-              {project.description || "no description yet — owner's keeping it mysterious 👀"}
+              {project.description || "no description yet — owner's keeping it mysterious"}
             </p>
           </div>
 
@@ -336,7 +346,9 @@ export default function ProjectDetail() {
                 color: C.muted, textTransform: "uppercase", letterSpacing: "0.14em",
                 margin: "0 0 14px",
               }}>
-                🎯 skills they're looking for
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <TargetIcon size={14} color={C.brand} /> skills they're looking for
+                </span>
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {projectSkills.map((skill) => (
@@ -382,7 +394,9 @@ export default function ProjectDetail() {
                   color: C.brand, textTransform: "uppercase", letterSpacing: "0.14em",
                   margin: 0,
                 }}>
-                  📊 your matching stats
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <BarChartIcon size={14} color={C.brand} /> your matching stats
+                  </span>
                 </p>
                 <span style={{
                   fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 15,
@@ -412,7 +426,9 @@ export default function ProjectDetail() {
                     fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 700,
                     color: C.dark, marginBottom: 8,
                   }}>
-                    💡 priority gaps to learn:
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <LightbulbIcon size={14} color={C.brand} /> priority gaps to learn:
+                    </span>
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {skillGap.recommendations.map((rec) => (
@@ -421,7 +437,7 @@ export default function ProjectDetail() {
                         borderRadius: 14, padding: "10px 14px",
                         display: "flex", alignItems: "flex-start", gap: 10,
                       }}>
-                        <span style={{ fontSize: 16 }}>🎯</span>
+                        <TargetIcon size={16} color={C.brand} />
                         <div>
                           <p style={{ fontWeight: 700, fontSize: 13, color: C.dark, margin: 0 }}>
                             {rec.skill_name}
@@ -439,7 +455,9 @@ export default function ProjectDetail() {
                   fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#2E7D32",
                   margin: 0, fontStyle: "italic",
                 }}>
-                  🎉 you have all the required skills for this project! You're ready to ship.
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#2E7D32" }}>
+                    <CelebrationIcon size={14} color="currentColor" /> you have all the required skills for this project! You're ready to ship.
+                  </span>
                 </p>
               )}
             </div>
@@ -459,7 +477,9 @@ export default function ProjectDetail() {
                   display: "flex", alignItems: "center", gap: 8,
                 }}
               >
-                ✨ open a role
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <SparklesIcon size={14} color="currentColor" /> open a role
+                </span>
               </button>
               <button
                 className="pd-btn-ghost"
@@ -471,7 +491,9 @@ export default function ProjectDetail() {
                   cursor: "pointer", transition: "all .18s",
                 }}
               >
-                ✏️ edit
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <PenIcon size={14} color="currentColor" /> edit
+                </span>
               </button>
               <button
                 className="pd-btn-ghost"
@@ -483,7 +505,9 @@ export default function ProjectDetail() {
                   cursor: "pointer", transition: "all .18s",
                 }}
               >
-                🤝 matches
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <HandshakeIcon size={14} color="currentColor" /> matches
+                </span>
               </button>
               <button
                 onClick={handleDeleteProject}
@@ -494,7 +518,9 @@ export default function ProjectDetail() {
                   cursor: "pointer", marginLeft: "auto",
                 }}
               >
-                delete 🗑️
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  delete <TrashIcon size={14} color="currentColor" />
+                </span>
               </button>
             </div>
           )}
@@ -506,7 +532,9 @@ export default function ProjectDetail() {
                 fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
                 color: C.dark, marginBottom: 16,
               }}>
-                🚪 open roles
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <DoorIcon size={20} color={C.dark} /> open roles
+                </span>
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {opportunities.map((opportunity) => (
@@ -569,7 +597,11 @@ export default function ProjectDetail() {
                         opacity: applyingId === opportunity.id ? 0.7 : 1,
                       }}
                     >
-                      {applyingId === opportunity.id ? "sending..." : "🙋 apply"}
+                      {applyingId === opportunity.id ? "sending..." : (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                          <UserPlusIcon size={13} color="currentColor" /> apply
+                        </span>
+                      )}
                     </button>
                   </div>
                 ))}
@@ -584,7 +616,7 @@ export default function ProjectDetail() {
               border: `1.5px dashed ${C.border}`, borderRadius: 18, padding: "26px 20px",
               textAlign: "center", fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 14,
             }}>
-              no open roles right now — check back later 👀
+              no open roles right now — check back later
             </div>
           )}
 
@@ -595,7 +627,9 @@ export default function ProjectDetail() {
                 fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
                 color: C.dark, margin: 0,
               }}>
-                🧷 stuff you'll need
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <PaperclipIcon size={20} color={C.dark} /> stuff you'll need
+                </span>
               </h2>
               {isOwner && (
                 <button
@@ -676,7 +710,7 @@ export default function ProjectDetail() {
                 border: `1.5px dashed ${C.border}`, borderRadius: 18, padding: "26px 20px",
                 textAlign: "center", fontFamily: '"DM Sans", sans-serif', color: C.muted, fontSize: 14,
               }}>
-                empty board so far — nothing pinned yet 🕸️
+                empty board so far — nothing pinned yet
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
@@ -694,7 +728,9 @@ export default function ProjectDetail() {
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <span style={{ fontSize: 20 }}>
-                        {RESOURCE_ICONS[link.resource_type] || "🔗"}
+                      <span style={{ display: "inline-flex", alignItems: "center" }}>
+                        {RESOURCE_ICONS[link.resource_type] || <LinkIcon size={16} />}
+                      </span>
                       </span>
                       <div style={{ minWidth: 0 }}>
                         <p style={{
@@ -748,7 +784,9 @@ export default function ProjectDetail() {
                 fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
                 color: C.dark, marginBottom: 16,
               }}>
-                📬 who's knocking
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <MailIcon size={20} color={C.dark} /> who's knocking
+                </span>
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {opportunities.map((opportunity) => (
@@ -810,7 +848,9 @@ export default function ProjectDetail() {
                             cursor: "pointer", transition: "all .15s ease",
                           }}
                         >
-                          ✏️ edit
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                            <PenIcon size={12} color="currentColor" /> edit
+                          </span>
                         </button>
                         <button
                           onClick={() => navigate(`/opportunities/${opportunity.id}/applicants`)}
@@ -846,7 +886,7 @@ export default function ProjectDetail() {
                       }}
                     >
                       <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <span>💡</span> You can also invite builders to apply for this role
+                        <LightbulbIcon size={14} color={C.brand} /> You can also invite builders to apply for this role
                       </span>
                       <span style={{ color: C.brand }}>invite builders →</span>
                     </div>

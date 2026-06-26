@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { CheckIcon, ChevronUpIcon, TargetIcon, SparkleIcon, XIcon } from "../../components/common/Icons";
 
 import { getProjects } from "../../api/projects";
 import { getProjectOpportunities } from "../../api/opportunities";
@@ -368,7 +369,11 @@ function PinCard({ project, idx, appliedSet, onApply }) {
                   onMouseEnter={e=>{ if(!done) e.currentTarget.style.background=C.brandDk }}
                   onMouseLeave={e=>{ if(!done) e.currentTarget.style.background=C.brand }}
                 >
-                  {busy ? <span style={{display:"inline-block",width:10,height:10,borderRadius:"50%",border:"2px solid currentColor",borderTopColor:"transparent",animation:"spin .7s linear infinite"}}/> : done ? "✓ Applied" : "Apply"}
+                  {busy ? <span style={{display:"inline-block",width:10,height:10,borderRadius:"50%",border:"2px solid currentColor",borderTopColor:"transparent",animation:"spin .7s linear infinite"}}/> : done ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      <CheckIcon size={11} color="currentColor" /> Applied
+                    </span>
+                  ) : "Apply"}
                 </button>
               </div>
             );
@@ -407,7 +412,15 @@ function PinCard({ project, idx, appliedSet, onApply }) {
         >
           {loading
             ? <span style={{display:"inline-block",width:10,height:10,borderRadius:"50%",border:"2px solid currentColor",borderTopColor:"transparent",animation:"spin .7s linear infinite"}}/>
-            : open ? "▲ Close" : "🎯 Roles"
+            : open ? (
+              <>
+                <ChevronUpIcon size={12} color="currentColor" /> Close
+              </>
+            ) : (
+              <>
+                <TargetIcon size={12} color="currentColor" /> Roles
+              </>
+            )
           }
         </button>
       </div>
@@ -479,8 +492,8 @@ export default function ProjectSwipe() {
           {/* ── Header ── */}
           <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:16, alignItems:"flex-end", marginBottom:28 }}>
             <div>
-              <p style={{ fontSize:10, fontWeight:800, letterSpacing:".22em", textTransform:"uppercase", color:C.brand, marginBottom:6, fontFamily:'"DM Sans",sans-serif' }}>
-                ✦ Discover
+              <p style={{ fontSize:10, fontWeight:800, letterSpacing:".22em", textTransform:"uppercase", color:C.brand, marginBottom:6, fontFamily:'"DM Sans",sans-serif', display:"flex", alignItems:"center", gap:4 }}>
+                <SparkleIcon size={10} color={C.brand} /> Discover
               </p>
               <h1 style={{ fontFamily:'"Cormorant Garamond",serif', fontWeight:700, lineHeight:.9, color:C.dark, margin:0 }}>
                 <span style={{ fontSize:"clamp(32px,4vw,56px)", display:"block" }}>Find your</span>
@@ -536,7 +549,9 @@ export default function ProjectSwipe() {
               }}
             />
             {search && (
-              <button onClick={()=>setSearch("")} style={{ position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", fontSize:14, color:C.muted }}>✕</button>
+              <button onClick={()=>setSearch("")} style={{ position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", color:C.muted }}>
+                <XIcon size={12} color="currentColor" />
+              </button>
             )}
           </div>
 

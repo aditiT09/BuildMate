@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { subscribeEmail } from '../../api/newsletter'
 import useScrollReveal from '../../hooks/useScrollReveal'
+import { CheckIcon } from '../../components/common/Icons'
 
 const C = {
   terra300:  '#e8845a',
@@ -109,7 +110,8 @@ export default function Contact() {
               padding: '16px 32px', borderRadius: 9999,
               fontSize: 16, fontFamily: '"DM Sans", sans-serif', fontWeight: 500,
             }}>
-              ✓ You're on the list — we'll be in touch!
+              <CheckIcon size={18} color={C.olive400} />
+              <span>You're on the list — we'll be in touch!</span>
             </div>
           ) : (
             <form

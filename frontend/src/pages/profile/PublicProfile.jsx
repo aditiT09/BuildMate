@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { UserIcon } from "../../components/common/Icons";
 import Layout from "../../components/layout/Layout";
 import { getProfile } from "../../api/profile";
 import { getProjects } from "../../api/projects";
@@ -186,7 +187,7 @@ export default function PublicProfile() {
     return (
       <Layout>
         <div style={{ minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-          <span style={{ fontSize: 44 }}>🧐</span>
+          <div style={{ color: C.muted }}><UserIcon size={44} color="currentColor" /></div>
           <h2 style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22, color: C.dark }}>
             Profile Not Found
           </h2>
@@ -418,7 +419,7 @@ export default function PublicProfile() {
                   color: C.dark2, fontStyle: "italic", borderLeft: `3px solid ${C.brand}`,
                   paddingLeft: 16, margin: 0, whiteSpace: "pre-line",
                 }}>
-                  {profile.bio ? `"${profile.bio}"` : "No bio added yet — keeping it mysterious 👀"}
+                  {profile.bio ? `"${profile.bio}"` : <span style={{ display: "flex", alignItems: "center", gap: 6 }}><UserIcon size={14} /> No bio added yet</span>}
                 </p>
               </Card>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { MedalIcon, SearchIcon, BrainIcon, ZapIcon, HandshakeIcon, CheckIcon, XIcon, CelebrationIcon } from "../../components/common/Icons";
 
 import { getProjectMatches } from "../../api/matching";
 import Layout from "../../components/layout/Layout";
@@ -22,7 +23,7 @@ const C = {
   green:   "#5C8A52",
 };
 
-const MEDALS = ["🥇", "🥈", "🥉"];
+// Emojis replaced by SVGs
 
 const tilt = (n) => {
   const seq = [-1.4, 1.1, -0.7, 1.6, -1.1, 0.8];
@@ -96,9 +97,9 @@ export default function MatchResults() {
     return (
       <Layout>
         <EmptyState
-          icon={<span style={{ fontSize: 40 }}>🔍</span>}
+          icon={<SearchIcon size={40} color={C.muted} />}
           headline="no matches yet"
-          sub="nobody's skills line up well enough rn — check back once more people fill out their profiles 🌱"
+          sub="nobody's skills line up well enough rn — check back once more people fill out their profiles"
         />
       </Layout>
     );
@@ -148,8 +149,12 @@ export default function MatchResults() {
               fontFamily: '"Syne", sans-serif', fontWeight: 800,
               fontSize: "clamp(28px, 5.5vw, 46px)", lineHeight: 1.08,
               letterSpacing: "-0.02em", margin: 0,
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
             }}>
-              who's actually a fit 🔎
+              who's actually a fit <SearchIcon size={32} color="currentColor" />
             </h1>
 
             <p style={{
@@ -186,8 +191,18 @@ export default function MatchResults() {
                       <span className="mr-pill" style={{
                         background: index < 3 ? C.orange : C.sand,
                         color: C.dark,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
                       }}>
-                        {MEDALS[index] || `#${index + 1}`} {index >= 3 ? `rank ${index + 1}` : ""}
+                        {index < 3 ? (
+                          <>
+                            <MedalIcon rank={index + 1} size={16} />
+                            Rank {index + 1}
+                          </>
+                        ) : (
+                          `#${index + 1} Rank ${index + 1}`
+                        )}
                       </span>
                       <h2 style={{
                         fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 20,
@@ -234,15 +249,15 @@ export default function MatchResults() {
                     marginBottom: 22,
                   }}>
                     {[
-                      { label: "skill match", value: match.skill_match.toFixed(1), emoji: "🧠" },
-                      { label: "activity", value: match.activity_score, emoji: "⚡" },
-                      { label: "reliability", value: match.reliability_score, emoji: "🤝" },
+                      { label: "skill match", value: match.skill_match.toFixed(1), icon: <BrainIcon size={18} color={C.brand} /> },
+                      { label: "activity", value: match.activity_score, icon: <ZapIcon size={18} color={C.orange} /> },
+                      { label: "reliability", value: match.reliability_score, icon: <HandshakeIcon size={18} color={C.green} /> },
                     ].map((stat) => (
                       <div key={stat.label} style={{
                         background: C.bg, border: `1.5px solid ${C.border}`,
                         borderRadius: 14, padding: "12px 10px", textAlign: "center",
                       }}>
-                        <p style={{ fontSize: 18, margin: "0 0 4px" }}>{stat.emoji}</p>
+                        <p style={{ fontSize: 18, margin: "0 0 4px", display: "flex", justifyContent: "center" }}>{stat.icon}</p>
                         <p style={{
                           fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 17,
                           color: C.dark, margin: 0,
@@ -278,7 +293,9 @@ export default function MatchResults() {
                               borderRadius: 999, padding: "4px 10px",
                               fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 700,
                             }}>
-                              ✅ {skill}
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                                <CheckIcon size={12} color="currentColor" /> {skill}
+                              </span>
                             </span>
                           ))}
                         </div>
@@ -306,13 +323,17 @@ export default function MatchResults() {
                               borderRadius: 999, padding: "4px 10px",
                               fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 700,
                             }}>
-                              ❌ {skill}
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                                <XIcon size={12} color="currentColor" /> {skill}
+                              </span>
                             </span>
                           ))}
                         </div>
                       ) : (
                         <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: C.muted, margin: 0 }}>
-                          🎉 nothing missing
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: C.green }}>
+                            <CelebrationIcon size={14} color="currentColor" /> nothing missing
+                          </span>
                         </p>
                       )}
                     </div>

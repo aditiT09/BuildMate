@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { SearchIcon, TargetIcon, XIcon, MailIcon } from "../../components/common/Icons";
 import Layout from "../../components/layout/Layout";
 import LoadingState from "../../components/ui/LoadingState";
 
@@ -163,7 +164,7 @@ export default function InviteBuilders() {
                 borderRadius: 22, padding: "48px 20px", textAlign: "center",
                 fontFamily: '"DM Sans", sans-serif', color: C.muted,
               }}>
-                <span style={{ fontSize: 32 }}>🔍</span>
+                <div style={{ display: "inline-flex", justifyContent: "center", width: "100%", color: C.muted }}><SearchIcon size={32} color="currentColor" /></div>
                 <p style={{ fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 16, color: C.dark, marginTop: 12 }}>
                   no matching builders found
                 </p>
@@ -197,7 +198,7 @@ export default function InviteBuilders() {
                         fontFamily: '"DM Sans", sans-serif', fontSize: 13,
                         color: C.muted, margin: "4px 0 0",
                       }}>
-                        {user.bio || "No bio yet — keeping it mysterious 👀"}
+                        {user.bio || "No bio yet — keeping it mysterious"}
                       </p>
                     </div>
 
@@ -210,7 +211,9 @@ export default function InviteBuilders() {
                         borderRadius: 999,
                         border: `1px solid ${user.skill_match >= 75 ? "#A5D6A7" : `${C.brand}20`}`,
                       }}>
-                        🎯 {user.skill_match}% overlap
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                          <TargetIcon size={14} color="currentColor" /> {user.skill_match}% overlap
+                        </span>
                       </span>
 
                       {invitedUserIds.has(user.user_id) ? (
@@ -231,7 +234,11 @@ export default function InviteBuilders() {
                             transition: "all 0.15s ease",
                           }}
                         >
-                          {invitingId === user.user_id ? "Cancelling..." : "✕ Cancel Invite"}
+                           {invitingId === user.user_id ? "Cancelling..." : (
+                             <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                               <XIcon size={12} color="currentColor" /> Cancel Invite
+                             </span>
+                           )}
                         </button>
                       ) : (
                         <button
@@ -246,7 +253,11 @@ export default function InviteBuilders() {
                             transition: "all 0.15s ease",
                           }}
                         >
-                          {invitingId === user.user_id ? "Sending..." : "✉️ Invite"}
+                           {invitingId === user.user_id ? "Sending..." : (
+                             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                               <MailIcon size={13} color="currentColor" /> Invite
+                             </span>
+                           )}
                         </button>
                       )}
 

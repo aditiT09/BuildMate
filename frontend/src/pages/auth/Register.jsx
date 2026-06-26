@@ -2,6 +2,12 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../../api/users";
 
+const IconCheck = ({ color = "currentColor", size = 12 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
 const IconMail = ({ color }) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -85,7 +91,7 @@ const PasswordHint = ({ password }) => {
           fontWeight: met ? 600 : 400,
           transition: "color 0.2s",
         }}>
-          {met ? "✓" : "·"} {label}
+          {met ? <IconCheck color="#16a34a" size={12} /> : "·"} {label}
         </span>
       ))}
     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { MonitorIcon, WrenchIcon, PaletteIcon, BotIcon, CompassIcon, PenIcon, BoardIcon, TargetIcon, ChairIcon, InboxIcon, CheckIcon, LockIcon, XIcon, SaveIcon, MailIcon } from "../../components/common/Icons";
 
 import Layout from "../../components/layout/Layout";
 import { createOpportunity, getOpportunity, updateOpportunity } from "../../api/opportunities";
@@ -22,12 +23,12 @@ const C = {
 };
 
 const ROLE_PRESETS = [
-  { label: "Frontend Dev", emoji: "🖥️" },
-  { label: "Backend Dev", emoji: "🛠️" },
-  { label: "UI/UX Designer", emoji: "🎨" },
-  { label: "ML Engineer", emoji: "🤖" },
-  { label: "Project Manager", emoji: "🧭" },
-  { label: "Content Writer", emoji: "✍️" },
+  { label: "Frontend Dev", icon: <MonitorIcon size={14} /> },
+  { label: "Backend Dev", icon: <WrenchIcon size={14} /> },
+  { label: "UI/UX Designer", icon: <PaletteIcon size={14} /> },
+  { label: "ML Engineer", icon: <BotIcon size={14} /> },
+  { label: "Project Manager", icon: <CompassIcon size={14} /> },
+  { label: "Content Writer", icon: <PenIcon size={14} /> },
 ];
 
 const STYLES = `
@@ -326,8 +327,12 @@ export default function CreateOpportunity() {
               fontFamily: '"Syne", sans-serif', fontWeight: 800,
               fontSize: "clamp(28px, 5.5vw, 46px)", lineHeight: 1.08,
               letterSpacing: "-0.02em", margin: 0,
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
             }}>
-              {opportunityId ? "tweak the role 🪧" : "open up a spot 🪧"}
+              {opportunityId ? "tweak the role" : "open up a spot"} <BoardIcon size={32} color="currentColor" />
             </h1>
 
             <p style={{
@@ -352,7 +357,7 @@ export default function CreateOpportunity() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  what role are you after? 🎯
+                  what role are you after? <TargetIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
 
                 {/* preset chips */}
@@ -364,7 +369,7 @@ export default function CreateOpportunity() {
                       className={`co-chip ${form.role === r.label ? "on" : ""}`}
                       onClick={() => setForm({ ...form, role: r.label })}
                     >
-                      <span>{r.emoji}</span> {r.label}
+                      <span style={{ display: "inline-flex", alignItems: "center" }}>{r.icon}</span> {r.label}
                     </button>
                   ))}
                 </div>
@@ -387,7 +392,7 @@ export default function CreateOpportunity() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  how many spots? 🪑
+                  how many spots? <ChairIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <button type="button" className="co-stepper-btn" onClick={() => adjustSeats(-1)}>
@@ -413,7 +418,7 @@ export default function CreateOpportunity() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  taking applications? 📥
+                  taking applications? <InboxIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
                 <div style={{ display: "flex", gap: 12 }}>
                   <button
@@ -421,7 +426,7 @@ export default function CreateOpportunity() {
                     className={`co-status-card ${form.status === "open" ? "on" : ""}`}
                     onClick={() => setForm({ ...form, status: "open" })}
                   >
-                    <span style={{ fontSize: 20 }}>✅</span>
+                    <CheckIcon size={20} color={C.green} />
                     <div>
                       <p style={{
                         fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 14, color: C.dark, margin: 0,
@@ -441,7 +446,7 @@ export default function CreateOpportunity() {
                     className={`co-status-card ${form.status === "closed" ? "on" : ""}`}
                     onClick={() => setForm({ ...form, status: "closed" })}
                   >
-                    <span style={{ fontSize: 20 }}>🔒</span>
+                    <LockIcon size={20} color={C.brandDk} />
                     <div>
                       <p style={{
                         fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 14, color: C.dark, margin: 0,
@@ -464,7 +469,7 @@ export default function CreateOpportunity() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  required tech stack 🛠️
+                  required tech stack <WrenchIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
 
                 {/* selected skills */}
@@ -474,7 +479,7 @@ export default function CreateOpportunity() {
                       <span key={skill.id} className="co-skill-tag">
                         {skill.name}
                         <button type="button" onClick={() => handleRemoveSkill(skill.id)}>
-                          ✕
+                          <XIcon size={10} color="currentColor" />
                         </button>
                       </span>
                     ))}
@@ -552,7 +557,15 @@ export default function CreateOpportunity() {
             >
               {loading 
                 ? (opportunityId ? "saving..." : "posting...") 
-                : (opportunityId ? "💾 save changes" : "📬 post this role")}
+                : (opportunityId ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <SaveIcon size={14} color="currentColor" /> save changes
+                    </span>
+                  ) : (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <MailIcon size={14} color="currentColor" /> post this role
+                    </span>
+                  ))}
             </button>
           </form>
         </div>

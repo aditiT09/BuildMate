@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { WarningIcon } from "../../components/common/Icons";
 
 const C = {
   brand: "#E35336",
@@ -289,7 +290,10 @@ export default function ComingSoon() {
                     fontWeight: 600,
                     color: C.brandDk,
                   }}>
-                    ⚠️ {sec.warning}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <WarningIcon size={14} color={C.brand} />
+                      <span>{sec.warning}</span>
+                    </div>
                   </div>
                 )}
 

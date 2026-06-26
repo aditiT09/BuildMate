@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { HelpCircleIcon } from "../../components/common/Icons";
 
 const C = {
   brand: "#E35336",
@@ -41,9 +42,9 @@ export default function NotFound() {
           animation: "floatUp 0.5s ease both",
         }}
       >
-        <span style={{ fontSize: "72px", display: "block", marginBottom: "20px" }}>
-          🤷‍♂️
-        </span>
+        <div style={{ display: "inline-flex", justifyContent: "center", width: "100%", marginBottom: "20px", color: C.brand }}>
+          <HelpCircleIcon size={72} color="currentColor" />
+        </div>
 
         <h1
           style={{

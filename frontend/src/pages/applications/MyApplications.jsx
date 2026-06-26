@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { CelebrationIcon, DeadIcon, TimelineIcon, HatIcon, HopeIcon, MailIcon, MailOpenIcon, CheckIcon } from "../../components/common/Icons";
 
 import { getMyApplications } from "../../api/applications";
 import { getReceivedInvitations, respondToInvitation } from "../../api/invitations";
@@ -24,9 +25,9 @@ const C = {
 };
 
 const STATUS_META = {
-  accepted: { emoji: "🎉", label: "accepted", bg: "#EAF3E7", fg: C.green, border: "#CDE3C7" },
-  rejected: { emoji: "💀", label: "rejected", bg: "#FBEAE6", fg: C.brandDk, border: "#F4CFC6" },
-  pending:  { emoji: "⏳", label: "pending", bg: "#FBF1DE", fg: "#A6741C", border: "#F0DCB3" },
+  accepted: { icon: <CelebrationIcon size={14} />, label: "accepted", bg: "#EAF3E7", fg: C.green, border: "#CDE3C7" },
+  rejected: { icon: <DeadIcon size={14} />, label: "rejected", bg: "#FBEAE6", fg: C.brandDk, border: "#F4CFC6" },
+  pending:  { icon: <TimelineIcon size={14} />, label: "pending", bg: "#FBF1DE", fg: "#A6741C", border: "#F0DCB3" },
 };
 
 const tilt = (n) => {
@@ -135,15 +136,23 @@ export default function MyApplications() {
               fontFamily: '"Syne", sans-serif', fontWeight: 800,
               fontSize: "clamp(28px, 5.5vw, 46px)", lineHeight: 1.08,
               letterSpacing: "-0.02em", margin: 0,
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
             }}>
-              where you've thrown your hat in 🎩
+              where you've thrown your hat in <HatIcon size={32} color="currentColor" />
             </h1>
 
             <p style={{
               fontFamily: '"DM Sans", sans-serif', fontSize: 14,
               color: "rgba(255,248,240,0.7)", marginTop: 14, maxWidth: 480, lineHeight: 1.6,
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 6,
             }}>
-              every role you've applied for, and where it stands. fingers crossed 🤞
+              every role you've applied for, and where it stands. fingers crossed <HopeIcon size={14} color="rgba(255,248,240,0.7)" />
             </p>
           </div>
 
@@ -154,7 +163,7 @@ export default function MyApplications() {
                 fontFamily: '"Syne", sans-serif', fontWeight: 800, fontSize: 22,
                 color: C.dark, marginBottom: 16, display: "flex", alignItems: "center", gap: 8
               }}>
-                📬 Collaboration Invites ({invitations.filter(inv => inv.status === "pending").length})
+                <MailIcon size={20} color={C.dark} /> Collaboration Invites ({invitations.filter(inv => inv.status === "pending").length})
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {invitations.filter(inv => inv.status === "pending").map((invite) => (
@@ -190,9 +199,10 @@ export default function MyApplications() {
                           borderRadius: 999, padding: "8px 18px",
                           fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontSize: 13,
                           cursor: "pointer", transition: "all .15s ease",
+                          display: "inline-flex", alignItems: "center", gap: 6,
                         }}
                       >
-                        ✓ Accept
+                        <CheckIcon size={13} color="white" /> Accept
                       </button>
                       <button
                         onClick={() => handleRespond(invite.id, "rejected")}
@@ -218,9 +228,9 @@ export default function MyApplications() {
               background: C.surface, display: "flex", justifyContent: "center"
             }}>
               <EmptyState
-                icon={<span style={{ fontSize: 40 }}>📭</span>}
+                icon={<MailOpenIcon size={40} color={C.muted} />}
                 headline="nothing here yet"
-                sub="you haven't applied to any roles yet. go find a project that's looking for someone like you 👀"
+                sub="you haven't applied to any roles yet. go find a project that's looking for someone like you"
                 cta="browse projects"
                 href="/discover"
               />
@@ -268,7 +278,7 @@ export default function MyApplications() {
                         fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 800,
                         textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap",
                       }}>
-                        {meta.emoji} {meta.label}
+                        <span style={{ display: "flex", alignItems: "center" }}>{meta.icon}</span> {meta.label}
                       </span>
                     </div>
 

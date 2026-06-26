@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../api/axios";
 import { getErrorMessage } from "../../utils/validation";
+import { WarningIcon, CheckIcon } from "../../components/common/Icons";
 
 const colors = {
   primary: "#E35336",
@@ -161,7 +162,10 @@ export default function ForgotPassword() {
                     fontWeight: 500,
                   }}
                 >
-                  ⚠️ {error}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <WarningIcon size={16} color="#DC2626" />
+                    <span>{error}</span>
+                  </div>
                 </div>
               )}
 
@@ -260,7 +264,7 @@ export default function ForgotPassword() {
                   border: "2px solid #C8E6C9",
                 }}
               >
-                ✓
+                <CheckIcon size={24} color={colors.success} />
               </div>
               <h2
                 className="text-2xl font-bold mb-3"

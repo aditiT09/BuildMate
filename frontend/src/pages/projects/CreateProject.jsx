@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { GlobeIcon, SmartphoneIcon, BotIcon, PaletteIcon, ZapIcon, LockOpenIcon, RocketIcon, TagIcon, MessageIcon, TimelineIcon, FolderIcon, TargetIcon, XIcon, SaveIcon } from "../../components/common/Icons";
 
 import Layout from "../../components/layout/Layout";
 import {
@@ -24,12 +25,12 @@ const C = {
 };
 
 const TYPE_PRESETS = [
-  { label: "Web App", emoji: "🌐" },
-  { label: "Mobile App", emoji: "📱" },
-  { label: "AI / ML", emoji: "🤖" },
-  { label: "Design", emoji: "🎨" },
-  { label: "Hackathon", emoji: "⚡" },
-  { label: "Open Source", emoji: "🔓" },
+  { label: "Web App", icon: <GlobeIcon size={14} /> },
+  { label: "Mobile App", icon: <SmartphoneIcon size={14} /> },
+  { label: "AI / ML", icon: <BotIcon size={14} /> },
+  { label: "Design", icon: <PaletteIcon size={14} /> },
+  { label: "Hackathon", icon: <ZapIcon size={14} /> },
+  { label: "Open Source", icon: <LockOpenIcon size={14} /> },
 ];
 
 const STYLES = `
@@ -328,7 +329,7 @@ export default function CreateProject() {
             }}>
               {id
                 ? "update the details — your team will see the latest version instantly."
-                : "give it a name, a vibe, and a rough plan. teammates will find their way in 🚀"}
+                : "give it a name, a vibe, and a rough plan. teammates will find their way in"} <RocketIcon size={14} color="rgba(255,248,240,0.7)" style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
             </p>
           </div>
 
@@ -346,7 +347,7 @@ export default function CreateProject() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  what's it called? 🏷️
+                  what's it called? <TagIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
                 <input
                   id="title"
@@ -366,7 +367,7 @@ export default function CreateProject() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  what's the pitch? 💬
+                  what's the pitch? <MessageIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
                 <textarea
                   id="description"
@@ -386,7 +387,7 @@ export default function CreateProject() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  how long's the grind? ⏳
+                  how long's the grind? <TimelineIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
                 <input
                   id="timeline"
@@ -406,7 +407,7 @@ export default function CreateProject() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  what kind of project? 🗂️
+                  what kind of project? <FolderIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
 
                 {/* preset chips */}
@@ -418,7 +419,7 @@ export default function CreateProject() {
                       className={`cp-chip ${form.project_type === t.label ? "on" : ""}`}
                       onClick={() => setForm({ ...form, project_type: t.label })}
                     >
-                      <span>{t.emoji}</span> {t.label}
+                      <span style={{ display: "inline-flex", alignItems: "center" }}>{t.icon}</span> {t.label}
                     </button>
                   ))}
                 </div>
@@ -441,7 +442,7 @@ export default function CreateProject() {
                   display: "block", marginBottom: 8,
                   fontFamily: '"Syne", sans-serif', fontWeight: 700, fontSize: 14, color: C.dark,
                 }}>
-                  skills required 🎯
+                  skills required <TargetIcon size={14} color={C.brand} style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 4 }} />
                 </label>
 
                 {/* selected skills */}
@@ -451,7 +452,7 @@ export default function CreateProject() {
                       <span key={skill.id} className="cp-skill-tag">
                         {skill.name}
                         <button type="button" onClick={() => handleRemoveSkill(skill.id)}>
-                          ✕
+                          <XIcon size={10} color="currentColor" />
                         </button>
                       </span>
                     ))}
@@ -529,7 +530,15 @@ export default function CreateProject() {
             >
               {loading
                 ? (id ? "saving..." : "publishing...")
-                : (id ? "💾 save changes" : "🚀 publish it")}
+                : (id ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <SaveIcon size={14} color="currentColor" /> save changes
+                    </span>
+                  ) : (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <RocketIcon size={14} color="currentColor" /> publish it
+                    </span>
+                  ))}
             </button>
           </form>
         </div>
