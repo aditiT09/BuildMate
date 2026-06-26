@@ -48,12 +48,14 @@ app.include_router(
 # Base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
-   allow_origins=[
-       "http://localhost:5173",
-       "http://localhost:5174",
-       "https://build-mate-r1b414v3p-adititiwari095-8972s-projects.vercel.app",
-       "https://buildmate-frontend-git-main-adititiwari095-8972-projects.vercel.app",
-],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "https://build-mate-delta.vercel.app",
+        "https://build-mate-r1b414v3p-adititiwari095-8972s-projects.vercel.app",
+        "https://buildmate-frontend-git-main-adititiwari095-8972-projects.vercel.app",
+    ],
+    allow_origin_regex=r"https://build-mate-[a-z0-9-]+\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
