@@ -172,7 +172,7 @@ export default function IncomingDashboard() {
                   fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em",
                   color: C.brand, margin: "0 0 4px 0"
                 }}>
-                  My Projects ({projects.length})
+                  My Projects (<span style={{ fontFamily: '"Melody by W.", "Melody", sans-serif', fontSize: 13, fontWeight: 800 }}>{projects.length}</span>)
                 </p>
                 {projects.map((p) => {
                   const isSelected = selectedProject?.id === p.id;

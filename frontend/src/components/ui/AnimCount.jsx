@@ -1,25 +1,48 @@
 import { useState, useEffect, useRef } from "react";
 
-export default function AnimCount({ target, duration = 1200 }) {
-  const [val, setVal] = useState(0);
-  const prevTargetRef = useRef(0);
+export default function AnimCount({
+  target,
+  duration = 1200,
+}) {
+  const [value, setValue] = useState(0);
+
+  const previousTarget = useRef(0);
+  const frameId = useRef();
 
   useEffect(() => {
-    const startVal = prevTargetRef.current;
-    prevTargetRef.current = target;
-    
-    let start = null;
-    const diff = target - startVal;
+    const startValue = previousTarget.current;
+    previousTarget.current = target;
 
-    const step = (ts) => {
-      if (!start) start = ts;
-      const progress = Math.min((ts - start) / duration, 1);
-      setVal(Math.floor(startVal + progress * diff));
-      if (progress < 1) requestAnimationFrame(step);
+    const difference = target - startValue;
+
+    let startTime = null;
+
+    const animate = (timestamp) => {
+      if (startTime === null) {
+        startTime = timestamp;
+      }
+
+      const elapsed = timestamp - startTime;
+
+      const progress = Math.min(elapsed / duration, 1);
+
+      setValue(
+        Math.floor(startValue + difference * progress)
+      );
+
+      if (progress < 1) {
+        frameId.current = requestAnimationFrame(animate);
+      }
     };
-    
-    requestAnimationFrame(step);
+
+    frameId.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (frameId.current) {
+        cancelAnimationFrame(frameId.current);
+      }
+    };
   }, [target, duration]);
 
-  return <>{val}</>;
+  return <>{value}</>;
 }
