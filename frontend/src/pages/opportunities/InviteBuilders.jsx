@@ -129,7 +129,7 @@ export default function InviteBuilders() {
               display: "flex", alignItems: "center", gap: 6,
             }}
           >
-            ← back
+            {"\u2190"} back
           </button>
 
           {/* HERO */}

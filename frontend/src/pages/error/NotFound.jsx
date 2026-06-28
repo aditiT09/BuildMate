@@ -120,7 +120,7 @@ export default function NotFound() {
               e.target.style.color = C.dark;
             }}
           >
-            ← Go Back
+            {"\u2190"} Go Back
           </button>
         </div>
       </div>

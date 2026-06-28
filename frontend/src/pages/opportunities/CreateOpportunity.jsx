@@ -300,7 +300,7 @@ export default function CreateOpportunity() {
               display: "flex", alignItems: "center", gap: 6,
             }}
           >
-            ← back
+            {"\u2190"} back
           </button>
 
           {/* HERO */}

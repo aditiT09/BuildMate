@@ -203,7 +203,7 @@ export default function PublicProfile() {
               cursor: "pointer",
             }}
           >
-            ← Back
+            {"\u2190"} Back
           </button>
         </div>
       </Layout>
@@ -234,7 +234,7 @@ export default function PublicProfile() {
               display: "flex", alignitems: "center", gap: 6,
             }}
           >
-            ← back
+            {"\u2190"} back
           </button>
 
           {/* Centered Stacked Layout */}

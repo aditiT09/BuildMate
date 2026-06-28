@@ -45,7 +45,7 @@ const PRIVACY_SECTIONS = [
       "Help users discover projects and teammates.",
       "Match builders with relevant projects and opportunities.",
       "Show profile completeness, activity, and reliability scores.",
-      "Improve BuildMate’s features, safety, and user experience.",
+      "Improve BuildMate's features, safety, and user experience.",
       "Contact you about important updates or feedback if you choose to share your email."
     ]
   },
@@ -83,7 +83,7 @@ const PRIVACY_SECTIONS = [
     email: "adititiwari095@gmail.com"
   },
   {
-    title: "9. Children’s Privacy",
+    title: "9. Children's Privacy",
     text: "BuildMate is not intended for children under 13. If we learn that we have collected data from a child under 13, we will delete it."
   },
   {
@@ -123,7 +123,7 @@ const TERMS_SECTIONS = [
       "False or misleading information.",
       "Offensive, harmful, or abusive content.",
       "Spam or irrelevant promotions.",
-      "Content that violates someone else’s rights.",
+      "Content that violates someone else's rights.",
       "Malicious links or unsafe files."
     ]
   },
@@ -141,14 +141,14 @@ const TERMS_SECTIONS = [
   {
     title: "5. Matching, Scores, and Recommendations",
     text: "BuildMate may show activity scores, reliability scores, skill matches, rankings, or recommendations.",
-    warning: "These are only platform-generated indicators and should not be treated as absolute judgments of a person’s ability, character, or trustworthiness."
+    warning: "These are only platform-generated indicators and should not be treated as absolute judgments of a person's ability, character, or trustworthiness."
   },
   {
     title: "6. Acceptable Use",
     subtext: "You agree not to:",
     items: [
       "Attack, disrupt, or overload the platform.",
-      "Try to access another user’s account.",
+      "Try to access another user's account.",
       "Scrape data without permission.",
       "Reverse-engineer protected parts of the service.",
       "Use BuildMate for illegal, harmful, or abusive activity."
@@ -325,7 +325,7 @@ export default function ComingSoon() {
             onMouseEnter={(e) => (e.target.style.backgroundColor = C.brandDk)}
             onMouseLeave={(e) => (e.target.style.backgroundColor = C.brand)}
           >
-            ← Go Back
+            {"\u2190"} Go Back
           </button>
         </div>
       </div>
