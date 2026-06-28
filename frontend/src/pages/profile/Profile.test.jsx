@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 
@@ -157,11 +157,8 @@ describe("Profile Page", () => {
     expect(collegeInput.value).toBe("MIT");
 
     // Modify fields
-    await user.clear(nameInput);
-    await user.type(nameInput, "Alice Developer");
-
-    await user.clear(collegeInput);
-    await user.type(collegeInput, "Stanford");
+    fireEvent.change(nameInput, { target: { value: "Alice Developer" } });
+    fireEvent.change(collegeInput, { target: { value: "Stanford" } });
 
     // Click Save
     const saveBtn = screen.getByRole("button", { name: /save changes/i });

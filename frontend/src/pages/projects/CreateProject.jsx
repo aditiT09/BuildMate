@@ -11,6 +11,7 @@ import {
 import { getSkills } from "../../api/userSkills";
 import { addProjectSkill, getProjectSkills, removeProjectSkill } from "../../api/projectSkills";
 import { getErrorMessage } from "../../utils/validation";
+import { useToast } from "../../hooks/useToast";
 
 const C = {
   brand:   "#E35336",
@@ -143,6 +144,7 @@ const STYLES = `
 export default function CreateProject() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { toast } = useToast();
 
   const [form, setForm] = useState({
     title: "",
@@ -182,11 +184,11 @@ export default function CreateProject() {
       setInitialSkills(currentSkills);
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.detail || "Failed to load project.");
+      toast(error?.response?.data?.detail || "Failed to load project.", "error");
     } finally {
       setLoadingProject(false);
     }
-  }, [id]);
+  }, [id, toast]);
 
   useEffect(() => {
     const init = async () => {
@@ -227,22 +229,22 @@ export default function CreateProject() {
       };
 
       if (payload.title.length < 3) {
-        alert("Project title must be at least 3 characters.");
+        toast("Project title must be at least 3 characters.", "error");
         return;
       }
 
       if (payload.description.length < 20) {
-        alert("Project description must be at least 20 characters.");
+        toast("Project description must be at least 20 characters.", "error");
         return;
       }
 
       if (payload.timeline.length < 2) {
-        alert("Timeline must be at least 2 characters.");
+        toast("Timeline must be at least 2 characters.", "error");
         return;
       }
 
       if (payload.project_type.length < 2) {
-        alert("Please choose or enter a project type.");
+        toast("Please choose or enter a project type.", "error");
         return;
       }
 
@@ -261,7 +263,7 @@ export default function CreateProject() {
           ...toRemove.map(s => removeProjectSkill(id, s.id))
         ]);
         
-        alert("Project updated successfully!");
+        toast("Project updated successfully!", "success");
       } else {
         project = await createProject(payload);
 
@@ -273,13 +275,13 @@ export default function CreateProject() {
           validSelectedSkills.map(s => addProjectSkill(project.id, s.id))
         );
         
-        alert("Project created successfully!");
+        toast("Project created successfully!", "success");
       }
 
       navigate(`/projects/${project.id}`);
     } catch (error) {
       console.error(error);
-      alert(getErrorMessage(error?.response?.data?.detail) || `Failed to ${id ? "update" : "create"} project`);
+      toast(getErrorMessage(error?.response?.data?.detail) || `Failed to ${id ? "update" : "create"} project`, "error");
     } finally {
       setLoading(false);
     }

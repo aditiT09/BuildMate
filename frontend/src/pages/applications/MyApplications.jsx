@@ -8,6 +8,7 @@ import Layout from "../../components/layout/Layout";
 import LoadingState from "../../components/ui/LoadingState";
 import ErrorState from "../../components/ui/ErrorState";
 import EmptyState from "../../components/ui/EmptyState";
+import { useToast } from "../../hooks/useToast";
 
 
 const C = {
@@ -48,6 +49,7 @@ const STYLES = `
 
 export default function MyApplications() {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [applications, setApplications] = useState([]);
   const [invitations, setInvitations] = useState([]);
@@ -64,7 +66,6 @@ export default function MyApplications() {
       setInvitations(inviteData);
     } catch {
       setError("couldn't load your applications");
-
     } finally {
       setLoading(false);
     }
@@ -81,10 +82,10 @@ export default function MyApplications() {
     try {
       setLoading(true);
       await respondToInvitation(invitationId, status);
-      alert(`Invitation ${status}!`);
+      toast(`Invitation ${status}!`, "success");
       await fetchApplications();
     } catch (err) {
-      alert(err?.response?.data?.detail || "Failed to respond to invitation.");
+      toast(err?.response?.data?.detail || "Failed to respond to invitation.", "error");
       setLoading(false);
     }
   };

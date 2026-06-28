@@ -4,6 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
 import LoadingState from "../../components/ui/LoadingState";
 import EmptyState from "../../components/ui/EmptyState";
+import { useToast } from "../../hooks/useToast";
 
 
 
@@ -31,6 +32,7 @@ const C = {
 
 export default function OpportunityApplicants() {
   const { opportunityId } = useParams();
+  const { toast } = useToast();
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,9 +60,10 @@ export default function OpportunityApplicants() {
       await acceptApplication(id);
       await loadApplications();
     } catch (error) {
-      alert(
+      toast(
         error?.response?.data?.detail ||
-          "Failed to accept application"
+          "Failed to accept application",
+        "error"
       );
     }
   };
@@ -70,9 +73,10 @@ export default function OpportunityApplicants() {
       await rejectApplication(id);
       await loadApplications();
     } catch (error) {
-      alert(
+      toast(
         error?.response?.data?.detail ||
-          "Failed to reject application"
+          "Failed to reject application",
+        "error"
       );
     }
   };

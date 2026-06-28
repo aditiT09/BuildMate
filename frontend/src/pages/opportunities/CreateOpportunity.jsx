@@ -6,6 +6,7 @@ import Layout from "../../components/layout/Layout";
 import { createOpportunity, getOpportunity, updateOpportunity } from "../../api/opportunities";
 import { getSkills } from "../../api/userSkills";
 import LoadingState from "../../components/ui/LoadingState";
+import { useToast } from "../../hooks/useToast";
 
 
 
@@ -155,6 +156,7 @@ const STYLES = `
 export default function CreateOpportunity() {
   const { id, opportunityId } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [allSkills, setAllSkills] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -196,11 +198,11 @@ export default function CreateOpportunity() {
         })));
       }
     } catch {
-      alert("Failed to load role details.");
+      toast("Failed to load role details.", "error");
     } finally {
       setLoadingOpportunity(false);
     }
-  }, [opportunityId]);
+  }, [opportunityId, toast]);
 
   useEffect(() => {
     const init = async () => {
@@ -258,17 +260,18 @@ export default function CreateOpportunity() {
 
       if (opportunityId) {
         await updateOpportunity(opportunityId, payload);
-        alert("Role updated successfully!");
+        toast("Role updated successfully!", "success");
         navigate(`/projects/${form.project_id}`);
       } else {
         await createOpportunity(payload);
-        alert("Role created successfully!");
+        toast("Role created successfully!", "success");
         navigate(`/projects/${id}`);
       }
     } catch (error) {
-      alert(
+      toast(
         error?.response?.data?.detail ||
-        `Failed to ${opportunityId ? "update" : "create"} opportunity`
+        `Failed to ${opportunityId ? "update" : "create"} opportunity`,
+        "error"
       );
     } finally {
       setLoading(false);

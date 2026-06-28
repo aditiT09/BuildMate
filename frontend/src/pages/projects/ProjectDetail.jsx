@@ -11,6 +11,7 @@ import Layout from "../../components/layout/Layout";
 import LoadingState from "../../components/ui/LoadingState";
 import EmptyState from "../../components/ui/EmptyState";
 import { getErrorMessage, validateExternalLink } from "../../utils/validation";
+import { useToast } from "../../hooks/useToast";
 
 import {
   getProjectLinks,
@@ -99,6 +100,7 @@ export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -121,11 +123,12 @@ export default function ProjectDetail() {
 
   const loadProject = useCallback(async () => {
     try {
+      setLoading(true);
       const data = await getProjectById(id);
       setProject(data);
 
-      const opps = await getProjectOpportunities(id);
-      setOpportunities(opps);
+      const roles = await getProjectOpportunities(id);
+      setOpportunities(roles);
 
       const projectLinks = await getProjectLinks(id);
       setLinks(projectLinks);
@@ -168,20 +171,20 @@ export default function ProjectDetail() {
       const resourceType = resourceForm.resource_type.trim();
 
       if (!title) {
-        alert("Please add a title for this resource.");
+        toast("Please add a title for this resource.", "error");
         setAddingResource(false);
         return;
       }
 
       if (!resourceType) {
-        alert("Please choose a resource type.");
+        toast("Please choose a resource type.", "error");
         setAddingResource(false);
         return;
       }
 
       const normalizedUrl = validateExternalLink(resourceForm.url);
       if (!normalizedUrl) {
-        alert("Please enter a valid URL (e.g., https://github.com/user or github.com)");
+        toast("Please enter a valid URL (e.g., https://github.com/user or github.com)", "error");
         setAddingResource(false);
         return;
       }
@@ -196,7 +199,7 @@ export default function ProjectDetail() {
       setShowResourceForm(false);
     } catch (error) {
       console.error(error);
-      alert(getErrorMessage(error?.response?.data?.detail) || "Failed to add resource");
+      toast(getErrorMessage(error?.response?.data?.detail) || "Failed to add resource", "error");
     } finally {
       setAddingResource(false);
     }
@@ -209,7 +212,7 @@ export default function ProjectDetail() {
       setLinks((prev) => prev.filter((link) => link.id !== linkId));
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.detail || "Failed to delete resource");
+      toast(error?.response?.data?.detail || "Failed to delete resource", "error");
     }
   };
 
@@ -217,11 +220,11 @@ export default function ProjectDetail() {
     if (!window.confirm("Delete this project?")) return;
     try {
       await deleteProject(id);
-      alert("Project deleted.");
+      toast("Project deleted.", "success");
       navigate("/my-projects");
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.detail || "Failed to delete project.");
+      toast(error?.response?.data?.detail || "Failed to delete project.", "error");
     }
   };
 
@@ -230,10 +233,10 @@ export default function ProjectDetail() {
       setApplyingId(opportunityId);
       await createApplication(opportunityId);
       setAppliedSet((prev) => new Set([...prev, opportunityId]));
-      alert("Application submitted!");
+      toast("Application submitted!", "success");
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.detail || "Failed to apply");
+      toast(error?.response?.data?.detail || "Failed to apply", "error");
     } finally {
       setApplyingId(null);
     }

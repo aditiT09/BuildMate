@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { SearchIcon, TargetIcon, XIcon, MailIcon } from "../../components/common/Icons";
 import Layout from "../../components/layout/Layout";
 import LoadingState from "../../components/ui/LoadingState";
+import { useToast } from "../../hooks/useToast";
 
 
 import { getOpportunity } from "../../api/opportunities";
@@ -35,6 +36,7 @@ const STYLES = `
 export default function InviteBuilders() {
   const { opportunityId } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [opportunity, setOpportunity] = useState(null);
   const [matches, setMatches] = useState([]);
@@ -59,11 +61,11 @@ export default function InviteBuilders() {
         .map((inv) => inv.user_id);
       setInvitedUserIds(new Set(activeInvites));
     } catch {
-      alert("Failed to load match recommendations.");
+      toast("Failed to load match recommendations.", "error");
     } finally {
       setLoading(false);
     }
-  }, [opportunityId]);
+  }, [opportunityId, toast]);
 
   useEffect(() => {
     const init = async () => {
@@ -80,9 +82,9 @@ export default function InviteBuilders() {
         opportunity_id: Number(opportunityId),
       });
       setInvitedUserIds((prev) => new Set([...prev, userId]));
-      alert("Invitation sent successfully!");
+      toast("Invitation sent successfully!", "success");
     } catch (error) {
-      alert(error?.response?.data?.detail || "Failed to send invitation.");
+      toast(error?.response?.data?.detail || "Failed to send invitation.", "error");
     } finally {
       setInvitingId(null);
     }
@@ -97,9 +99,9 @@ export default function InviteBuilders() {
         next.delete(userId);
         return next;
       });
-      alert("Invitation cancelled.");
+      toast("Invitation cancelled.", "success");
     } catch (error) {
-      alert(error?.response?.data?.detail || "Failed to cancel invitation.");
+      toast(error?.response?.data?.detail || "Failed to cancel invitation.", "error");
     } finally {
       setInvitingId(null);
     }

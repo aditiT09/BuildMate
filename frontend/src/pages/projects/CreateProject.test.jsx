@@ -110,19 +110,18 @@ describe("CreateProject - Creation Mode", () => {
   });
 
   it("handles form inputs correctly", async () => {
-    const user = userEvent.setup();
     renderPage();
 
     const titleInput = screen.getByLabelText(/what's it called\?/i);
-    await user.type(titleInput, "My Awesome Project");
+    fireEvent.change(titleInput, { target: { value: "My Awesome Project" } });
     expect(titleInput.value).toBe("My Awesome Project");
 
     const descInput = screen.getByLabelText(/what's the pitch\?/i);
-    await user.type(descInput, "This is a long description of at least twenty characters.");
+    fireEvent.change(descInput, { target: { value: "This is a long description of at least twenty characters." } });
     expect(descInput.value).toBe("This is a long description of at least twenty characters.");
 
     const timelineInput = screen.getByLabelText(/how long's the grind\?/i);
-    await user.type(timelineInput, "3 months");
+    fireEvent.change(timelineInput, { target: { value: "3 months" } });
     expect(timelineInput.value).toBe("3 months");
   });
 
